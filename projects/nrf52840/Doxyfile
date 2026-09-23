@@ -1,0 +1,33 @@
+PROJECT_NAME           = "nRF52840 SuperMini Firmware"
+PROJECT_BRIEF          = "Standalone PlatformIO firmware for nRF52840 SuperMini / nice!nano boards."
+OUTPUT_DIRECTORY       = build
+INPUT                  = README.md include src docs
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp *.c *.cpp *.md
+EXCLUDE                = vendor .pio build
+EXCLUDE_PATTERNS       = */vendor/* */.pio/* */build/*
+USE_MDFILE_AS_MAINPAGE = README.md
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = YES
+
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+HIDE_UNDOC_CLASSES     = NO
+HIDE_UNDOC_MEMBERS     = NO
+WARN_IF_UNDOCUMENTED   = NO
+WARN_AS_ERROR          = NO
+QUIET                  = YES
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = APP_NAME=\"nrf52840-supermini\" APP_VERSION=\"0.1.0\"

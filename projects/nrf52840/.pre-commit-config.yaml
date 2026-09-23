@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: clang-format-check
+        name: clang-format check
+        entry: scripts/format.sh --check
+        language: system
+        pass_filenames: false
+        stages: [pre-commit, pre-push, manual]
+
+      - id: platformio-quality
+        name: PlatformIO build and static analysis
+        entry: scripts/quality.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push, manual]
+
+      - id: doxygen-docs
+        name: Doxygen API documentation
+        entry: doxygen Doxyfile
+        language: system
+        pass_filenames: false
+        stages: [manual]
