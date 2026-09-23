@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "module_id": "zigbee-c6",
+  "name": "ESP32-C6 Zigbee extension firmware",
+  "role": "LiteGraph controller Zigbee and deterministic low-level I/O extension",
+  "target": "esp32c6",
+  "framework": {
+    "name": "ESP-IDF",
+    "verified_version": "5.5.4"
+  },
+  "dependencies": {
+    "espressif/esp-zigbee-lib": "2.0.4",
+    "jef-sure/scd4x": "0.0.3"
+  },
+  "project": {
+    "build_root": ".",
+    "entrypoint": "main/app_main.c"
+  },
+  "gatewaylink": {
+    "protocol_version": 2,
+    "contract": "docs/GATEWAY_LINK_V2.md",
+    "supported_backends": [
+      "uart1",
+      "i2c0-mailbox"
+    ],
+    "default_backend": "uart1",
+    "verified_fallback_backend": "uart1",
+    "i2c": {
+      "controller": "I2C0",
+      "role": "master",
+      "sda_gpio": 1,
+      "scl_gpio": 0,
+      "frequency_hz": 400000,
+      "planned_s3_slave_address": "0x42",
+      "shared_scd4x_address": "0x62",
+      "transaction_timeout_ms": 20,
+      "absent_peer_backoff_ms": 1000
+    }
+  },
+  "verification": {
+    "canonical_host_tests": "./scripts/run_host_tests.sh",
+    "migration_readiness": "./scripts/verify_migration_ready.sh",
+    "uart_build": "idf.py set-target esp32c6 && idf.py build",
+    "i2c_build": "CONFIG_GATEWAY_LINK_BACKEND_I2C=y then idf.py build",
+    "emulator_path": "tests/zigbee_device_emulator",
+    "emulator_build": "idf.py -C tests/zigbee_device_emulator set-target esp32c6 && idf.py -C tests/zigbee_device_emulator build",
+    "hardware_tested_source": "5ce963d6ee3b03b9b788f9d02bd9acb4910acead",
+    "hardware_identities": {
+      "gateway_c6_usb_serial": "40:4C:CA:5D:0A:00",
+      "emulator_c6_usb_serial": "40:4C:CA:5D:01:D8"
+    },
+    "migration_ready_hardware_gate": "5ce963d6ee3b03b9b788f9d02bd9acb4910acead",
+    "migration_ready_hardware_gate_result": "PASS",
+    "migration_ready_hardware_gate_date": "2026-09-04",
+    "final_hardware_gate": "20260904-c6-migration-ready-hardware-v55",
+    "final_hardware_gate_result": "PASS",
+    "final_reaudit": "docs/FINAL_REAUDIT_2026-09-04.md"
+  },
+  "migration": {
+    "suggested_destination": "firmware/extensions/zigbee-c6/",
+    "guide": "docs/LITEGRAPH_MIGRATION.md",
+    "export_source_checkpoint": "5ce963d6ee3b03b9b788f9d02bd9acb4910acead",
+    "export_source": "5ce963d6ee3b03b9b788f9d02bd9acb4910acead"
+  }
+}

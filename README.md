@@ -17,6 +17,8 @@ This repository consolidates several previously standalone repositories while re
 - `projects/esp32_s2_wifi` — ESP32-S2 USB NCM ↔ Wi-Fi bridge; working main snapshot plus preserved OLED variant
 - `projects/pcb` — SKiDL/KiCad PCB workspace and board experiments (unfinished; hardware validation pending)
 
+-  — retired ESP32-C6 Zigbee/low-level I/O extension prototype; maintained code absorbed into esp32s3_LiteGraph
+
 ## History and licenses
 
 Most imported projects retain their original commits as merge ancestry. Some former standalone repositories have since been removed after verification. Projects with contaminated secret history may be imported as sanitized snapshots instead. Existing per-project license files and notices remain authoritative for their respective project directories; there is intentionally no repository-wide license override.
