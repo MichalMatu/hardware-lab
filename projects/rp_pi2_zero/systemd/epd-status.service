@@ -1,0 +1,8 @@
+[Unit]
+Description=Show Raspberry Pi connection info on WeAct 2.9 e-paper
+After=network.target ssh.service
+
+[Service]
+Type=oneshot
+User=michal
+ExecStart=/home/michal/bin/epd_290_bw_status --auto status
