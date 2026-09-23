@@ -14,6 +14,7 @@ This repository consolidates several previously standalone repositories while re
 - `projects/milkV256mb` — Milk-V Duo 256 setup and experiments
 - `projects/LILYGO_T_HIGH_GROW` — LILYGO T-HIGrow PlantStatus firmware and web UI (sanitized snapshot)
 - `projects/esp32-cam-telegram` — ESP32-CAM/OV2640 Telegram motion camera (unfinished; build validated)
+- `projects/esp32_s2_wifi` — ESP32-S2 USB NCM ↔ Wi-Fi bridge; working main snapshot plus preserved OLED variant
 - `projects/pcb` — SKiDL/KiCad PCB workspace and board experiments (unfinished; hardware validation pending)
 
 ## History and licenses
