@@ -13,9 +13,9 @@ This repository consolidates several previously standalone repositories while re
 - `projects/LilyGo_4.7` — LilyGo T5 4.7-inch e-paper firmware
 - `projects/milkV256mb` — Milk-V Duo 256 setup and experiments
 - `projects/LILYGO_T_HIGH_GROW` — LILYGO T-HIGrow PlantStatus firmware and web UI (sanitized snapshot)
+- `projects/esp32-cam-telegram` — ESP32-CAM/OV2640 Telegram motion camera (unfinished; build validated)
+- `projects/pcb` — SKiDL/KiCad PCB workspace and board experiments (unfinished; hardware validation pending)
 
 ## History and licenses
 
 Most imported projects retain their original commits as merge ancestry. Some former standalone repositories have since been removed after verification. Projects with contaminated secret history may be imported as sanitized snapshots instead. Existing per-project license files and notices remain authoritative for their respective project directories; there is intentionally no repository-wide license override.
-- `projects/esp32-cam-telegram` — ESP32-CAM/OV2640 Telegram motion camera (unfinished; build validated)
-- `projects/pcb` — SKiDL/KiCad PCB workspace and board experiments (unfinished; hardware validation pending)
