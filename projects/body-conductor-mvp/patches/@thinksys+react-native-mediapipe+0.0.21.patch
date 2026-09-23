@@ -1,0 +1,691 @@
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/GlobalState.java b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/GlobalState.java
+index ac0995b..34893c9 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/GlobalState.java
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/GlobalState.java
+@@ -1,16 +1,16 @@
+ package com.tsmediapipe;
+ 
+ public class GlobalState {
+-  public static boolean isFaceEnabled = false;
+-  public static boolean isTorsoEnabled = false;
+-  public static boolean isLeftArmEnabled = false;
+-  public static boolean isRightArmEnabled = false;
+-  public static boolean isLeftWristEnabled = false;
+-  public static boolean isRightWristEnabled = false;
+-  public static boolean isLeftLegEnabled = false;
+-  public static boolean isRightLegEnabled = false;
+-  public static boolean isLeftAnkleEnabled = false;
+-  public static boolean isRightAnkleEnabled = false;
++  public static boolean isFaceEnabled = true;
++  public static boolean isTorsoEnabled = true;
++  public static boolean isLeftArmEnabled = true;
++  public static boolean isRightArmEnabled = true;
++  public static boolean isLeftWristEnabled = true;
++  public static boolean isRightWristEnabled = true;
++  public static boolean isLeftLegEnabled = true;
++  public static boolean isRightLegEnabled = true;
++  public static boolean isLeftAnkleEnabled = true;
++  public static boolean isRightAnkleEnabled = true;
+ 
+   public static String orientation = "portrait";
+ }
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/OverlayView.kt b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/OverlayView.kt
+index 2ecf9a4..d7daac8 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/OverlayView.kt
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/OverlayView.kt
+@@ -21,9 +21,15 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+   private var linePaint = Paint()
+ 
+   private var scaleFactor: Float = 1f
++  private var offsetX: Float = 0f
++  private var offsetY: Float = 0f
+   private var imageWidth: Int = 1
+   private var imageHeight: Int = 1
+ 
++  private fun landmarkX(x: Float): Float = x * imageWidth * scaleFactor + offsetX
++
++  private fun landmarkY(y: Float): Float = y * imageHeight * scaleFactor + offsetY
++
+   init {
+     initPaints()
+   }
+@@ -79,20 +85,20 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+         for ((count, it) in PoseLandmarker.POSE_LANDMARKS.withIndex()) {
+           if (face && it.start() in 0..10) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+ 
+           if (torso && ((it.start() == 11 && it.end() == 12) || (it.start() == 23 && it.end() == 24) || (it.start() == 11 && it.end() == 23) || (it.start() == 12 && it.end() == 24))) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+@@ -100,10 +106,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+           if (leftArm && ((it.start() == 11 && it.end() == 13) || (it.start() == 13 && it.end() == 15))) {
+             print("left arm true cond")
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+@@ -111,10 +117,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+           if (rightArm && ((it.start() == 12 && it.end() == 14) || (it.start() == 14 && it.end() == 16))) {
+             print("right arm true cond")
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+@@ -122,10 +128,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+           if (leftLeg && ((it.start() == 23 && it.end() == 25) || (it.start() == 25 && it.end() == 27))) {
+             print("left leg true cond")
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+@@ -133,49 +139,49 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+           if (rightLeg && ((it.start() == 24 && it.end() == 26) || (it.start() == 26 && it.end() == 28))) {
+             print("right leg true cond")
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+ 
+           if (leftWrist && ((it.start() == 15 && it.end() == 21) || (it.start() == 15 && it.end() == 17) || (it.start() == 15 && it.end() == 19) || (it.start() == 17 && it.end() == 19))) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+ 
+           if (rightWrist && ((it.start() == 16 && it.end() == 22) || (it.start() == 16 && it.end() == 20) || (it.start() == 16 && it.end() == 18) || (it.start() == 18 && it.end() == 20))) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+ 
+           if (leftAnkle && ((it.start() == 27 && it.end() == 29) || (it.start() == 27 && it.end() == 31) || (it.start() == 29 && it.end() == 31))) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+           if (rightAnkle && ((it.start() == 28 && it.end() == 30) || (it.start() == 28 && it.end() == 32) || (it.start() == 30 && it.end() == 32))) {
+             canvas.drawLine(
+-              poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+-              poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
++              landmarkX(poseLandmarkerResult.landmarks()[0][it!!.start()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.start()].y()),
++              landmarkX(poseLandmarkerResult.landmarks()[0][it.end()].x()),
++              landmarkY(poseLandmarkerResult.landmarks()[0][it.end()].y()),
+               linePaint
+             )
+           }
+@@ -202,12 +208,15 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
+       }
+ 
+       RunningMode.LIVE_STREAM -> {
+-        // PreviewView is in FILL_START mode. So we need to scale up the
+-        // landmarks to match with the size that the captured images will be
+-        // displayed.
+         max(width * 1f / imageWidth, height * 1f / imageHeight)
+       }
+     }
++
++    val scaledWidth = imageWidth * scaleFactor
++    val scaledHeight = imageHeight * scaleFactor
++    offsetX = (width - scaledWidth) / 2f
++    offsetY = (height - scaledHeight) / 2f
++
+     invalidate()
+   }
+ 
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/PoseLandmarkerHelper.kt b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/PoseLandmarkerHelper.kt
+index 1dc36b8..9d9478f 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/PoseLandmarkerHelper.kt
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/PoseLandmarkerHelper.kt
+@@ -141,7 +141,6 @@ class PoseLandmarkerHelper(
+     }
+     val frameTime = SystemClock.uptimeMillis()
+ 
+-    // Copy out RGB bits from the frame to a bitmap buffer
+     val bitmapBuffer =
+       Bitmap.createBitmap(
+         imageProxy.width,
+@@ -150,13 +149,9 @@ class PoseLandmarkerHelper(
+       )
+ 
+     imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
+-    imageProxy.close()
+ 
+     val matrix = Matrix().apply {
+-      // Rotate the frame received from the camera to be in the same direction as it'll be shown
+       postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
+-
+-      // flip image if user use front camera
+       if (isFrontCamera) {
+         postScale(
+           -1f,
+@@ -171,7 +166,6 @@ class PoseLandmarkerHelper(
+       matrix, true
+     )
+ 
+-    // Convert the input Bitmap object to an MPImage object to run inference
+     val mpImage = BitmapImageBuilder(rotatedBitmap).build()
+ 
+     detectAsync(mpImage, frameTime)
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/TsMediapipeViewManager.java b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/TsMediapipeViewManager.java
+index 1bac227..e3832ca 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/TsMediapipeViewManager.java
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/TsMediapipeViewManager.java
+@@ -29,6 +29,8 @@ public class TsMediapipeViewManager extends ViewGroupManager<FrameLayout> {
+   private int propWidth;
+   private int propHeight;
+   private Choreographer.FrameCallback frameCallback;
++  private long lastLayoutNanos = 0L;
++  private static final long LAYOUT_INTERVAL_NS = 66_666_667L;
+   private CameraFragment currentFragment;
+ 
+   ReactApplicationContext reactContext;
+@@ -142,22 +144,13 @@ public class TsMediapipeViewManager extends ViewGroupManager<FrameLayout> {
+     setupLayout(view);
+ 
+     if (currentFragment == null && propWidth > 0 && propHeight > 0) {
+-      view.post(new Runnable() {
+-        @Override
+-        public void run() {
+-          if (view.getParent() != null) {
+-            createFragmentAuto(view);
+-          } else {
+-            Log.w("TsMediapipe", "View not yet attached to parent, retrying...");
+-            view.postDelayed(new Runnable() {
+-              @Override
+-              public void run() {
+-                createFragmentAuto(view);
+-              }
+-            }, 100);
+-          }
++      final FragmentActivity activity = (FragmentActivity) reactContext.getCurrentActivity();
++      if (activity != null && view.getId() != View.NO_ID) {
++        Fragment existing = activity.getSupportFragmentManager().findFragmentById(view.getId());
++        if (existing instanceof CameraFragment) {
++          currentFragment = (CameraFragment) existing;
+         }
+-      });
++      }
+     }
+   }
+ 
+@@ -349,8 +342,11 @@ public class TsMediapipeViewManager extends ViewGroupManager<FrameLayout> {
+       @Override
+       public void doFrame(long frameTimeNanos) {
+         try {
+-          manuallyLayoutChildren(view);
+-          view.getViewTreeObserver().dispatchOnGlobalLayout();
++          if (frameTimeNanos - lastLayoutNanos >= LAYOUT_INTERVAL_NS) {
++            manuallyLayoutChildren(view);
++            view.getViewTreeObserver().dispatchOnGlobalLayout();
++            lastLayoutNanos = frameTimeNanos;
++          }
+           Choreographer.getInstance().postFrameCallback(this);
+         } catch (Exception e) {
+           Log.e("TsMediapipe", "Error in frame callback: " + e.getMessage());
+@@ -366,31 +362,26 @@ public class TsMediapipeViewManager extends ViewGroupManager<FrameLayout> {
+    */
+   public void manuallyLayoutChildren(View view) {
+     try {
+-      // Use default dimensions if props are not set
+-      int width = propWidth > 0 ? propWidth : ViewGroup.LayoutParams.MATCH_PARENT;
+-      int height = propHeight > 0 ? propHeight : ViewGroup.LayoutParams.MATCH_PARENT;
+-
+       View parent = (View) view.getParent();
+       if (parent == null) {
+-        return; // Ensure the parent is not null
++        return;
++      }
++
++      int parentWidth = parent.getWidth();
++      int parentHeight = parent.getHeight();
++
++      if (parentWidth <= 0 || parentHeight <= 0) {
++        return;
+       }
+ 
+-      // Only measure if the view needs it
+       if (view.isLayoutRequested()) {
+         view.measure(
+-                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+-                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY)
++                View.MeasureSpec.makeMeasureSpec(parentWidth, View.MeasureSpec.EXACTLY),
++                View.MeasureSpec.makeMeasureSpec(parentHeight, View.MeasureSpec.EXACTLY)
+         );
+       }
+ 
+-      // Get parent's dimensions
+-      int parentWidth = parent.getWidth();
+-      int parentHeight = parent.getHeight();
+-
+-      // Only layout if parent has valid dimensions
+-      if (parentWidth > 0 && parentHeight > 0) {
+-        view.layout(0, 0, parentWidth, parentHeight);
+-      }
++      view.layout(0, 0, parentWidth, parentHeight);
+ 
+     } catch (Exception e) {
+       Log.e("TsMediapipe", "Error in manuallyLayoutChildren: " + e.getMessage());
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/fragment/CameraFragment.kt b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/fragment/CameraFragment.kt
+index 8b61fa3..ff71a5f 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/fragment/CameraFragment.kt
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/fragment/CameraFragment.kt
+@@ -6,7 +6,9 @@ import android.content.Context
+ import android.content.pm.PackageManager
+ import android.content.res.Configuration
+ import android.os.Bundle
++import android.os.SystemClock
+ import android.util.Log
++import android.util.Size
+ import android.view.LayoutInflater
+ import android.view.View
+ import android.view.ViewGroup
+@@ -18,6 +20,8 @@ import androidx.camera.core.CameraSelector
+ import androidx.camera.core.ImageAnalysis
+ import androidx.camera.core.ImageProxy
+ import androidx.camera.core.Preview
++import androidx.camera.core.resolutionselector.ResolutionSelector
++import androidx.camera.core.resolutionselector.ResolutionStrategy
+ import androidx.camera.lifecycle.ProcessCameraProvider
+ import androidx.core.content.ContextCompat
+ import androidx.fragment.app.Fragment
+@@ -26,6 +30,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
+ import com.google.gson.Gson
+ import com.google.mediapipe.tasks.vision.core.RunningMode
+ import com.tsmediapipe.CameraFragmentManager
++import com.tsmediapipe.GlobalState
+ import com.tsmediapipe.MainViewModel
+ import com.tsmediapipe.PoseLandmarkerHelper
+ import com.tsmediapipe.ReactContextProvider
+@@ -36,10 +41,6 @@ import java.util.concurrent.TimeUnit
+ 
+ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+ 
+-  companion object {
+-    private const val TAG = "Pose Landmarker"
+-  }
+-
+   private var _fragmentCameraBinding: FragmentMyCameraBinding? = null
+   private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
+ 
+@@ -53,10 +54,17 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+   private var camera: Camera? = null
+   private var cameraProvider: ProcessCameraProvider? = null
+   private var cameraFacing = CameraSelector.LENS_FACING_FRONT
++  private var lastInferenceMs = 0L
+ 
+   /** Blocking ML operations are performed using this executor */
+   private lateinit var backgroundExecutor: ExecutorService
+ 
++  companion object {
++    private const val TAG = "Pose Landmarker"
++    private const val INFERENCE_INTERVAL_MS = 125L
++    private val ANALYSIS_TARGET_SIZE = Size(640, 480)
++  }
++
+   fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
+     ContextCompat.checkSelfPermission(
+       context,
+@@ -86,16 +94,23 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+     }
+ 
+   fun completeCameraSetUpWithPose() {
++    if (!isAdded || _fragmentCameraBinding == null || !::backgroundExecutor.isInitialized) {
++      Log.w(TAG, "Skipping camera setup — fragment not ready")
++      return
++    }
++
+     setUpCamera()
+ 
+     // Create the PoseLandmarkerHelper that will handle the inference
+     backgroundExecutor.execute {
++      val appContext = context?.applicationContext ?: return@execute
+       poseLandmarkerHelper = PoseLandmarkerHelper(
+-        context = requireContext(),
++        context = appContext,
+         runningMode = RunningMode.LIVE_STREAM,
+         minPoseDetectionConfidence = viewModel.currentMinPoseDetectionConfidence,
+         minPoseTrackingConfidence = viewModel.currentMinPoseTrackingConfidence,
+         minPosePresenceConfidence = viewModel.currentMinPosePresenceConfidence,
++        currentModel = viewModel.currentModel,
+         currentDelegate = viewModel.currentDelegate,
+         poseLandmarkerHelperListener = this
+       )
+@@ -107,6 +122,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+ 
+     // Start the PoseLandmarkerHelper again when users come back
+     // to the foreground.
++    if (!::backgroundExecutor.isInitialized || backgroundExecutor.isShutdown) return
+     backgroundExecutor.execute {
+       if (this::poseLandmarkerHelper.isInitialized) {
+         if (poseLandmarkerHelper.isClose()) {
+@@ -123,20 +139,23 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+       viewModel.setMinPoseTrackingConfidence(poseLandmarkerHelper.minPoseTrackingConfidence)
+       viewModel.setMinPosePresenceConfidence(poseLandmarkerHelper.minPosePresenceConfidence)
+       viewModel.setDelegate(poseLandmarkerHelper.currentDelegate)
+-
+-      // Close the PoseLandmarkerHelper and release resources
+-      backgroundExecutor.execute { poseLandmarkerHelper.clearPoseLandmarker() }
+     }
+   }
+ 
+   override fun onDestroyView() {
++    cameraProvider?.unbindAll()
++    if (this::poseLandmarkerHelper.isInitialized && ::backgroundExecutor.isInitialized && !backgroundExecutor.isShutdown) {
++      backgroundExecutor.execute { poseLandmarkerHelper.clearPoseLandmarker() }
++    }
+     _fragmentCameraBinding = null
+     super.onDestroyView()
+ 
+-    backgroundExecutor.shutdown()
+-    backgroundExecutor.awaitTermination(
+-      Long.MAX_VALUE, TimeUnit.NANOSECONDS
+-    )
++    if (::backgroundExecutor.isInitialized) {
++      backgroundExecutor.shutdown()
++      backgroundExecutor.awaitTermination(
++        Long.MAX_VALUE, TimeUnit.NANOSECONDS
++      )
++    }
+   }
+ 
+   override fun onCreate(savedInstanceState: Bundle?) {
+@@ -177,31 +196,66 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+   }
+ 
+   private fun setUpCamera() {
+-    val cameraProviderFuture =
+-      ProcessCameraProvider.getInstance(requireContext())
++    val ctx = context ?: return
++    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+     cameraProviderFuture.addListener(
+       {
+-        cameraProvider = cameraProviderFuture.get()
+-        bindCameraUseCases()
+-      }, ContextCompat.getMainExecutor(requireContext())
++        bindCameraWhenReady(cameraProviderFuture.get(), 0)
++      }, ContextCompat.getMainExecutor(ctx)
+     )
+   }
+ 
++  private fun bindCameraWhenReady(provider: ProcessCameraProvider, attempt: Int) {
++    if (!isAdded) {
++      Log.w(TAG, "Skipping camera provider bind — fragment detached")
++      return
++    }
++
++    if (_fragmentCameraBinding == null) {
++      if (attempt < 20) {
++        view?.postDelayed({ bindCameraWhenReady(provider, attempt + 1) }, 50)
++      } else {
++        Log.e(TAG, "Camera view never became ready")
++      }
++      return
++    }
++
++    cameraProvider = provider
++    bindCameraUseCases()
++  }
++
+   @SuppressLint("UnsafeOptInUsageError")
+   private fun bindCameraUseCases() {
++    val binding = _fragmentCameraBinding
++    if (binding == null || !isAdded) {
++      Log.w(TAG, "Skipping camera use cases — view not available")
++      return
++    }
++
+     val cameraProvider = cameraProvider
+       ?: throw IllegalStateException("Camera initialization failed.")
+ 
+     val cameraSelector =
+       CameraSelector.Builder().requireLensFacing(cameraFacing).build()
+ 
+-    preview = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+-      .setTargetRotation(_fragmentCameraBinding?.viewFinder?.display?.rotation ?: 0)
++    val sharedResolutionSelector = ResolutionSelector.Builder()
++      .setResolutionStrategy(
++        ResolutionStrategy(
++          ANALYSIS_TARGET_SIZE,
++          ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
++        )
++      )
++      .build()
++
++    preview = Preview.Builder()
++      .setTargetAspectRatio(AspectRatio.RATIO_4_3)
++      .setTargetRotation(binding.viewFinder.display?.rotation ?: 0)
+       .build()
+ 
+     imageAnalyzer =
+-      ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+-        .setTargetRotation(_fragmentCameraBinding?.viewFinder?.display?.rotation ?: 0)
++      ImageAnalysis.Builder()
++        .setResolutionSelector(sharedResolutionSelector)
++        .setTargetRotation(binding.viewFinder.display?.rotation ?: 0)
+         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+         .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+         .build()
+@@ -218,18 +272,40 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+         this, cameraSelector, preview, imageAnalyzer
+       )
+ 
+-      preview?.setSurfaceProvider(fragmentCameraBinding.viewFinder.surfaceProvider)
++      preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+     } catch (exc: Exception) {
+       Log.e(TAG, "Use case binding failed", exc)
+     }
+   }
+ 
++  private fun isOverlayEnabled(): Boolean {
++    return GlobalState.isFaceEnabled ||
++      GlobalState.isTorsoEnabled ||
++      GlobalState.isLeftArmEnabled ||
++      GlobalState.isRightArmEnabled ||
++      GlobalState.isLeftWristEnabled ||
++      GlobalState.isRightWristEnabled ||
++      GlobalState.isLeftLegEnabled ||
++      GlobalState.isRightLegEnabled ||
++      GlobalState.isLeftAnkleEnabled ||
++      GlobalState.isRightAnkleEnabled
++  }
++
+   private fun detectPose(imageProxy: ImageProxy) {
++    val now = SystemClock.uptimeMillis()
++    if (now - lastInferenceMs < INFERENCE_INTERVAL_MS) {
++      imageProxy.close()
++      return
++    }
++    lastInferenceMs = now
++
+     if (this::poseLandmarkerHelper.isInitialized) {
+       poseLandmarkerHelper.detectLiveStream(
+         imageProxy = imageProxy,
+         isFrontCamera = cameraFacing == CameraSelector.LENS_FACING_FRONT
+       )
++    } else {
++      imageProxy.close()
+     }
+   }
+ 
+@@ -263,7 +339,6 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+         val data = resultBundle.results.first()
+         val landmarksArray: MutableList<Map<String, Any>> = mutableListOf()
+         val worldLandmarksArray: MutableList<Map<String, Any>> = mutableListOf()
+-
+         val landmarks = data.landmarks()
+         val worldLandmarks = data.worldLandmarks()
+ 
+@@ -283,7 +358,6 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+         worldLandmarks?.let {
+           if (it.isNotEmpty() && it[0].size == 33) {
+             for (worldLandmark in it[0]) {
+-              // Assuming similar structure for worldLandmark as for landmark
+               val worldLandmarkData: Map<String, Any> = mapOf(
+                 "x" to worldLandmark.x(),
+                 "y" to worldLandmark.y(),
+@@ -299,15 +373,12 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+         val additionalData = mapOf(
+           "height" to resultBundle.inputImageHeight,
+           "width" to resultBundle.inputImageWidth,
+-//          "presentationTimeStamp" to resultBundle.presentationTimeStamp,
+-//          "frameNumber" to resultBundle.frameNumber,
+-//          "startTimestamp" to resultBundle.startTimestamp
+         )
+ 
+         val swiftDict: MutableMap<String, Any> = mutableMapOf(
+           "landmarks" to landmarksArray,
+           "additionalData" to additionalData,
+-          "worldLandmarks" to worldLandmarksArray
++          "worldLandmarks" to worldLandmarksArray,
+         )
+ 
+ 
+@@ -318,19 +389,23 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
+         reactContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+           ?.emit("onLandmark", jsonData)
+ 
+-        fragmentCameraBinding.myOverlay.setResults(
+-          resultBundle.results.first(),
+-          resultBundle.inputImageHeight,
+-          resultBundle.inputImageWidth,
+-          RunningMode.LIVE_STREAM
+-        )
+-        fragmentCameraBinding.myOverlay.invalidate()
++        if (isOverlayEnabled()) {
++          fragmentCameraBinding.myOverlay.setResults(
++            resultBundle.results.first(),
++            resultBundle.inputImageHeight,
++            resultBundle.inputImageWidth,
++            RunningMode.LIVE_STREAM
++          )
++          fragmentCameraBinding.myOverlay.invalidate()
++        }
+       }
+     }
+   }
+ 
+   override fun onError(error: String, errorCode: Int) {
++    Log.e(TAG, "Pose error ($errorCode): $error")
+     activity?.runOnUiThread {
++      if (!isAdded) return@runOnUiThread
+       Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+       if (errorCode == PoseLandmarkerHelper.GPU_ERROR) {
+       }
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/res/layout/fragment_my_camera.xml b/node_modules/@thinksys/react-native-mediapipe/android/src/main/res/layout/fragment_my_camera.xml
+index 547d172..12da4de 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/res/layout/fragment_my_camera.xml
++++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/res/layout/fragment_my_camera.xml
+@@ -24,7 +24,7 @@
+     android:id="@+id/view_finder"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+-    app:scaleType="fillStart"
++    app:scaleType="fillCenter"
+     />
+ 
+   <com.tsmediapipe.OverlayView
+diff --git a/node_modules/@thinksys/react-native-mediapipe/src/index.tsx b/node_modules/@thinksys/react-native-mediapipe/src/index.tsx
+index c76f8fc..55922ec 100644
+--- a/node_modules/@thinksys/react-native-mediapipe/src/index.tsx
++++ b/node_modules/@thinksys/react-native-mediapipe/src/index.tsx
+@@ -6,7 +6,6 @@ import {
+   type ViewStyle,
+   findNodeHandle,
+   View,
+-  PixelRatio,
+   NativeModules,
+   NativeEventEmitter,
+   type EmitterSubscription,
+@@ -126,10 +125,8 @@ const TsMediapipeView: React.FC<MediapipeComponentProps> = (props) => {
+       ]}
+     >
+       <TsMediapipe
+-        height={
+-          isAndroid ? PixelRatio.getPixelSizeForLayoutSize(height) : height
+-        }
+-        width={isAndroid ? PixelRatio.getPixelSizeForLayoutSize(width) : width}
++        height={height}
++        width={width}
+         onLandmark={bodyLandmark}
+         face={face}
+         leftArm={leftArm}

@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+output/
+config.json
+config.json.tmp
+
+# Local YOLO model artifacts. Keep them outside Git or publish them as release assets / Git LFS.
+*.pt
+*.onnx
+*_openvino_model/
