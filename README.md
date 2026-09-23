@@ -16,8 +16,7 @@ This repository consolidates several previously standalone repositories while re
 - `projects/esp32-cam-telegram` — ESP32-CAM/OV2640 Telegram motion camera (unfinished; build validated)
 - `projects/esp32_s2_wifi` — ESP32-S2 USB NCM ↔ Wi-Fi bridge; working main snapshot plus preserved OLED variant
 - `projects/pcb` — SKiDL/KiCad PCB workspace and board experiments (unfinished; hardware validation pending)
-
--  — retired ESP32-C6 Zigbee/low-level I/O extension prototype; maintained code absorbed into esp32s3_LiteGraph
+- `projects/esp32_c6_zigbee` — retired ESP32-C6 Zigbee/low-level I/O extension prototype; maintained code absorbed into esp32s3_LiteGraph
 
 ## History and licenses
 
