@@ -1,0 +1,10 @@
+{
+  "name": "Esp32CamTelegram",
+  "version": "0.1.0",
+  "description": "Local ESP32-CAM Telegram motion camera firmware modules",
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32"],
+  "build": {
+    "srcDir": "src"
+  }
+}

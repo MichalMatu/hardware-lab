@@ -1,0 +1,1 @@
+# Shared SKiDL library namespace.

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SKiDL/KiCad
+*.erc
+*.log
+*.bak
+*.net
+*.kicad_prl
+boards/*/out/drc_after_*.txt
+boards/*/out/project-backups/
+boards/*/out/~*.lck
+*_sklib.py
+.skidl/
+.mplconfig/
+fp-info-cache
+.skidlcfg
+
+# OS
+.DS_Store

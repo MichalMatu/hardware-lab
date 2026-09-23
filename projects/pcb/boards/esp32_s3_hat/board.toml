@@ -1,0 +1,18 @@
+[board]
+name = "esp32_devkitc_hat"
+description = "Manualny HAT pod ESP32-DevKitC V4 i kompatybilne 38-pin dev board"
+power = "host_5v"
+
+[composition]
+modules = []
+# Dodawaj tu wspolne moduly z `library/modules/`.
+# Aktualnie registry wspiera tez: `battery_power`, `power_path`, `battery_gauge`,
+# `axp2101_pmic`, `i2c_bus`, `external_io`, `sensors`.
+# Nowe moduly dodawaj razem z kontraktem w `docs/modules/<module_name>/README.md`
+# i wpisem w `framework/module_registry.py`.
+# Ten board jest na razie hand-authored w `src/main.py`; nie renderuj go z `board.toml`.
+
+[outputs]
+netlist = true
+schematic = true
+pcb = true
