@@ -1,0 +1,27 @@
+.pio
+.vscode/.browse.c_cpp.db*
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/settings.json
+.vscode/ipch
+data/
+include/user-variables.local.h
+unpacked_fs/
+downloaded*
+partition_table_from_flash.binfirmware/
+vendor/ESP32-sveltekit/
+lib/framework/WWWData.h
+lib/framework/core/WWWData.h
+interfaces/.DS_Store
+.DS_Store
+*.log
+interface/stats.html
+secrets.ini
+# Local/generated files
+secrets.ini
+compile_commands.json
+**/__pycache__/
+*.pyc
+*.bak
+*.backup2

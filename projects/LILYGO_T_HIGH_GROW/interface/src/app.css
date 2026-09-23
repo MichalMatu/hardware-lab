@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@plugin "daisyui" {
+	themes:
+		corporate --default,
+		business --prefersdark;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	html,
+	body {
+		max-width: 100%;
+		overflow-x: hidden;
+	}
+
+	@media (max-width: 420px) {
+		.uplot-scroll .u-axis text {
+			font-size: 10px;
+		}
+	}
+
+	@media (max-width: 320px) {
+		.uplot-scroll .u-axis text {
+			font-size: 9px;
+		}
+	}
+
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
+}
+
+/* ApexCharts Compact Tooltip */
+.apexcharts-tooltip {
+	padding: 4px !important;
+}
+.apexcharts-tooltip-title {
+	padding: 2px 5px !important;
+	font-size: 10px !important;
+	margin-bottom: 0 !important;
+}
+.apexcharts-tooltip-text-y-value,
+.apexcharts-tooltip-text-goals-value,
+.apexcharts-tooltip-text-z-value {
+	font-size: 10px !important;
+}
+.apexcharts-tooltip-series-group {
+	padding: 0 5px !important;
+}
+
+/* Card shadow effects with smooth color transitions */
+.card-shadow-base {
+	box-shadow:
+		0 20px 25px -5px rgb(96 165 250 / 0.3),
+		0 8px 10px -6px rgb(96 165 250 / 0.3);
+	transition: box-shadow 0.3s ease-in-out;
+}
+
+.card-shadow-error:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(248 113 113 / 0.5),
+		0 8px 10px -6px rgb(248 113 113 / 0.5);
+}
+
+.card-shadow-info:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(56 189 248 / 0.5),
+		0 8px 10px -6px rgb(56 189 248 / 0.5);
+}
+
+.card-shadow-warning:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(250 204 21 / 0.5),
+		0 8px 10px -6px rgb(250 204 21 / 0.5);
+}
+
+.card-shadow-success:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(74 222 128 / 0.5),
+		0 8px 10px -6px rgb(74 222 128 / 0.5);
+}
+
+.card-shadow-accent:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(192 132 252 / 0.5),
+		0 8px 10px -6px rgb(192 132 252 / 0.5);
+}
+
+.card-shadow-primary:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(96 165 250 / 0.5),
+		0 8px 10px -6px rgb(96 165 250 / 0.5);
+}
+
+.card-shadow-neutral:hover {
+	box-shadow:
+		0 20px 25px -5px rgb(148 163 184 / 0.5),
+		0 8px 10px -6px rgb(148 163 184 / 0.5);
+}

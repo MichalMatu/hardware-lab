@@ -1,0 +1,10 @@
+title = "Hardware Lab secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "telegram-bot-token"
+description = "Telegram Bot API token"
+regex = "[0-9]{8,12}:[A-Za-z0-9_-]{30,50}"
+tags = ["telegram", "token"]

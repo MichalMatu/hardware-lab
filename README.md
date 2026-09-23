@@ -12,7 +12,8 @@ This repository consolidates several previously standalone repositories while re
 - `projects/nrf52840` — nRF52840 SuperMini / nice!nano experiments
 - `projects/LilyGo_4.7` — LilyGo T5 4.7-inch e-paper firmware
 - `projects/milkV256mb` — Milk-V Duo 256 setup and experiments
+- `projects/LILYGO_T_HIGH_GROW` — LILYGO T-HIGrow PlantStatus firmware and web UI (sanitized snapshot)
 
 ## History and licenses
 
-The imported source repositories remain untouched. Their original commits are retained as merge ancestry of this repository. Existing per-project license files and notices remain authoritative for their respective project directories; there is intentionally no repository-wide license override.
+Most imported projects retain their original commits as merge ancestry. Some former standalone repositories have since been removed after verification. Projects with contaminated secret history may be imported as sanitized snapshots instead. Existing per-project license files and notices remain authoritative for their respective project directories; there is intentionally no repository-wide license override.
