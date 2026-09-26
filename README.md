@@ -21,6 +21,8 @@ This repository consolidates several previously standalone repositories while re
 - `projects/IPCam` — IP camera/YOLO detection and recording experiment (clean snapshot)
 - `projects/body-conductor-mvp` — MediaPipe body-to-audio mapping experiment (clean snapshot)
 
+- `projects/kobra2-neo` — Anycubic Kobra 2 Neo modular three-axis platform: interchangeable pen, clay/paste and future toolheads
+
 ## History and licenses
 
 Most imported projects retain their original commits as merge ancestry. Some former standalone repositories have since been removed after verification. Projects with contaminated secret history may be imported as sanitized snapshots instead. Existing per-project license files and notices remain authoritative for their respective project directories; there is intentionally no repository-wide license override.
