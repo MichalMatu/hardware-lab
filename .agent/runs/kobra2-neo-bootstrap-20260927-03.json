@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-bootstrap-20260927-03",
+  "task_digest": "d455da674b274e3d3d493122f51602c9d2ff4e549b70dd702ae68a60c84f578c",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-26T23:19:30.993153+00:00",
+  "attempt_id": "e25f3057ffc905b1beeb1de4",
+  "daemon_version": "4.18.26",
+  "daemon_pid": 48450,
+  "updated_at": "2026-09-26T23:19:30.993207+00:00",
+  "pid": 48450
+}
