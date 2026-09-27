@@ -1,0 +1,17 @@
+{
+  "id": "pcb-bootstrap-audit-20260928-01",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; printf '%s\\n' '=== git ==='; git status --short; git branch --show-current; git rev-parse HEAD; git log -1 --oneline",
+    "set -euo pipefail; printf '%s\\n' '=== pcb workspace ==='; test -d projects/pcb; find projects/pcb -maxdepth 2 -type f | sort | sed -n '1,160p'; printf '%s\\n' '=== board ==='; find projects/pcb/boards/esp32_devkitc_hat -maxdepth 2 -type f | sort | sed -n '1,200p'",
+    "set -euo pipefail; printf '%s\\n' '=== host tools ==='; uname -a; command -v python3 || true; python3 --version 2>&1 || true; command -v kicad-cli || true; kicad-cli version 2>&1 || true; test -x /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3 && /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3 --version || true",
+    "set -euo pipefail; BOARD_DIR=projects/pcb/boards/esp32_devkitc_hat; REPO_ROOT=projects/pcb; KICAD_PYTHON=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3; EXTRA_PYTHONPATH=/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages; BRIDGED_PYTHONPATH=\"$REPO_ROOT/templates/skidl_reference/src:$EXTRA_PYTHONPATH\"; printf '%s\\n' '=== python imports ==='; if test -x \"$KICAD_PYTHON\"; then PYTHONPATH=\"$BRIDGED_PYTHONPATH${PYTHONPATH:+:$PYTHONPATH}\" \"$KICAD_PYTHON\" -c 'import sys; print(sys.executable); import skidl; print(\"skidl\", getattr(skidl, \"__version__\", \"unknown\")); import pcbnew; print(\"pcbnew-ok\")'; else echo 'KiCad Python interpreter missing'; fi",
+    "set -euo pipefail; printf '%s\\n' '=== generated outputs ==='; find projects/pcb/boards/esp32_devkitc_hat/out -maxdepth 1 -type f -print -exec stat -f '%N | %z bytes | %Sm' -t '%Y-%m-%d %H:%M:%S' {} \\; 2>/dev/null | sed -n '1,160p'; printf '%s\\n' '=== final status ==='; git status --short"
+  ]
+}
