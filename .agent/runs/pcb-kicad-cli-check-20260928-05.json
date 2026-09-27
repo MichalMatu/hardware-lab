@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-27T23:54:15.151581+00:00",
+  "task_id": "pcb-kicad-cli-check-20260928-05",
+  "daemon_version": "4.19.1",
+  "pid": 63483
+}
