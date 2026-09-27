@@ -1,0 +1,17 @@
+{
+  "id": "pcb-kicad-postinstall-check-20260928-04",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; echo '=== git ==='; git status --short; git rev-parse HEAD",
+    "set -euo pipefail; echo '=== applications ==='; ls -la /Applications | grep -i kicad || true; find /Applications -maxdepth 6 -type f -name 'kicad-cli' -print 2>/dev/null | head -20; find /Applications -maxdepth 6 -type f -name 'pcbnew' -print 2>/dev/null | head -20",
+    "set -euo pipefail; echo '=== versions ==='; for p in /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli /Applications/KiCad/KiCad.app/Contents/MacOS/kicad /Applications/KiCad/pcbnew.app/Contents/MacOS/pcbnew; do if test -x \"$p\"; then echo \"--- $p\"; \"$p\" --version 2>&1 || true; fi; done",
+    "set -euo pipefail; echo '=== shared support ==='; for d in /Applications/KiCad/KiCad.app/Contents/SharedSupport /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols /Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints; do if test -e \"$d\"; then echo \"--- $d\"; ls -ld \"$d\"; fi; done; find /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols -maxdepth 1 -type f 2>/dev/null | head -10; find /Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints -maxdepth 1 -type d 2>/dev/null | head -10",
+    "set -euo pipefail; echo '=== python pcbnew ==='; for py in /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/*/bin/python3 /Library/Frameworks/Python.framework/Versions/3.12/bin/python3; do if test -x \"$py\"; then echo \"--- $py\"; \"$py\" --version 2>&1 || true; \"$py\" -c 'import importlib.util; print(\"pcbnew\", importlib.util.find_spec(\"pcbnew\")); print(\"skidl\", importlib.util.find_spec(\"skidl\"))' 2>&1 || true; fi; done; echo '=== final status ==='; git status --short"
+  ]
+}
