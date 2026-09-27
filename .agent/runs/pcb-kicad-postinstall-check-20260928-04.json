@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-kicad-postinstall-check-20260928-04",
+  "task_digest": "81c059aeafb810229fc1a0bb9396378a7034ae5d33b4a321cadfd5c331396205",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-27T23:49:00.532410+00:00",
+  "attempt_id": "2f5f2cf810ef4492a59bcee2",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 50944,
+  "updated_at": "2026-09-27T23:49:00.532504+00:00",
+  "pid": 50944
+}
