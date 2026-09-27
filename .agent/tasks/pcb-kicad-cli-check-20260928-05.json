@@ -1,0 +1,17 @@
+{
+  "id": "pcb-kicad-cli-check-20260928-05",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; echo '=== git ==='; git status --short; git rev-parse HEAD",
+    "set -euo pipefail; CLI=/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli; echo '=== cli ==='; test -x \"$CLI\"; \"$CLI\" --version; echo '=== drc help ==='; \"$CLI\" pcb drc --help | sed -n '1,120p'",
+    "set -euo pipefail; echo '=== libraries ==='; for d in /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols /Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints; do echo \"--- $d\"; test -d \"$d\" && { echo present; find \"$d\" -maxdepth 1 -mindepth 1 | head -12; } || echo missing; done",
+    "set -euo pipefail; echo '=== python api candidates ==='; find /Applications/KiCad -type f \( -name 'python3' -o -name 'pcbnew.py' -o -name '_pcbnew*.so' \) -print 2>/dev/null | sed -n '1,160p'",
+    "set -euo pipefail; echo '=== user kicad dirs ==='; for d in \"$HOME/Documents/KiCad\" \"$HOME/Library/Preferences/kicad\" \"$HOME/Library/Application Support/kicad\"; do if test -e \"$d\"; then echo \"--- $d\"; find \"$d\" -maxdepth 2 -type d | sed -n '1,80p'; fi; done; echo '=== final status ==='; git status --short"
+  ]
+}
