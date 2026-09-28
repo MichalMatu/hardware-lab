@@ -1,0 +1,9 @@
+{
+  "id": "kobra2-neo-prepare-v1-implementation-20260928-04",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-28T11:06:04.688544+00:00",
+  "daemon_version": "4.19.1",
+  "error": "JSONDecodeError: Expecting ',' delimiter: line 12 column 121 (char 691)"
+}
