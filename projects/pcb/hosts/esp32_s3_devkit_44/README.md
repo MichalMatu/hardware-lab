@@ -1,15 +1,20 @@
-# ESP32-S3 devkit 2x22 host profile
+# ESP32-S3 DevKitC host candidate
 
-Status: **draft / model do wyboru**.
+Status: **draft**.
 
-Ten katalog rezerwuje profil dla pierwszego hosta Growclip S3 z dwoma headerami po 22 piny.
+Referencyjnym kandydatem dla pierwszego Growclip S3 jest oficjalny **Espressif ESP32-S3-DevKitC-1 v1.1** z dwoma headerami po 22 piny.
 
-Przed utworzeniem `growclip_s3_basic` trzeba:
-1. wskazac dokladny model devboardu,
-2. zapisac oficjalne zrodlo pinoutu,
-3. zmierzyc / potwierdzic geometrie headerow i obrys,
-4. oznaczyc 5 V, 3.3 V, GND, EN/BOOT i strapping pins,
-5. zapisac antenna keep-out,
-6. dopiero wtedy utworzyc maszynowo czytelny `pinout.py` / `mechanical.py`.
+`pinout.toml` zawiera uproszczone mapowanie fizycznych pinow J1/J3 na zasilanie/GPIO na podstawie oficjalnego user guide.
 
-Nie przenosimy placeholderow `Lxx/Rxx` ze starego eksperymentalnego boardu.
+Profil pozostaje `draft`, dopoki nie potwierdzimy na fizycznym module Growclip:
+1. zgodnosci konkretnego modelu/revision,
+2. rozstawu headerow, obrysu i orientacji pin 1,
+3. antenna keep-out i kolizji USB,
+4. wariantu modulu WROOM/flash/PSRAM.
+
+Wazne ograniczenia:
+- rewizja v1.1 uzywa GPIO38 dla RGB LED; poczatkowa rewizja uzywala GPIO48,
+- GPIO35/36/37 nie sa dostepne na czesci wariantow z octal flash/PSRAM,
+- nie przenosimy placeholderow `Lxx/Rxx` ze starego eksperymentalnego boardu.
+
+Dopiero po lokalnej weryfikacji mechaniki profil moze przejsc na `verified` i stac sie baza `growclip_s3_basic`.
