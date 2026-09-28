@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-prepare-shaft50-showcase-20260928-19",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-28T18:18:21.772884+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin agent-control --quiet; python3 -c 'import json,subprocess; raw=subprocess.check_output([\"git\",\"show\",\"origin/agent-control:.agent/tasks/kobra2-neo-prepare-shaft50-showcase-20260928-15.json\"],text=True); cmd=json.loads(raw)[\"commands\"][0]; cmd=cmd.replace(\"python3 - <<\",\"uv run python - <<\",1); old=\"kp.normalize_svg(source,norm)\"; new=\"import xml.etree.ElementTree as ET\\ntree=ET.parse(source); rr=tree.getroot(); allowed={\\\"svg\\\",\\\"g\\\",\\\"path\\\",\\\"line\\\",\\\"polyline\\\",\\\"polygon\\\",\\\"rect\\\",\\\"circle\\\",\\\"ellipse\\\"}\\ndef local(tag): return tag.rsplit(\\\"}\\\",1)[-1]\\nfor parent in list(rr.iter()):\\n    for child in list(parent):\\n        if local(child.tag) not in allowed: parent.remove(child)\\ntree.write(source,encoding=\\\"unicode\\\")\\nkp.normalize_svg(source,norm)\"; assert old in cmd; cmd=cmd.replace(old,new,1); subprocess.run([\"bash\",\"-lc\",cmd],check=True)'",
+      "exit_code": 0,
+      "output": "Checked 20 packages in 20ms\nPREPARED_OK {\"bounds\": {\"height\": 150.0, \"max_x\": 188.0, \"max_y\": 208.0, \"min_x\": 38.0, \"min_y\": 58.0, \"width\": 150.0}, \"commands\": 4345, \"stats\": {\"draw_distance_mm\": 3035.865, \"initial_xy_travel_included_in_estimate\": false, \"nominal_time_seconds\": 1105.67, \"points\": 3454, \"polylines\": 444, \"travel_distance_mm\": 1074.054}}\n{'valid': True, 'homing_present': False, 'heater_commands_present': False, 'extrusion_present': False, 'xy_moves': 3454, 'draw_moves': 3010, 'command_whitelist': ['G90', 'G0', 'G1', 'M400']}\n{'polylines': 444, 'points': 3454, 'draw_distance_mm': 3035.865, 'travel_distance_mm': 1074.054, 'nominal_time_seconds': 1105.67, 'initial_xy_travel_included_in_estimate': False}\n[agent-work 4a899d9] Add shaft 50x20 showcase plot\n 6 files changed, 6191 insertions(+), 5 deletions(-)\n create mode 100644 projects/kobra2-neo/samples/gcode/shaft-50x20-showcase.report.json\n create mode 100644 projects/kobra2-neo/samples/svg/shaft-50x20-showcase-base.svg\n create mode 100644 projects/kobra2-neo/samples/svg/shaft-50x20-showcase-normalized.svg\n create mode 100644 projects/kobra2-neo/samples/svg/shaft-50x20-showcase-preview.svg\n create mode 100644 projects/kobra2-neo/samples/svg/shaft-50x20-showcase.svg\nTo https://github.com/MichalMatu/hardware-lab.git\n   490215a..4a899d9  HEAD -> main\n",
+      "elapsed_seconds": 9.291,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 167.73,
+      "output_policy": "stream",
+      "captured_output_chars": 1332,
+      "output_truncated": false,
+      "current_rss_mb": 27.2,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 9.291
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.189
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.085
+  },
+  "finished_at": "2026-09-28T18:18:33.519078+00:00",
+  "task_digest": "6959262e56a2b9767ec4c39f9a736e103613f3802f3faaefe7f1100158c9505b",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "664ca8dc711e2dd195fd6717",
+  "daemon_version": "4.19.4"
+}
