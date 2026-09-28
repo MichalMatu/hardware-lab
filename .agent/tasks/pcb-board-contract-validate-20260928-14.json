@@ -1,0 +1,16 @@
+{
+  "id": "pcb-board-contract-validate-20260928-14",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"4b3a84300985c8b1b47fa3e85c9e55cd2f9a2c48\"; git show -s --oneline HEAD",
+    "set -euo pipefail; python3 - <<'PY'\nimport sys\nsys.path.insert(0, 'projects/pcb')\nfrom library.host_profile import HostIdentity\nfrom library.board_profile import validate_board_manifest\nbase = {'board': {'id': 'growclip_s3_basic', 'revision': 'A', 'status': 'prototype'}, 'host': {'profile': 'esp32_s3_devkit_44'}, 'features': {'modules': []}}\ndraft = HostIdentity('esp32_s3_devkit_44', 'esp32-s3', 'draft', 'Espressif', 'ESP32-S3-DevKitC-1')\nverified = HostIdentity('esp32_s3_devkit_44', 'esp32-s3', 'verified', 'Espressif', 'ESP32-S3-DevKitC-1')\nprint(validate_board_manifest(base, host_identity=draft))\nprod = {'board': {'id': 'growclip_s3_basic', 'revision': 'A', 'status': 'production'}, 'host': {'profile': 'esp32_s3_devkit_44'}, 'features': {'modules': []}}\ntry:\n    validate_board_manifest(prod, host_identity=draft)\nexcept ValueError as exc:\n    print('EXPECTED_BLOCK:', exc)\nelse:\n    raise SystemExit('production board was not blocked for draft host')\nprint(validate_board_manifest(prod, host_identity=verified))\nPY",
+    "set -euo pipefail; /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3 - <<'PY'\nimport sys\nsys.path.insert(0, 'projects/pcb')\nfrom library.host_profile import HostIdentity\nfrom library.board_profile import validate_board_manifest\ndata = {'board': {'id': 'test', 'revision': 'A', 'status': 'prototype'}, 'host': {'profile': 'h'}, 'features': {'modules': ['i2c_bus']}}\nhost = HostIdentity('h', 'esp32-s3', 'draft', '', '')\nprint(validate_board_manifest(data, host_identity=host))\nPY",
+    "set -euo pipefail; python3 -m compileall -q projects/pcb/library; git diff --check; git status --short"
+  ]
+}
