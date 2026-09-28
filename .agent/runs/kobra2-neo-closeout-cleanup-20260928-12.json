@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-closeout-cleanup-20260928-12",
+  "task_digest": "3a67c1c74608dc5cdb1073c9e1626fb68b61ff66f8c3f3b36d4ed54c4210b67b",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T16:26:49.896683+00:00",
+  "attempt_id": "ccdc8841b699e7fdda7d862d",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 84691,
+  "updated_at": "2026-09-28T16:26:49.896788+00:00",
+  "pid": 84691
+}
