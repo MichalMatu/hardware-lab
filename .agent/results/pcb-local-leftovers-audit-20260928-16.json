@@ -1,0 +1,142 @@
+{
+  "id": "pcb-local-leftovers-audit-20260928-16",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-28T01:18:12.068792+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; echo HEAD=$(git rev-parse HEAD); git show -s --oneline HEAD",
+      "exit_code": 0,
+      "output": "HEAD=5ef4f213e21274024f44153f1f31007d1af5717a\n5ef4f21 Document reusable PCB module rules\n",
+      "elapsed_seconds": 0.415,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.45,
+      "output_policy": "stream",
+      "captured_output_chars": 89,
+      "output_truncated": false,
+      "current_rss_mb": 3.45,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; echo '=== boards tree ==='; find projects/pcb/boards -maxdepth 3 -print | sort",
+      "exit_code": 0,
+      "output": "=== boards tree ===\nprojects/pcb/boards\nprojects/pcb/boards/BOARD_CONTRACT.md\nprojects/pcb/boards/README.md\nprojects/pcb/boards/esp32_devkitc_hat\nprojects/pcb/boards/esp32_devkitc_hat/out\nprojects/pcb/boards/esp32_devkitc_hat/out/project.kicad_prl\n",
+      "elapsed_seconds": 0.381,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 248,
+      "output_truncated": false,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; echo '=== ignored/untracked under boards ==='; git status --short --ignored -- projects/pcb/boards",
+      "exit_code": 0,
+      "output": "=== ignored/untracked under boards ===\n!! projects/pcb/boards/esp32_devkitc_hat/\n",
+      "elapsed_seconds": 0.404,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.08,
+      "output_policy": "stream",
+      "captured_output_chars": 81,
+      "output_truncated": false,
+      "current_rss_mb": 2.08,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; echo '=== files in leftover dir ==='; if test -d projects/pcb/boards/esp32_devkitc_hat; then find projects/pcb/boards/esp32_devkitc_hat -maxdepth 3 -type f -print | sort; fi; git status --short",
+      "exit_code": 0,
+      "output": "=== files in leftover dir ===\nprojects/pcb/boards/esp32_devkitc_hat/out/project.kicad_prl\n",
+      "elapsed_seconds": 0.462,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 90,
+      "output_truncated": false,
+      "stage_name": "command-4",
+      "stage_index": 4,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.415
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.381
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.404
+    },
+    {
+      "stage_name": "command-4",
+      "stage_index": 4,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.462
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.136
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "finished_at": "2026-09-28T01:18:15.870898+00:00",
+  "task_digest": "6d6244f186fe5fc5aa24bd632f37e1ceaf12922d65a3b4e6f26ddb84884cae1a",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "attempt_id": "1919eca2bba9e32b31cfe19a",
+  "daemon_version": "4.19.1"
+}
