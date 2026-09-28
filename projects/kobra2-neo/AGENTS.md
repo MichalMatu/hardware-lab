@@ -11,10 +11,10 @@ These rules apply to everything under `projects/kobra2-neo/`.
 
 ## Live hardware safety
 
-- Perform exactly one physical printer operation at a time and wait for operator confirmation before the next one.
 - Do not enable heaters, extrusion or firmware flashing unless the current task explicitly requires and reviews it.
-- Homing is always a separate explicit decision; never hide `G28` inside normal plotting flow.
-- The current cylindrical sensor is verified as `z_min`, and `G28 Z` has succeeded with the present setup, but revalidate the mechanical configuration before any future Z homing.
+- A fully reviewed live plot may be approved as one complete physical transaction: home XY, home Z, raise the pen, travel to the first plot point, stream the complete approved job, wait for final `M400`, and finish pen-up. Do not require intermediate confirmations inside that approved flow unless the operator asks to pause or an error/unsafe condition occurs.
+- The whole start-and-draw transaction still requires explicit operator approval before it begins. Keep `G28` out of normal prepare-generated G-code; the live executor owns the explicit homing preamble and must never add it without job-level approval.
+- The current cylindrical sensor is verified as `z_min`, and `G28 Z` has succeeded with the present setup, but revalidate the mechanical configuration before any future Z homing after a hardware/tool change.
 - Current automatic plotting bounds are the real pen-tip envelope `X=3..223`, `Y=36..230` mm. Normal plots use an additional 5 mm internal margin.
 - Current pen-up is `Z=6.12`; current pen-down is `Z=2.97`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
 - Render and inspect complete G-code before opening a live execution path. Never send a full image/plot without explicit operator approval.
