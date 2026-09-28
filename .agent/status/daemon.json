@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.3",
-  "state": "idle",
-  "pid": 58829,
-  "updated_at": "2026-09-28T17:08:15.060796+00:00",
+  "state": "running",
+  "pid": 61798,
+  "updated_at": "2026-09-28T17:11:23.879685+00:00",
   "self_revision": "0e0d6caed52e852c04072a484240a70b7a6fa225",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "kobra2-neo-shaft-preflight-20260928-14",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,7 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 58829,
+  "worker_pid": 61798,
   "supervisor_pid": 48358,
+  "active_resources": [],
   "execution_variant": "parallel"
 }
