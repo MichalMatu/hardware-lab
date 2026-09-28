@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-closeout-audit-20260928-10",
+  "task_digest": "7acb727b3cee0d7c2e22a24c59f82c59c0ffb286fb342709e676ab9666dfd293",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T16:19:23.017639+00:00",
+  "attempt_id": "5f1aec844001f41482093501",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 70667,
+  "updated_at": "2026-09-28T16:19:23.017998+00:00",
+  "pid": 70667
+}
