@@ -1,0 +1,16 @@
+{
+  "id": "pcb-host-guard-validate-20260928-11",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"e454d02290de154f20e97c8b032be8904c5c62b3\"; git show -s --oneline HEAD",
+    "set -euo pipefail; python3 - <<'PY'\nfrom pathlib import Path\nimport sys\nsys.path.insert(0, 'projects/pcb')\nfrom library.host_profile import load_host_identity\nfor path in [Path('projects/pcb/hosts/esp32_s3_devkit_44/host.toml'), Path('projects/pcb/hosts/esp32_c6_devkit/host.toml')]:\n    identity = load_host_identity(path)\n    print(identity)\n    assert identity.status == 'draft'\nPY",
+    "set -euo pipefail; /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3 - <<'PY'\nimport sys\nsys.path.insert(0, 'projects/pcb')\nfrom library.host_profile import validate_host_identity\ndata = {'host': {'id': 'test', 'family': 'esp32-s3', 'status': 'draft', 'vendor': '', 'model': ''}}\nprint(validate_host_identity(data))\ntry:\n    validate_host_identity(data, require_verified=True)\nexcept ValueError as exc:\n    print('EXPECTED_BLOCK:', exc)\nelse:\n    raise SystemExit('draft host was not blocked')\nPY",
+    "set -euo pipefail; python3 -m compileall -q projects/pcb/library; git diff --check; git status --short"
+  ]
+}
