@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-final-baseline-validate-20260928-18",
+  "task_digest": "3f5ca181cf9f26acd675512c970415cedd3ee68b6bac6f0ab85d1e1f7f83310a",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:21:01.850185+00:00",
+  "attempt_id": "fe9e5aa8c094bf4bc798faa4",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 42668,
+  "updated_at": "2026-09-28T01:21:01.850253+00:00",
+  "pid": 42668
+}
