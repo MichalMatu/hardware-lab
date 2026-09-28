@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-fusion-import-diagnose-20260928-02",
   "task_digest": "5bc9a8ea45de42499c58178cd3925af840aff6a9286f8e7a648938bdda6a03bf",
-  "idle_timeout": 300,
-  "task_timeout": 300,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T09:29:36.358636+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-28T09:29:39.328195+00:00",
   "attempt_id": "b4a2aa0105481714c1468d3e",
   "daemon_version": "4.19.1",
   "daemon_pid": 56221,
-  "updated_at": "2026-09-28T09:29:36.358720+00:00",
+  "updated_at": "2026-09-28T09:29:39.642655+00:00",
   "pid": 56221
 }
