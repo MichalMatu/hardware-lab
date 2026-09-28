@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-record-next-live-job-20260928-13",
   "task_digest": "259047f02027bad29b3e5c98f064428e0cb79b1d247c08bdf1a152c4165d1976",
-  "idle_timeout": 300,
-  "task_timeout": 1800,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T16:39:50.049871+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-28T16:39:53.414861+00:00",
   "attempt_id": "3cf95cd45a32b4852686bed8",
   "daemon_version": "4.19.2",
   "daemon_pid": 6369,
-  "updated_at": "2026-09-28T16:39:50.049936+00:00",
+  "updated_at": "2026-09-28T16:39:53.725587+00:00",
   "pid": 6369
 }
