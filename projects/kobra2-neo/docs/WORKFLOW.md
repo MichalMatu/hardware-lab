@@ -2,9 +2,9 @@
 
 ## Goal
 
-Build one safe workflow that can eventually accept vector art, text and raster images while keeping machine-specific fitting, calibration and execution bounded and inspectable.
+Keep source conversion, machine fitting, dry-run inspection and physical execution as explicit boundaries while making an already-approved live plot fast and repeatable.
 
-Target architecture:
+Canonical architecture:
 
 ```text
 SVG / text / raster image
@@ -15,26 +15,33 @@ SVG / text / raster image
     -> hard bounds validation
     -> G-code generation
     -> dry-run / preview / inspection
-    -> explicit live streaming
+    -> explicit operator approval
+    -> kobra-live revalidation
+    -> M115 identity
+    -> XY home -> Z home -> pen up
+    -> acknowledged artwork stream
+    -> M400 -> final pen up
+    -> structured result evidence
 ```
 
-The normalized geometry layer represents drawable polylines/strokes independent of the Kobra. Text becomes vector strokes before machine fitting. Raster images require an explicit rendering strategy such as contours, hatching, crosshatching or stippling; there is no generic inkjet-style filled pixel for a pen plotter.
+The normalized geometry layer represents drawable polylines/strokes independent of the Kobra. Text becomes vector strokes before machine fitting. Raster images require an explicit rendering strategy such as contours, hatching, crosshatching or stippling.
 
-## Current project-local prepare V1
+## Project-local prepare V1
 
-`projects/kobra2-neo` now owns the prepare-only `kobra-plot` CLI:
+`projects/kobra2-neo` owns the prepare-only `kobra-plot` CLI:
 
 `SVG / text -> vpype source conversion -> normalized line SVG -> Kobra orientation/fit -> bounded G-code -> preview/report`
 
-V1 uses pinned `vpype==1.15.0` inside the project environment. SVG curves are linearized before the strict normalized-geometry parser. Text uses vpype's bundled Hershey vector fonts.
+V1 uses pinned `vpype==1.15.0`. Raster and PDF extensions are detected but deliberately rejected until explicit line-rendering presets are implemented and tested.
 
-Raster and PDF extensions are detected but deliberately rejected in V1. They stay disabled until explicit line-rendering presets are implemented and tested.
+Preparation never opens serial. Every prepare report keeps execution disabled; physical execution is a separate operator-approved command.
 
-The earlier `MichalMatu/host-ops/prototype/penplotter` remains prototype evidence. New Kobra-specific conversion, fitting and safety policy belongs in this project. `host-ops` remains the generic machine/serial capability layer for a future execution phase.
+## Repository boundary
 
-Most importantly, V1 contains no serial dependency and no `execute` command. Every successful report says `execution.allowed = false`.
-
-See `PREPARE_CLI.md` for commands, artifacts and the validator contract.
+- `hardware-lab/projects/kobra2-neo` owns Kobra-specific conversion, calibration, limits, Marlin protocol policy and long-running plot streaming.
+- `host-ops` owns generic host/device capabilities such as macOS serial enumeration and bounded raw serial transactions. It is not the Kobra protocol executor.
+- Local Agent owns repository binding, task scheduling/watchdogs and task/run/result evidence.
+- A binary available in one Local Agent binding must never be assumed available in another worker PATH.
 
 ## Current Kobra profile contract
 
@@ -46,60 +53,76 @@ See `PREPARE_CLI.md` for commands, artifacts and the validator contract.
 - pen-down: `G0 Z2.97 F180`;
 - orientation: flip Y, no XY swap, no X flip;
 - end sequence: `M400`;
-- homing must not be included in normal render/dry-run work.
+- homing is forbidden in prepare-generated artwork and belongs only to the approved live preamble.
 
 The profile is stored at `config/kobra2_neo_pen.toml`. Unknown or missing keys fail closed.
 
 ## Prepare output contract
 
-A prepared job contains:
-
-```text
-source.<ext>
-normalized.svg
-preview.svg
-output.gcode
-report.json
-```
-
-`normalized.svg` is the source-independent boundary. `preview.svg` displays drawing strokes and pen-up travel separately. `report.json` captures source/backend/profile identity, hashes, geometry statistics, bounds, nominal feed-time estimate and safety state.
-
-The generated G-code validator accepts only `G90`, `G0`, `G1` and `M400`. It rejects all other commands, extrusion parameter `E`, malformed/duplicate parameters, unexpected Z values and XY outside the hard pen-tip envelope.
+A prepared job contains source material, normalized geometry, preview, bounded G-code and a report. The generated artwork validator accepts only `G90`, `G0`, `G1` and `M400`. It rejects all other commands, extrusion parameter `E`, malformed/duplicate parameters, unexpected Z values and XY outside the calibrated envelope.
 
 ## Required dry-run sequence
 
-Before any future live plotting job:
+Before live plotting:
 
-1. Convert/normalize the source without talking to the printer.
+1. Convert/normalize without talking to the printer.
 2. Render G-code without implicit homing.
-3. Record input geometry statistics: polylines/strokes and point count.
-4. Record generated XY bounding box.
-5. Inspect every pen-up, pen-down, start/end and other profile command.
-6. Verify there is no unintended `G28` or relative mode.
-7. Verify there are no heater or extrusion commands.
-8. Verify all XY motion remains within the calibrated hard envelope.
-9. Inspect `preview.svg` and the complete G-code.
-10. Only after operator approval may a separate live execution path be considered.
+3. Record geometry statistics and generated XY bounds.
+4. Inspect pen-up/down and start/end commands.
+5. Verify there is no unintended `G28`, relative mode, heater or extrusion command.
+6. Verify all XY motion remains within the calibrated envelope.
+7. Inspect `preview.svg` and the complete G-code.
+8. Obtain explicit approval for the complete physical transaction.
 
-## Live validation milestone — 2026-09-28
+## Durable live execution
 
-One complete approved artwork has now been executed successfully using the current calibration. The 10 cm `MongooseLemur.svg` outline job used 283 polylines / 7046 simplified points, machine bounds X=63.79..163.00 and Y=84.21..181.79, pen-up Z=6.12 and pen-down Z=2.97. A temporary Local Agent serial streamer waited for Marlin acknowledgement after every command, completed all 7615 commands in about 14 min 44 s, ended with `M400` and left the pen up.
+Use `kobra-live`; do not create another temporary serial streamer in a Local Agent task.
 
-This is hardware/workflow validation, not a permanent execution API. The project-local `kobra-plot` CLI remains prepare-only and has no serial dependency.
+Example:
 
-## Durable live execution contract
+```bash
+uv run kobra-live \
+  samples/gcode/JOB.gcode \
+  --report samples/gcode/JOB.report.json \
+  --port /dev/cu.usbserial-130 \
+  --expect-sha256 EXPECTED_SHA256
+```
 
-There is no final plotter-specific streamer yet. A future durable execution layer must:
+Before opening serial the runner revalidates the report, command whitelist, normal plotting envelope, calibrated Z values and optional SHA-256 pin. It then:
 
-- remain project-specific or use only genuinely generic transport primitives from `host-ops`;
-- accept only a previously prepared and revalidated immutable job;
-- handle Marlin acknowledgement/error responses explicitly;
-- support bounded cancellation/error reporting;
-- never silently insert homing, heating or extrusion;
-- after one explicit approval of the complete transaction, allow a continuous start flow of XY homing -> Z homing -> pen-up -> travel to the first point -> full artwork -> final `M400` -> pen-up, without artificial confirmation stops between those stages;
-- keep `G28` out of prepare-generated artwork so homing remains an execution-layer preamble that is visible in the approved live plan;
-- never send a whole artwork until the corresponding dry-run has been explicitly approved.
+1. opens exactly the explicit serial path at 115200;
+2. requires `M115` evidence identifying Anycubic Kobra;
+3. sends `G28 X Y` and waits for `ok`;
+4. sends `G28 Z` and waits for `ok`;
+5. selects absolute mode and raises the pen;
+6. streams the already-approved artwork command by command, waiting for Marlin acknowledgement after every command;
+7. treats firmware errors, resend requests and acknowledgement timeouts as terminal failures rather than blind retry opportunities;
+8. after the artwork `M400`, raises the pen again and waits for a final `M400`;
+9. emits a terminal pen-up result.
 
-## Next source-conversion decision
+If streaming fails after successful Z homing, the runner makes one bounded best-effort pen-up recovery attempt and reports it.
 
-The normalized geometry and Kobra safety boundary are now explicit, and one complete live plot has validated the physical profile. The next source-conversion phase is raster/photo support plus explicit physical-size/detail controls. Evaluate outline, hatch/crosshatch and stipple as replaceable source renderers; do not weaken or bypass the common Kobra fitting/G-code validator to support them.
+## Structured progress and evidence
+
+Long physical tasks must emit Local Agent native markers:
+
+```text
+[AGENT_PROGRESS] {"stage_name":"kobra-live",...}
+```
+
+The runner reports `PREFLIGHT_OK`, `PRINTER_IDENTIFIED`, `HOMING_XY_OK`, `HOMING_Z_OK`, `PEN_UP_OK`, `DRAWING_STARTED`, periodic drawing progress and `COMPLETE_PEN_UP`.
+
+Never infer a physical stage from process liveness or `seconds_since_output`. Say a stage passed only when its structured progress/result evidence exists.
+
+## Fast-path transport rule
+
+A new chat does not require a new host-ops probe when the host/cabling session is unchanged and the serial path is known. The live runner always performs its own `M115` identity check before motion. Use host-ops discovery/probe only if the port is unknown, changed, ambiguous or the runner's identity check fails.
+
+Never open a host-ops serial probe concurrently with an active live task on the same printer.
+
+## Live validation milestones
+
+- 2026-09-28: 10 cm `MongooseLemur.svg` outline completed all 7615 acknowledged commands in about 14 min 44 s and finished pen-up, validating the physical profile and acknowledgement-driven streaming model.
+- 2026-09-28: the slow-start incident exposed missing durable execution/orchestration. `kobra-live`, structured progress and the golden runbook were added as corrective actions.
+
+See `GOLDEN_LIVE_FLOW.md` for the authoritative operator flow and `INCIDENT_2026-09-28_SLOW_LIVE_START.md` for the incident review.
