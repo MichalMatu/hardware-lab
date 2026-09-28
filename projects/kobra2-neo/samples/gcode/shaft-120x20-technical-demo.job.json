@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "next_live_job",
+  "title": "Shaft 120 x 20 mm technical drawing",
+  "created_from_session": "2026-09-28 technical drawing demo",
+  "drawing": {
+    "part": "cylindrical shaft",
+    "length_mm": 120.0,
+    "diameter_mm": 20.0,
+    "sheet_target_mm": {
+      "width": 150.0,
+      "height": 150.0
+    },
+    "features": [
+      "side view",
+      "end view",
+      "centerlines",
+      "dimension arrows",
+      "120 mm length dimension",
+      "20 mm / diameter 20 dimension",
+      "technical title block and dimension table"
+    ]
+  },
+  "validated_machine_job": {
+    "bounds_mm": {
+      "min_x": 38.0,
+      "max_x": 191.68,
+      "min_y": 58.0,
+      "max_y": 208.0
+    },
+    "polylines": 361,
+    "points": 5020,
+    "draw_distance_mm": 4887.43,
+    "travel_distance_mm": 1182.26,
+    "nominal_time_seconds": 1026.12,
+    "pen_up_z": 6.12,
+    "pen_down_z": 2.97,
+    "travel_feed_mm_min": 3000.0,
+    "draw_feed_mm_min": 1200.0,
+    "z_feed_mm_min": 180.0,
+    "prepared_gcode_must_not_contain_homing": true,
+    "allowed_commands": ["G90", "G0", "G1", "M400"]
+  },
+  "live_start_flow": {
+    "approval": "one explicit approval for the complete transaction",
+    "steps": [
+      "G28 X Y",
+      "G28 Z",
+      "raise pen to Z6.12",
+      "travel with pen up to first drawing point",
+      "lower pen to Z2.97",
+      "stream complete approved drawing",
+      "M400",
+      "finish with pen at Z6.12"
+    ],
+    "intermediate_confirmation_required": false,
+    "pause_on_error_or_operator_request": true
+  },
+  "next_action": "Regenerate the technical drawing from this specification, render and validate the complete G-code against the current calibration, then execute the approved start-and-draw flow as one transaction."
+}
