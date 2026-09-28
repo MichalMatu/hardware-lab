@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-host-core-validate-20260928-10",
+  "task_digest": "de96f361e4ee0811315b9a3d717b128700c2a79e3c41b8da7662a5df79f85baf",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T00:51:49.715761+00:00",
+  "attempt_id": "a0242c28fcdd187bf80f30ee",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 80374,
+  "updated_at": "2026-09-28T00:51:49.715816+00:00",
+  "pid": 80374
+}
