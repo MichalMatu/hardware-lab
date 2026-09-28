@@ -1,0 +1,6 @@
+[host]
+id = "esp32_s3_devkit_44"
+family = "esp32-s3"
+status = "draft"
+vendor = ""
+model = ""

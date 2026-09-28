@@ -1,0 +1,6 @@
+[host]
+id = "esp32_c6_devkit"
+family = "esp32-c6"
+status = "draft"
+vendor = ""
+model = ""
