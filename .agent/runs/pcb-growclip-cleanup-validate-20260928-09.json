@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-growclip-cleanup-validate-20260928-09",
+  "task_digest": "4f555f2bf2e6faddb1fbfd11d1319f40c27da63e699e31172e93f8084c5c3c36",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T00:49:52.256750+00:00",
+  "attempt_id": "2ec2711cb8a5973737f9efb0",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 76200,
+  "updated_at": "2026-09-28T00:49:52.256810+00:00",
+  "pid": 76200
+}
