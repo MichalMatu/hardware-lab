@@ -1,0 +1,13 @@
+{
+  "id": "omniplot-import-timing-20260928-23",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 180,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; ROOT=\"$HOME/.local/share/plotter-tools/omniplot/backend\"; V=\"$ROOT/.venv\"; cd \"$ROOT\"; export OMNIPLOT_FAKE_HARDWARE=1 OMNIPLOT_BIND_HOST=127.0.0.1 PYTHONUNBUFFERED=1; /usr/bin/time -p \"$V/bin/python\" -c 'import time; t=time.monotonic(); import pen_plotter.main; print(f\"IMPORT_OK seconds={time.monotonic()-t:.3f}\", flush=True)'"
+  ]
+}
