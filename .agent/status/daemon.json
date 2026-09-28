@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.1",
-  "state": "idle",
-  "pid": 28970,
-  "updated_at": "2026-09-28T01:15:10.738413+00:00",
+  "state": "running",
+  "pid": 34328,
+  "updated_at": "2026-09-28T01:16:57.115181+00:00",
   "self_revision": "105f9b6d2e28013020a06526abe179ab67160e0b",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "pcb-workspace-validator-20260928-15",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,8 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 28970,
+  "worker_pid": 34328,
   "supervisor_pid": 50844,
-  "last_task_id": "pcb-board-contract-validate-20260928-14",
+  "active_resources": [],
   "execution_variant": "parallel"
 }
