@@ -1,6 +1,6 @@
 # docs/modules/
 
-Dokumentacja na poziomie modulu, nie calej plytki.
+Dokumentacja na poziomie modulu, nie calej plytki. Obecnosc dokumentacji nie oznacza automatycznie, ze istnieje gotowa implementacja w `library/modules/`.
 
 ## Struktura
 
@@ -23,8 +23,11 @@ Dokumentacja na poziomie modulu, nie calej plytki.
 
 - Grupuj dokumentacje wedlug funkcji modulu, a nie pojedynczego ukladu.
 - Jesli kilka ukladow tworzy razem jeden blok funkcjonalny, trzymaj je w jednym module.
+- Dokumentacja moze wyprzedzac implementacje. Board moze wskazac modul dopiero, gdy odpowiadajacy mu plik istnieje w `library/modules/`.
 
-## Aktywne moduly
+## Aktualny kod reusable
 
-- `axp2101_pmic`: integrowany PMIC z charge, power-path, gauge i 3V3.
-- `i2c_bus`: wspolna magistrala I2C dla AXP2101 i przyszlych peryferiow.
+- `i2c_bus` - **basic reusable**. Mala infrastruktura I2C z opcjonalnymi pull-upami i headerem.
+- `axp2101_pmic` - **advanced optional**. Zachowany jako wartosciowy, zlozony blok PMIC, ale nie jest czescia domyslnej bazy Growclip i wymaga osobnego review elektrycznego/layoutowego przed uzyciem w nowym wariancie.
+
+Pozostale katalogi w `docs/modules/` sa baza wiedzy i kandydatami do przyszlych reusable blocks, a nie automatycznie aktywnymi komponentami boardu.
