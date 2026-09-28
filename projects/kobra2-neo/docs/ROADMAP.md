@@ -41,6 +41,7 @@
 - [ ] Implement a permanent Kobra live streamer that accepts only a prepared, revalidated immutable job.
 - [ ] Add explicit cancellation, progress and serial error/resend handling.
 - [ ] Tie live preflight to the current calibration identity/freshness rather than profile values alone.
+- [ ] Next live regression/demo job: execute `samples/gcode/shaft-120x20-technical-demo.job.json` — a professional technical drawing of a 120 x Ø20 mm cylindrical shaft on an approximately 150 x 150 mm sheet. Run it as one approved continuous flow: home XY -> home Z -> pen-up -> travel to start -> draw -> final `M400` -> pen-up.
 
 ## Phase 5 — Mechanical evolution / additional tools
 
