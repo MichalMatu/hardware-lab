@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-find-mongoose-20260928-08",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 60,
+  "task_timeout": 120,
+  "commands": [
+    "set -euo pipefail; for d in \"$HOME/Downloads\" \"$HOME/Public\" \"$HOME/Desktop\" \"$HOME/Documents\"; do [ -d \"$d\" ] || continue; find \"$d\" -maxdepth 3 -type f -iname 'MongooseLemur.svg' -print 2>/dev/null || true; done"
+  ]
+}
