@@ -16,5 +16,6 @@ pitch_mm = 2.54
 
 [verification]
 official_pinout = true
+official_mechanics = true
 local_mechanics = false
 physical_board_match = false
