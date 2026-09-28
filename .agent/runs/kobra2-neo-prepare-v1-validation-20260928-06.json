@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 5,
-  "command": "set -euo pipefail; cd projects/kobra2-neo; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot doctor; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot text 'MILEGO DNIA' -o /tmp/kobra-text-job",
-  "pid": 85677,
+  "command": "set -euo pipefail; python3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor p in [Path('/tmp/kobra-curve-job'), Path('/tmp/kobra-text-job')]:\n    report=json.loads((p/'report.json').read_text())\n    assert report['safety']['valid'] is True\n    assert report['execution']['allowed'] is False\n    b=report['geometry']['output_bounds']\n    assert 3 <= b['min_x'] <= b['max_x'] <= 223\n    assert 36 <= b['min_y'] <= b['max_y'] <= 230\n    g=(p/'output.gcode').read_text()\n    for token in ['G28','G91','M104','M109','M140','M190',' E']:\n        assert token not in g, (p, token)\n    allowed={'G90','G0','G1','M400'}\n    for raw in g.splitlines():\n        code=raw.split(';',1)[0].strip()\n        if code:\n            assert code.split()[0] in allowed, code\n    print(p.name, report['geometry']['polylines'], report['geometry']['points'], report['geometry']['output_bounds'], report['geometry']['nominal_time_seconds'])\nPY",
+  "pid": 85866,
   "timeout": 1200,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T11:20:43.142400+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-28T11:20:50.808883+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "kobra2-neo-prepare-v1-validation-20260928-06",
@@ -18,5 +18,5 @@
   "task_digest": "a8f6eba29d1715e6fd04010e17d58ad9fa098aa5ba487314c85dc7a89bf1231b",
   "daemon_version": "4.19.1",
   "daemon_pid": 85017,
-  "updated_at": "2026-09-28T11:20:43.209718+00:00"
+  "updated_at": "2026-09-28T11:20:50.880867+00:00"
 }
