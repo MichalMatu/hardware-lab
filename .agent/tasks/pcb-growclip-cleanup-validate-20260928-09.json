@@ -1,0 +1,16 @@
+{
+  "id": "pcb-growclip-cleanup-validate-20260928-09",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; echo HEAD=$(git rev-parse HEAD); git show -s --oneline HEAD; test \"$(git rev-parse HEAD)\" = \"3b8a8ceea630a5546c52a7e12e016e2d369637f2\"",
+    "set -euo pipefail; echo '=== active boards ==='; find projects/pcb/boards -maxdepth 2 -type f -print | sort; echo '=== hosts ==='; find projects/pcb/hosts -maxdepth 2 -type f -print | sort; echo '=== archived boards ==='; find projects/pcb/archive/boards -maxdepth 2 -type f -name README.md -print | sort; test -f projects/pcb/archive/boards/axp2101_devkitc38_reference/src/main.py; test -f projects/pcb/archive/boards/esp32_s3_hat_experiment/src/main.py",
+    "set -euo pipefail; test ! -e projects/pcb/framework; test ! -e projects/pcb/scripts; test ! -e projects/pcb/templates; test -d projects/pcb/archive/legacy_tooling/framework; test -d projects/pcb/archive/legacy_tooling/scripts; test -d projects/pcb/archive/legacy_tooling/templates; python3 -m compileall -q projects/pcb/library",
+    "set -euo pipefail; grep -q 'HAT-first' projects/pcb/SKILL.md; grep -q 'growclip_s3_basic' projects/pcb/README.md; grep -q '2 warstwy' projects/pcb/requirements.md; git diff --check; git status --short"
+  ]
+}
