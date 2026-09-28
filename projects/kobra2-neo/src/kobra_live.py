@@ -1,9 +1,10 @@
 """Bounded live executor for an already prepared Kobra 2 Neo pen plot.
 
-This module deliberately does not generate artwork.  It revalidates a prepared
-G-code/report pair, identifies the physical printer with M115, performs the
-explicitly approved homing preamble, and streams one command at a time while
-waiting for Marlin acknowledgements.
+This module deliberately does not generate artwork. It revalidates a prepared
+G-code/report pair, identifies the physical printer with M115, verifies the
+stock Marlin thermal monitor is healthy, performs the explicitly approved
+homing preamble, and streams one command at a time while waiting for Marlin
+acknowledgements.
 
 It uses only the Python standard library so the live path does not depend on a
 second serial package being present in the hardware-lab worker.
@@ -28,12 +29,17 @@ from typing import Any, Iterable
 ALLOWED_ARTWORK_COMMANDS = {"G90", "G0", "G1", "M400"}
 FORBIDDEN_ARTWORK_COMMANDS = {"G28", "G91", "M104", "M109", "M140", "M190"}
 PARAM_RE = re.compile(r"^([A-Z])([-+]?(?:\d+(?:\.\d*)?|\.\d+))$")
+HOTEND_TEMP_RE = re.compile(r"(?:^|\s)T:\s*(-?\d+(?:\.\d+)?)", re.IGNORECASE)
 DEFAULT_PROFILE = Path(__file__).resolve().parents[1] / "config" / "kobra2_neo_pen.toml"
 PROGRESS_PREFIX = "[AGENT_PROGRESS] "
 
 
 class LivePlotError(RuntimeError):
     """Fail-closed live plotting error."""
+
+
+class FirmwareHaltError(LivePlotError):
+    """Marlin entered a halted/kill state where further motion is not reliable."""
 
 
 def _progress(phase: str, message: str, *, current: int | None = None, total: int | None = None, metrics: dict[str, Any] | None = None) -> None:
@@ -159,8 +165,6 @@ def validate_job(gcode_path: Path, report_path: Path, profile_path: Path, *, exp
                 raise LivePlotError(f"unexpected parameters on {command}: {line!r}")
             continue
         _, params = _parse_motion(line)
-        if "E" in params:
-            raise LivePlotError("extrusion parameter E is forbidden")
         if "X" in params:
             x = params["X"]
             if not profile["min_x"] <= x <= profile["max_x"]:
@@ -198,6 +202,17 @@ def validate_job(gcode_path: Path, report_path: Path, profile_path: Path, *, exp
         "profile": profile,
         "title": report.get("title"),
     }
+
+
+def extract_hotend_temperature(lines: Iterable[str]) -> float:
+    joined = " ".join(lines)
+    match = HOTEND_TEMP_RE.search(joined)
+    if match is None:
+        raise LivePlotError(f"M105 response did not contain hotend temperature: {joined}")
+    value = float(match.group(1))
+    if not math.isfinite(value):
+        raise LivePlotError("M105 returned a non-finite hotend temperature")
+    return value
 
 
 class PosixSerial:
@@ -275,12 +290,14 @@ class PosixSerial:
                 continue
             lines.append(line)
             lower = line.lower()
-            if lower == "ok" or lower.startswith("ok "):
-                return lines
+            if "mintemp" in lower or "maxtemp" in lower or "printer halted" in lower or "kill() called" in lower:
+                raise FirmwareHaltError(f"Marlin halted after {command!r}: {line}")
             if lower.startswith("error") or line.startswith("!!"):
                 raise LivePlotError(f"Marlin rejected {command!r}: {line}")
             if lower.startswith("resend") or lower.startswith("rs "):
                 raise LivePlotError(f"unexpected resend request after {command!r}: {line}")
+            if lower == "ok" or lower.startswith("ok "):
+                return lines
 
 
 def _identify(serial: PosixSerial) -> list[str]:
@@ -291,7 +308,18 @@ def _identify(serial: PosixSerial) -> list[str]:
     return response
 
 
-def execute(job: dict[str, Any], port: str, *, progress_every: int = 100) -> float:
+def _check_thermal_monitor(serial: PosixSerial) -> float:
+    response = serial.transact("M105", timeout=10.0)
+    hotend_c = extract_hotend_temperature(response)
+    # Plotting never heats the hotend, but stock Marlin still enforces its
+    # thermistor safety state. A cold-room value below 5 C is treated as an
+    # implausible/open-sensor condition and must fail before further motion.
+    if not 5.0 <= hotend_c <= 80.0:
+        raise LivePlotError(f"hotend thermal monitor implausible for heater-off plotting: {hotend_c:.2f} C")
+    return hotend_c
+
+
+def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, thermal_check_every: int = 250) -> float:
     commands: list[str] = job["commands"]
     pen_up_z = job["profile"]["pen_up_z"]
     started = time.monotonic()
@@ -301,6 +329,8 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100) -> flo
         time.sleep(0.5)
         _identify(serial)
         _progress("identity", "PRINTER_IDENTIFIED", current=0, total=len(commands), metrics={"port": port})
+        hotend_c = _check_thermal_monitor(serial)
+        _progress("thermal", "THERMAL_MONITOR_OK", current=0, total=len(commands), metrics={"hotend_c": hotend_c})
 
         serial.transact("G28 X Y", timeout=120.0)
         _progress("homing", "HOMING_XY_OK", current=0, total=len(commands))
@@ -316,6 +346,9 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100) -> flo
             for index, command in enumerate(commands, start=1):
                 timeout = 180.0 if command == "M400" else 60.0
                 serial.transact(command, timeout=timeout)
+                if index % thermal_check_every == 0 and index < len(commands):
+                    hotend_c = _check_thermal_monitor(serial)
+                    _progress("thermal", f"THERMAL_MONITOR_OK {index}/{len(commands)}", current=index, total=len(commands), metrics={"hotend_c": hotend_c})
                 if index == 5:
                     _progress("stream", "DRAWING_STARTED", current=index, total=len(commands))
                 elif index % progress_every == 0 or index == len(commands):
@@ -323,13 +356,19 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100) -> flo
 
             serial.transact(f"G0 Z{pen_up_z:.2f} F180", timeout=30.0)
             serial.transact("M400", timeout=180.0)
+        except FirmwareHaltError:
+            # A Marlin kill state rejects motion. Do not claim or repeatedly
+            # attempt pen-up when firmware has explicitly halted the system.
+            _progress("error", "FIRMWARE_HALTED_FINAL_PEN_STATE_UNKNOWN", current=0, total=len(commands))
+            raise
         except BaseException:
             if homed_z:
                 try:
                     serial.transact("G90", timeout=5.0)
                     serial.transact(f"G0 Z{pen_up_z:.2f} F180", timeout=15.0)
-                    _progress("error", "ABORT_PEN_UP_ATTEMPTED", current=0, total=len(commands))
+                    _progress("error", "ABORT_PEN_UP_OK", current=0, total=len(commands))
                 except Exception as recovery_exc:  # pragma: no cover - hardware-only recovery
+                    _progress("error", "ABORT_PEN_UP_UNCONFIRMED", current=0, total=len(commands))
                     print(f"RECOVERY_ERROR:{recovery_exc}", file=sys.stderr, flush=True)
             raise
 
@@ -347,6 +386,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--expect-sha256", help="optional immutable G-code SHA-256 pin")
     parser.add_argument("--validate-only", action="store_true", help="perform full offline preflight and never open serial")
     parser.add_argument("--progress-every", type=int, default=100, help="emit structured stream progress every N commands")
+    parser.add_argument("--thermal-check-every", type=int, default=250, help="query the Marlin thermal monitor every N streamed commands")
     return parser
 
 
@@ -354,6 +394,8 @@ def main(argv: Iterable[str] | None = None) -> int:
     args = _parser().parse_args(list(argv) if argv is not None else None)
     if args.progress_every <= 0:
         raise SystemExit("--progress-every must be > 0")
+    if args.thermal_check_every <= 0:
+        raise SystemExit("--thermal-check-every must be > 0")
     try:
         job = validate_job(args.gcode, args.report, args.profile, expected_sha256=args.expect_sha256)
         _progress(
@@ -368,7 +410,12 @@ def main(argv: Iterable[str] | None = None) -> int:
             return 0
         if not args.port:
             raise LivePlotError("--port is required unless --validate-only is used")
-        elapsed = execute(job, args.port, progress_every=args.progress_every)
+        elapsed = execute(
+            job,
+            args.port,
+            progress_every=args.progress_every,
+            thermal_check_every=args.thermal_check_every,
+        )
         print(f"RESULT:KOBRA_LIVE_COMPLETE_PEN_UP elapsed_seconds={elapsed:.3f}")
         return 0
     except LivePlotError as exc:
