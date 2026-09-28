@@ -1,0 +1,18 @@
+{
+  "id": "pcb-final-clean-validate-and-prune-20260928-20",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 180,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"cc1bc31793c740246a43242e8183bc87d1be0469\"; git show -s --oneline HEAD; git status --short",
+    "set -euo pipefail; python3 projects/pcb/validate_workspace.py; python3 -m compileall -q projects/pcb/library projects/pcb/validate_workspace.py; git diff --check",
+    "set -euo pipefail; echo '=== active modules ==='; find projects/pcb/docs/modules -mindepth 1 -maxdepth 1 -type d -print | sort; echo '=== code modules ==='; find projects/pcb/library/modules -maxdepth 1 -type f -name '*.py' ! -name '__init__.py' -print | sort; test ! -e projects/pcb/docs/to_classify; test ! -e projects/pcb/docs/reference_designs; test ! -e projects/pcb/profiles; test ! -e projects/pcb/docs/modules/axp2101_pmic/references/eggfly_AXP2101",
+    "set -euo pipefail; echo '=== stale refs ==='; if grep -RInE '/Users/|framework/module_registry.py|scripts/create_board.py|scripts/render_board.py|templates/skidl_reference' projects/pcb --exclude-dir=archive; then echo 'stale refs found' >&2; exit 1; else echo 'none'; fi",
+    "set -euo pipefail; echo '=== remote heads before ==='; git ls-remote --heads origin; git ls-remote --exit-code --heads origin pcb-final-cleanup-audit >/dev/null; git push origin --delete pcb-final-cleanup-audit; git fetch --prune origin; echo '=== remote heads after ==='; git ls-remote --heads origin; test -z \"$(git ls-remote --heads origin pcb-final-cleanup-audit)\"",
+    "set -euo pipefail; count=$(git ls-remote --heads origin | awk '{print $2}' | grep -E '^refs/heads/(main|agent-control)$' | wc -l | tr -d ' '); total=$(git ls-remote --heads origin | wc -l | tr -d ' '); echo expected=$count total=$total; test \"$count\" = 2; test \"$total\" = 2; git status --short"
+  ]
+}
