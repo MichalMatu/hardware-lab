@@ -23,8 +23,17 @@ Point = tuple[float, float]
 Polyline = list[Point]
 SourceKind = Literal["svg", "text"]
 
+MAX_SOURCE_BYTES = 20 * 1024 * 1024
+MAX_SVG_ELEMENTS = 10_000
+MAX_SVG_DEPTH = 128
+MAX_POLYLINES = 10_000
+MAX_POINTS = 100_000
+VPYPE_TIMEOUT_SECONDS = 300
+
 _TOKEN_RE = re.compile(r"[MmLlHhVvZz]|[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?")
 _WORD_RE = re.compile(r"^([A-Za-z])([-+]?(?:\d+(?:\.\d*)?|\.\d+))$")
+_ALLOWED_SOURCE_SVG_TAGS = {"svg", "g", "path", "line", "polyline", "polygon", "rect", "circle", "ellipse"}
+_JOB_MARKER = ".kobra-plot-job"
 
 
 class KobraPlotError(RuntimeError):
@@ -152,31 +161,52 @@ def _require_exact_keys(name: str, value: dict, expected: set[str]) -> None:
         raise ProfileError(f"{name}: missing keys: {', '.join(sorted(missing))}")
 
 
+def _number(section: str, key: str, value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ProfileError(f"{section}.{key}: expected number")
+    result = float(value)
+    if not math.isfinite(result):
+        raise ProfileError(f"{section}.{key}: expected finite number")
+    return result
+
+
+def _boolean(section: str, key: str, value: object) -> bool:
+    if not isinstance(value, bool):
+        raise ProfileError(f"{section}.{key}: expected boolean")
+    return value
+
+
 def load_profile(path: Path | None = None) -> Profile:
     profile_path = (path or default_profile_path()).expanduser().resolve()
     try:
         with profile_path.open("rb") as handle:
             raw = tomllib.load(handle)
-    except OSError as exc:
+    except (OSError, tomllib.TOMLDecodeError) as exc:
         raise ProfileError(f"cannot read profile {profile_path}: {exc}") from exc
 
     _require_exact_keys("profile", raw, _ROOT_KEYS)
     if raw["schema_version"] != 1:
         raise ProfileError(f"unsupported schema_version: {raw['schema_version']!r}")
+    if not isinstance(raw["name"], str) or not raw["name"].strip():
+        raise ProfileError("name: expected non-empty string")
 
     for section, keys in _SECTION_KEYS.items():
         if not isinstance(raw[section], dict):
             raise ProfileError(f"{section}: expected table")
         _require_exact_keys(section, raw[section], keys)
 
-    ws = Workspace(**{k: float(raw["workspace"][k]) for k in _SECTION_KEYS["workspace"]})
-    motion = Motion(**{k: float(raw["motion"][k]) for k in _SECTION_KEYS["motion"]})
-    orientation = Orientation(**{k: bool(raw["orientation"][k]) for k in _SECTION_KEYS["orientation"]})
-    tool = Tool(**{k: float(raw["tool"][k]) for k in _SECTION_KEYS["tool"]})
+    w = raw["workspace"]
+    m = raw["motion"]
+    o = raw["orientation"]
+    t = raw["tool"]
+    ws = Workspace(**{k: _number("workspace", k, w[k]) for k in _SECTION_KEYS["workspace"]})
+    motion = Motion(**{k: _number("motion", k, m[k]) for k in _SECTION_KEYS["motion"]})
+    orientation = Orientation(**{k: _boolean("orientation", k, o[k]) for k in _SECTION_KEYS["orientation"]})
+    tool = Tool(**{k: _number("tool", k, t[k]) for k in _SECTION_KEYS["tool"]})
     end = raw["sequence"]["end"]
 
-    if not isinstance(end, list) or not all(isinstance(item, str) and item.strip() for item in end):
-        raise ProfileError("sequence.end must be a list of non-empty strings")
+    if end != ["M400"]:
+        raise ProfileError("sequence.end must be exactly ['M400'] in prepare V1")
     if not (ws.min_x < ws.max_x and ws.min_y < ws.max_y):
         raise ProfileError("workspace bounds are invalid")
     if ws.margin < 0 or ws.draw_min_x >= ws.draw_max_x or ws.draw_min_y >= ws.draw_max_y:
@@ -188,12 +218,12 @@ def load_profile(path: Path | None = None) -> Profile:
 
     return Profile(
         schema_version=1,
-        name=str(raw["name"]),
+        name=raw["name"].strip(),
         workspace=ws,
         motion=motion,
         orientation=orientation,
         tool=tool,
-        end_commands=tuple(item.strip() for item in end),
+        end_commands=("M400",),
     )
 
 
@@ -201,12 +231,12 @@ def vpype_executable() -> Path:
     override = os.environ.get("KOBRA_PLOT_VPYPE")
     if override:
         path = Path(override).expanduser()
-        if path.is_file():
+        if path.is_file() and os.access(path, os.X_OK):
             return path
-        raise KobraPlotError(f"KOBRA_PLOT_VPYPE does not point to a file: {path}")
+        raise KobraPlotError(f"KOBRA_PLOT_VPYPE is not executable: {path}")
 
     sibling = Path(sys.executable).resolve().parent / "vpype"
-    if sibling.is_file():
+    if sibling.is_file() and os.access(sibling, os.X_OK):
         return sibling
 
     found = shutil.which("vpype")
@@ -219,31 +249,72 @@ def vpype_executable() -> Path:
     )
 
 
+def _run_process(args: list[str]) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=VPYPE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise KobraPlotError(f"vpype timed out after {VPYPE_TIMEOUT_SECONDS}s") from exc
+    except OSError as exc:
+        raise KobraPlotError(f"cannot run vpype: {exc}") from exc
+
+
 def vpype_version() -> str:
-    proc = subprocess.run(
-        [str(vpype_executable()), "--version"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    proc = _run_process([str(vpype_executable()), "--version"])
     if proc.returncode != 0:
         raise KobraPlotError((proc.stderr or proc.stdout).strip() or "vpype --version failed")
     return (proc.stdout or proc.stderr).strip()
 
 
 def _run_vpype(args: list[str]) -> None:
-    proc = subprocess.run(
-        [str(vpype_executable()), *args],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    proc = _run_process([str(vpype_executable()), *args])
     if proc.returncode != 0:
         detail = (proc.stderr or proc.stdout).strip()
         raise KobraPlotError(f"vpype failed ({proc.returncode}): {detail}")
 
 
+def _local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def preflight_svg_source(source: Path) -> None:
+    try:
+        root = ET.parse(source).getroot()
+    except ET.ParseError as exc:
+        raise GeometryError(f"invalid SVG: {exc}") from exc
+
+    count = 0
+    stack: list[tuple[ET.Element, int]] = [(root, 1)]
+    while stack:
+        elem, depth = stack.pop()
+        count += 1
+        if count > MAX_SVG_ELEMENTS:
+            raise GeometryError(f"SVG exceeds {MAX_SVG_ELEMENTS} elements")
+        if depth > MAX_SVG_DEPTH:
+            raise GeometryError(f"SVG exceeds nesting depth {MAX_SVG_DEPTH}")
+
+        tag = _local_name(elem.tag)
+        if tag not in _ALLOWED_SOURCE_SVG_TAGS:
+            raise GeometryError(
+                f"SVG element <{tag}> is not supported by prepare V1; "
+                "flatten/convert it before plotting"
+            )
+        for attr, value in elem.attrib.items():
+            local_attr = _local_name(attr)
+            if local_attr in {"href", "src"} and value and not value.startswith("#"):
+                raise GeometryError(f"external SVG reference is forbidden: {value!r}")
+
+        for child in elem:
+            stack.append((child, depth + 1))
+
+
 def normalize_svg(source: Path, output: Path) -> None:
+    preflight_svg_source(source)
     _run_vpype([
         "read",
         "--single-layer",
@@ -265,6 +336,8 @@ def normalize_text(text: str, output: Path, font: str = "scripts") -> None:
     text = " ".join(text.split())
     if not text:
         raise KobraPlotError("text input is empty")
+    if len(text) > 10_000:
+        raise KobraPlotError("text input is too long")
     _run_vpype([
         "text",
         "--font",
@@ -282,18 +355,34 @@ def normalize_text(text: str, output: Path, font: str = "scripts") -> None:
     ])
 
 
+def _tokenize_linear_path(d: str) -> list[str]:
+    tokens: list[str] = []
+    pos = 0
+    for match in _TOKEN_RE.finditer(d):
+        gap = d[pos:match.start()]
+        if gap.strip(" \t\r\n,"):
+            snippet = gap.strip()[:24]
+            raise GeometryError(f"unsupported SVG path syntax near {snippet!r}")
+        tokens.append(match.group(0))
+        pos = match.end()
+    tail = d[pos:]
+    if tail.strip(" \t\r\n,"):
+        raise GeometryError(f"unsupported SVG path syntax near {tail.strip()[:24]!r}")
+    return tokens
+
+
 def _parse_points(value: str) -> list[Point]:
-    nums = [
-        float(tok)
-        for tok in re.findall(r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", value)
-    ]
+    tokens = _tokenize_linear_path(value)
+    if any(token.isalpha() for token in tokens):
+        raise GeometryError("path command found in points attribute")
+    nums = [float(token) for token in tokens]
     if len(nums) % 2:
         raise GeometryError("odd coordinate count in points attribute")
     return list(zip(nums[0::2], nums[1::2], strict=True))
 
 
 def parse_linear_path(d: str) -> list[Polyline]:
-    tokens = _TOKEN_RE.findall(d.replace(",", " "))
+    tokens = _tokenize_linear_path(d)
     if not tokens:
         return []
 
@@ -313,7 +402,10 @@ def parse_linear_path(d: str) -> list[Polyline]:
     def number(index: int) -> float:
         if index >= len(tokens) or tokens[index].isalpha():
             raise GeometryError(f"expected numeric path argument near token {index}")
-        return float(tokens[index])
+        value = float(tokens[index])
+        if not math.isfinite(value):
+            raise GeometryError("non-finite SVG coordinate")
+        return value
 
     while i < len(tokens):
         token = tokens[i]
@@ -349,10 +441,8 @@ def parse_linear_path(d: str) -> list[Polyline]:
                 cmd = "l" if relative else "L"
             else:
                 if not poly:
-                    poly = [current]
-                    start = current
-                else:
-                    poly.append(current)
+                    raise GeometryError("line command before moveto")
+                poly.append(current)
         elif upper == "H":
             x = number(i)
             i += 1
@@ -360,10 +450,8 @@ def parse_linear_path(d: str) -> list[Polyline]:
                 x += current[0]
             current = (x, current[1])
             if not poly:
-                poly = [current]
-                start = current
-            else:
-                poly.append(current)
+                raise GeometryError("horizontal line command before moveto")
+            poly.append(current)
         elif upper == "V":
             y = number(i)
             i += 1
@@ -371,10 +459,8 @@ def parse_linear_path(d: str) -> list[Polyline]:
                 y += current[1]
             current = (current[0], y)
             if not poly:
-                poly = [current]
-                start = current
-            else:
-                poly.append(current)
+                raise GeometryError("vertical line command before moveto")
+            poly.append(current)
         else:
             raise GeometryError(f"non-linear SVG command {cmd!r} found after normalization")
 
@@ -389,24 +475,44 @@ def load_normalized_svg(path: Path) -> list[Polyline]:
         raise GeometryError(f"invalid normalized SVG: {exc}") from exc
 
     lines: list[Polyline] = []
+    element_count = 0
     for elem in root.iter():
-        tag = elem.tag.rsplit("}", 1)[-1]
+        element_count += 1
+        if element_count > MAX_SVG_ELEMENTS:
+            raise GeometryError(f"normalized SVG exceeds {MAX_SVG_ELEMENTS} elements")
+        if "transform" in elem.attrib:
+            raise GeometryError("normalized SVG unexpectedly contains transform attributes")
+
+        tag = _local_name(elem.tag)
+        if tag in {"svg", "g", "metadata", "defs"}:
+            continue
         if tag == "path":
             lines.extend(parse_linear_path(elem.get("d", "")))
         elif tag == "line":
-            lines.append([
-                (float(elem.attrib["x1"]), float(elem.attrib["y1"])),
-                (float(elem.attrib["x2"]), float(elem.attrib["y2"])),
-            ])
+            try:
+                line = [
+                    (float(elem.attrib["x1"]), float(elem.attrib["y1"])),
+                    (float(elem.attrib["x2"]), float(elem.attrib["y2"])),
+                ]
+            except (KeyError, ValueError) as exc:
+                raise GeometryError("malformed line element in normalized SVG") from exc
+            lines.append(line)
         elif tag in {"polyline", "polygon"}:
             pts = _parse_points(elem.get("points", ""))
             if tag == "polygon" and pts and pts[-1] != pts[0]:
                 pts.append(pts[0])
             if len(pts) >= 2:
                 lines.append(pts)
+        else:
+            raise GeometryError(f"unexpected <{tag}> in normalized SVG")
 
     if not lines:
         raise GeometryError("normalized SVG contains no drawable line geometry")
+    point_count = sum(len(line) for line in lines)
+    if len(lines) > MAX_POLYLINES:
+        raise GeometryError(f"geometry exceeds {MAX_POLYLINES} polylines")
+    if point_count > MAX_POINTS:
+        raise GeometryError(f"geometry exceeds {MAX_POINTS} points")
     return lines
 
 
@@ -460,13 +566,21 @@ def fit_to_profile(polylines: list[Polyline], profile: Profile) -> list[Polyline
     off_x = ws.draw_min_x + (target_w - used_w) / 2
     off_y = ws.draw_min_y + (target_h - used_h) / 2
 
-    return [
+    fitted = [
         [
             (off_x + (x - b.min_x) * scale, off_y + (y - b.min_y) * scale)
             for x, y in line
         ]
         for line in oriented
     ]
+    fb = bounds(fitted)
+    eps = 1e-7
+    if not (
+        ws.draw_min_x - eps <= fb.min_x <= fb.max_x <= ws.draw_max_x + eps
+        and ws.draw_min_y - eps <= fb.min_y <= fb.max_y <= ws.draw_max_y + eps
+    ):
+        raise GeometryError("fitted geometry escaped drawing envelope")
+    return fitted
 
 
 def _distance(a: Point, b: Point) -> float:
@@ -535,61 +649,102 @@ def _parse_gcode_line(line: str) -> tuple[str, dict[str, float]]:
         key = match.group(1).upper()
         if key in params:
             raise GCodeSafetyError(f"duplicate G-code parameter: {key}")
-        params[key] = float(match.group(2))
+        value = float(match.group(2))
+        if not math.isfinite(value):
+            raise GCodeSafetyError(f"non-finite G-code parameter: {raw!r}")
+        params[key] = value
     return command, params
 
 
-def validate_gcode(text: str, profile: Profile) -> dict[str, object]:
-    allowed = {"G90", "G0", "G1", "M400"}
-    seen_g90 = False
-    current_x: float | None = None
-    current_y: float | None = None
-    xy_moves = 0
+def _feed_matches(value: float, expected: float) -> bool:
+    return math.isclose(value, expected, rel_tol=0, abs_tol=0.01)
 
+
+def validate_gcode(text: str, profile: Profile) -> dict[str, object]:
+    active: list[tuple[int, str, dict[str, float]]] = []
     for line_no, raw in enumerate(text.splitlines(), 1):
         command, params = _parse_gcode_line(raw)
-        if not command:
+        if command:
+            active.append((line_no, command, params))
+
+    if not active:
+        raise GCodeSafetyError("prepared G-code is empty")
+    if active[0][1] != "G90" or active[0][2]:
+        raise GCodeSafetyError("first active command must be bare G90")
+    if active[-1][1] != "M400" or active[-1][2]:
+        raise GCodeSafetyError("last active command must be bare M400")
+
+    ws = profile.workspace
+    pen_state: Literal["unknown", "up", "down"] = "unknown"
+    xy_moves = 0
+    draw_moves = 0
+
+    for index, (line_no, command, params) in enumerate(active):
+        if index == 0:
             continue
-        if command not in allowed:
+        if command == "G90":
+            raise GCodeSafetyError(f"line {line_no}: repeated G90 is not allowed")
+        if command == "M400":
+            if index != len(active) - 1:
+                raise GCodeSafetyError(f"line {line_no}: M400 is only allowed at the end")
+            continue
+        if command not in {"G0", "G1"}:
             raise GCodeSafetyError(f"line {line_no}: command {command} is not allowed")
-        if command in {"G90", "M400"} and params:
-            raise GCodeSafetyError(f"line {line_no}: {command} must not have parameters")
         if "E" in params:
             raise GCodeSafetyError(f"line {line_no}: extrusion parameter E is forbidden")
         unknown = set(params) - {"X", "Y", "Z", "F"}
         if unknown:
             raise GCodeSafetyError(f"line {line_no}: unsupported parameters {sorted(unknown)}")
 
-        if command == "G90":
-            seen_g90 = True
+        has_xy = "X" in params or "Y" in params
+        has_z = "Z" in params
+        if has_xy == has_z:
+            raise GCodeSafetyError(f"line {line_no}: motion must be XY-only or Z-only")
+        if "F" not in params:
+            raise GCodeSafetyError(f"line {line_no}: feed rate F is required")
+
+        if has_z:
+            if command != "G0" or set(params) != {"Z", "F"}:
+                raise GCodeSafetyError(f"line {line_no}: Z motion must be G0 Z... F...")
+            if not _feed_matches(params["F"], profile.motion.z_feed):
+                raise GCodeSafetyError(f"line {line_no}: unexpected Z feed {params['F']}")
+            z = params["Z"]
+            if math.isclose(z, profile.tool.pen_up_z, abs_tol=0.005):
+                pen_state = "up"
+            elif math.isclose(z, profile.tool.pen_down_z, abs_tol=0.005):
+                if pen_state != "up":
+                    raise GCodeSafetyError(f"line {line_no}: pen-down without known pen-up state")
+                pen_state = "down"
+            else:
+                raise GCodeSafetyError(f"line {line_no}: unexpected Z={z}")
             continue
 
-        if command in {"G0", "G1"}:
-            if not seen_g90:
-                raise GCodeSafetyError(f"line {line_no}: motion before G90")
-            if "X" in params:
-                current_x = params["X"]
-            if "Y" in params:
-                current_y = params["Y"]
-            if "X" in params or "Y" in params:
-                xy_moves += 1
-                if current_x is None or current_y is None:
-                    raise GCodeSafetyError(f"line {line_no}: first XY move must specify X and Y")
-                ws = profile.workspace
-                if not ws.min_x <= current_x <= ws.max_x:
-                    raise GCodeSafetyError(f"line {line_no}: X={current_x} outside hard envelope")
-                if not ws.min_y <= current_y <= ws.max_y:
-                    raise GCodeSafetyError(f"line {line_no}: Y={current_y} outside hard envelope")
-            if "Z" in params:
-                z = params["Z"]
-                allowed_z = (profile.tool.pen_up_z, profile.tool.pen_down_z)
-                if not any(math.isclose(z, value, abs_tol=0.005) for value in allowed_z):
-                    raise GCodeSafetyError(f"line {line_no}: unexpected Z={z}")
+        if set(params) != {"X", "Y", "F"}:
+            raise GCodeSafetyError(f"line {line_no}: XY motion must specify X, Y and F")
+        x = params["X"]
+        y = params["Y"]
+        if not (ws.draw_min_x <= x <= ws.draw_max_x and ws.draw_min_y <= y <= ws.draw_max_y):
+            raise GCodeSafetyError(
+                f"line {line_no}: XY=({x},{y}) outside normal drawing envelope"
+            )
+        xy_moves += 1
 
-    if not seen_g90:
-        raise GCodeSafetyError("prepared G-code must include G90")
-    if xy_moves == 0:
-        raise GCodeSafetyError("prepared G-code contains no XY motion")
+        if command == "G0":
+            if pen_state != "up":
+                raise GCodeSafetyError(f"line {line_no}: travel move requires pen-up")
+            if not _feed_matches(params["F"], profile.motion.travel_feed):
+                raise GCodeSafetyError(f"line {line_no}: unexpected travel feed {params['F']}")
+        else:
+            if pen_state != "down":
+                raise GCodeSafetyError(f"line {line_no}: draw move requires pen-down")
+            if not _feed_matches(params["F"], profile.motion.draw_feed):
+                raise GCodeSafetyError(f"line {line_no}: unexpected draw feed {params['F']}")
+            draw_moves += 1
+
+    if xy_moves == 0 or draw_moves == 0:
+        raise GCodeSafetyError("prepared G-code must contain travel and draw XY motion")
+    if pen_state != "up":
+        raise GCodeSafetyError("prepared G-code must finish with pen-up before M400")
 
     return {
         "valid": True,
@@ -597,6 +752,8 @@ def validate_gcode(text: str, profile: Profile) -> dict[str, object]:
         "heater_commands_present": False,
         "extrusion_present": False,
         "xy_moves": xy_moves,
+        "draw_moves": draw_moves,
+        "command_whitelist": ["G90", "G0", "G1", "M400"],
     }
 
 
@@ -682,6 +839,27 @@ def _profile_report(profile: Profile) -> dict[str, object]:
     }
 
 
+def _prepare_output_dir(source: Path, output: Path, force: bool) -> None:
+    if output == source or output in source.parents:
+        raise KobraPlotError("output directory must not be the source file or an ancestor of it")
+
+    if output.exists():
+        if not force:
+            raise KobraPlotError(f"output directory already exists: {output}")
+        if not output.is_dir():
+            raise KobraPlotError(f"output path is not a directory: {output}")
+        marker = output / _JOB_MARKER
+        if not marker.is_file():
+            raise KobraPlotError(
+                f"refusing --force for unmarked directory: {output}; "
+                f"only directories containing {_JOB_MARKER} may be replaced"
+            )
+        shutil.rmtree(output)
+
+    output.mkdir(parents=True)
+    (output / _JOB_MARKER).write_text("kobra-plot-job-v1\n", encoding="utf-8")
+
+
 def prepare_file(
     source: Path,
     output: Path,
@@ -693,17 +871,13 @@ def prepare_file(
     output = output.expanduser().resolve()
     if not source.is_file():
         raise KobraPlotError(f"source file does not exist: {source}")
+    size = source.stat().st_size
+    if size > MAX_SOURCE_BYTES:
+        raise KobraPlotError(f"source exceeds {MAX_SOURCE_BYTES} byte limit")
 
     kind = classify_source(source)
     profile = load_profile(profile_path)
-
-    if output.exists():
-        if not force:
-            raise KobraPlotError(f"output directory already exists: {output}")
-        if not output.is_dir():
-            raise KobraPlotError(f"output path is not a directory: {output}")
-        shutil.rmtree(output)
-    output.mkdir(parents=True)
+    _prepare_output_dir(source, output, force)
 
     copied_source = output / f"source{source.suffix.lower()}"
     shutil.copy2(source, copied_source)
@@ -711,12 +885,14 @@ def prepare_file(
 
     if kind == "svg":
         normalize_svg(copied_source, normalized)
+        conversion = "vpype-svg-linearize-simplify-linesort"
     else:
         try:
             text = copied_source.read_text(encoding="utf-8")
         except UnicodeError as exc:
             raise KobraPlotError(f"text source is not UTF-8: {exc}") from exc
         normalize_text(text, normalized)
+        conversion = "vpype-hershey-text-linesort"
 
     normalized_geometry = load_normalized_svg(normalized)
     input_bounds = bounds(normalized_geometry)
@@ -742,6 +918,8 @@ def prepare_file(
             "kind": kind,
             "filename": source.name,
             "sha256": sha256(copied_source),
+            "bytes": size,
+            "conversion": conversion,
         },
         "backend": {"vpype": vpype_version()},
         "geometry": stats,
@@ -749,7 +927,9 @@ def prepare_file(
         "safety": safety,
         "artifacts": {
             "normalized_svg": "normalized.svg",
+            "normalized_svg_sha256": sha256(normalized),
             "preview_svg": "preview.svg",
+            "preview_svg_sha256": sha256(preview_path),
             "gcode": "output.gcode",
             "gcode_sha256": sha256(gcode_path),
         },
