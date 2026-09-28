@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-closeout-cleanup-20260928-12",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 300,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; git fetch origin --prune --quiet; test \"$(git rev-parse origin/main)\" = \"dce0f97893ab5cd3f654a3792c53491672d7a0ca\"; git status --short; git push origin --delete feat/kobra-plot-prepare chore/kobra-closeout-20260928; git fetch origin --prune --quiet; git reset --hard origin/main; git branch -f main origin/main; rm -rf projects/kobra2-neo/.pytest_cache; echo '--- final head'; git rev-parse HEAD; echo '--- final status'; git status --short --branch; echo '--- final branches'; git branch -a --format='%(refname:short) %(objectname)' | sort; echo '--- stale calibration refs'; if grep -RIn --exclude-dir=.venv --exclude-dir=.pytest_cache --exclude='*.lock' '3\\.12' projects/kobra2-neo; then exit 1; else echo none; fi; echo '--- current docs'; find projects/kobra2-neo/docs -maxdepth 1 -type f -print | sort"
+  ]
+}
