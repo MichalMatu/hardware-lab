@@ -1,9 +1,0 @@
-{
-  "event": "invalid_task_rejected",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "updated_at": "2026-09-27T23:37:37.788744+00:00",
-  "task_id": "pcb-generated-board-audit-20260928-03",
-  "daemon_version": "4.19.1",
-  "pid": 28367
-}
