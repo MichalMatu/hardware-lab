@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-host-guard-validate-20260928-11",
+  "task_digest": "4fbef0752084ab902916e04a211543451804ebca941f668fddafbc621385ff76",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T00:59:23.294699+00:00",
+  "attempt_id": "906c89336955ada2817dd322",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 97060,
+  "updated_at": "2026-09-28T00:59:23.294782+00:00",
+  "pid": 97060
+}
