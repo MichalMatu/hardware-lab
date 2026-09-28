@@ -1,0 +1,16 @@
+{
+  "id": "pcb-local-leftovers-clean-20260928-17",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; echo HEAD=$(git rev-parse HEAD); git show -s --oneline HEAD; git status --short",
+    "set -euo pipefail; target='projects/pcb/boards/esp32_devkitc_hat/out/project.kicad_prl'; test -f \"$target\"; git check-ignore -q \"$target\"; rm -f \"$target\"; rmdir projects/pcb/boards/esp32_devkitc_hat/out; rmdir projects/pcb/boards/esp32_devkitc_hat",
+    "set -euo pipefail; test ! -e projects/pcb/boards/esp32_devkitc_hat; python3 projects/pcb/validate_workspace.py",
+    "set -euo pipefail; git diff --check; git status --short; git status --short --ignored -- projects/pcb/boards"
+  ]
+}
