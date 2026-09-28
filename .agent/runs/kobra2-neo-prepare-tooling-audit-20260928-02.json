@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-prepare-tooling-audit-20260928-02",
   "task_digest": "bb15cdd8f61ab5b2162f7053bca6fc221c0d64f0fe4678661af5bcbf7f8e0194",
-  "idle_timeout": 300,
-  "task_timeout": 600,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T10:10:34.017447+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-28T10:10:37.768000+00:00",
   "attempt_id": "f297c739e186beb5067764fa",
   "daemon_version": "4.19.1",
   "daemon_pid": 38843,
-  "updated_at": "2026-09-28T10:10:34.017538+00:00",
+  "updated_at": "2026-09-28T10:10:38.114152+00:00",
   "pid": 38843
 }
