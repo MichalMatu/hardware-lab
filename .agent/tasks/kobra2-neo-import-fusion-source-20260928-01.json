@@ -1,0 +1,15 @@
+{
+  "id": "kobra2-neo-import-fusion-source-20260928-01",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "docs/kobra2-neo-plotter-baseline",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 300,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git branch --show-current)\" = \"docs/kobra2-neo-plotter-baseline\"; git pull --ff-only origin docs/kobra2-neo-plotter-baseline; test \"$(git rev-parse HEAD)\" = \"89b9518189d2cffe8b18aae8db872d5824f8a115\"",
+    "set -euo pipefail; src=''; for p in \"$HOME/Downloads/kobra2neo.f3d\" \"$HOME/Desktop/kobra2neo.f3d\" \"$HOME/Documents/kobra2neo.f3d\"; do if [ -f \"$p\" ]; then src=\"$p\"; break; fi; done; if [ -z \"$src\" ]; then src=$(find \"$HOME/Downloads\" \"$HOME/Desktop\" \"$HOME/Documents\" -maxdepth 4 -type f -name 'kobra2neo.f3d' -print -quit 2>/dev/null || true); fi; test -n \"$src\"; actual=$(shasum -a 256 \"$src\" | awk '{print $1}'); test \"$actual\" = \"bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6\"; mkdir -p projects/kobra2-neo/cad/tools/pen; cp \"$src\" projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d; printf '%s  %s\\n' \"$actual\" 'kobra2-neo-pen-holder.f3d' > projects/kobra2-neo/cad/tools/pen/SOURCE.sha256; test \"$(shasum -a 256 projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d | awk '{print $1}')\" = \"$actual\"",
+    "set -euo pipefail; git add projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d projects/kobra2-neo/cad/tools/pen/SOURCE.sha256; git diff --cached --stat; git commit -m 'Add Kobra 2 Neo pen holder Fusion source'; git push origin HEAD:docs/kobra2-neo-plotter-baseline; git rev-parse HEAD; test -z \"$(git status --porcelain)\""
+  ]
+}
