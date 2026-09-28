@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.1",
-  "state": "idle",
-  "pid": 92223,
-  "updated_at": "2026-09-28T00:57:17.189504+00:00",
+  "state": "running",
+  "pid": 97060,
+  "updated_at": "2026-09-28T00:59:19.798164+00:00",
   "self_revision": "105f9b6d2e28013020a06526abe179ab67160e0b",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "pcb-host-guard-validate-20260928-11",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,7 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 92223,
+  "worker_pid": 97060,
   "supervisor_pid": 50844,
+  "active_resources": [],
   "execution_variant": "parallel"
 }
