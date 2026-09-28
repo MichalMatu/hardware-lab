@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-detect-serial-20260928-01",
+  "task_digest": "77373f666cf033f057d86ff1e5d624b25774aec3089b071e2877c2dee1727a13",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T13:56:28.221984+00:00",
+  "attempt_id": "3edb1d78f7b530e59162a57f",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 12203,
+  "updated_at": "2026-09-28T13:56:28.222067+00:00",
+  "pid": 12203
+}
