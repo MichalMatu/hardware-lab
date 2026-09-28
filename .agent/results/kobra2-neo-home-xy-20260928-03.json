@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-home-xy-20260928-03",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-28T14:03:45.129662+00:00",
+  "command_timeout": 90,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"0f74cf44d4c4971b1ccb18fd29a7612fb955cb31\"; test -e /dev/cu.usbserial-130; python3 - <<'PY'\nimport time\ntry:\n    import serial\nexcept Exception as exc:\n    raise SystemExit(f'pyserial unavailable: {exc}')\nport = '/dev/cu.usbserial-130'\nwith serial.Serial(port, 115200, timeout=0.25, write_timeout=2) as ser:\n    time.sleep(2.0)\n    ser.reset_input_buffer()\n    ser.write(b'G28 X Y\\n')\n    ser.flush()\n    print('SENT:G28 X Y', flush=True)\n    deadline = time.monotonic() + 60.0\n    saw_ok = False\n    while time.monotonic() < deadline:\n        raw = ser.readline()\n        if not raw:\n            continue\n        text = raw.decode('utf-8', errors='replace').strip()\n        if text:\n            print(f'RX:{text}', flush=True)\n        lower = text.lower()\n        if lower.startswith('error') or 'printer halted' in lower or 'kill() called' in lower:\n            raise SystemExit(f'printer error: {text}')\n        if lower == 'ok' or lower.startswith('ok '):\n            saw_ok = True\n            break\n    if not saw_ok:\n        raise SystemExit('timeout waiting for final ok after G28 X Y')\nprint('RESULT:XY_HOME_OK')\nPY",
+      "exit_code": 0,
+      "output": "SENT:G28 X Y\nRX:X:-5.80 Y:-1.00 Z:4.86 E:0.00 Count X:-464 Y:-80 Z:2000\nRX:ok\nRESULT:XY_HOME_OK\n",
+      "elapsed_seconds": 11.131,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.92,
+      "output_policy": "stream",
+      "captured_output_chars": 96,
+      "output_truncated": false,
+      "current_rss_mb": 9.88,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 11.131
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.233
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.091
+  },
+  "finished_at": "2026-09-28T14:03:58.436520+00:00",
+  "task_digest": "c427368f5c2b154ca9117c8d4ea75b12f48151d0b8eb8ff69ad746b732665193",
+  "idle_timeout": 300,
+  "task_timeout": 180,
+  "memory_limit_mb": 4096,
+  "attempt_id": "72f16e05b6494c569f6e4cef",
+  "daemon_version": "4.19.2"
+}
