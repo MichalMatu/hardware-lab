@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-28T10:09:59.332143+00:00",
+  "task_id": "kobra2-neo-prepare-tooling-audit-20260928-01",
+  "daemon_version": "4.19.1",
+  "pid": 36241
+}
