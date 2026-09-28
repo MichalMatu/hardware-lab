@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.2",
-  "state": "running",
+  "state": "idle",
   "pid": 12203,
-  "updated_at": "2026-09-28T13:56:24.216630+00:00",
+  "updated_at": "2026-09-28T13:56:44.116588+00:00",
   "self_revision": "fdb7d3cf4419a4a31b65e126846895db52325635",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "kobra2-neo-detect-serial-20260928-01",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -25,6 +25,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 12203,
   "supervisor_pid": 83179,
-  "active_resources": [],
+  "last_task_id": "kobra2-neo-detect-serial-20260928-01",
   "execution_variant": "parallel"
 }
