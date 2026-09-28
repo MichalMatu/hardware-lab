@@ -1,0 +1,80 @@
+{
+  "id": "kobra2-neo-prepare-shaft50-showcase-20260928-18",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-28T18:17:28.777143+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin agent-control --quiet; python3 -c 'import json,subprocess; raw=subprocess.check_output([\"git\",\"show\",\"origin/agent-control:.agent/tasks/kobra2-neo-prepare-shaft50-showcase-20260928-15.json\"],text=True); cmd=json.loads(raw)[\"commands\"][0]; cmd=cmd.replace(\"python3 - <<'PY'\",\"uv run python - <<'PY'\",1); old=\"kp.normalize_svg(source,norm)\"; new=\"import xml.etree.ElementTree as ET\\ntree=ET.parse(source); rr=tree.getroot(); allowed={\\\"svg\\\",\\\"g\\\",\\\"path\\\",\\\"line\\\",\\\"polyline\\\",\\\"polygon\\\",\\\"rect\\\",\\\"circle\\\",\\\"ellipse\\\"}\\ndef local(tag): return tag.rsplit(\\\"}\\\",1)[-1]\\nfor parent in list(rr.iter()):\\n    for child in list(parent):\\n        if local(child.tag) not in allowed: parent.remove(child)\\ntree.write(source,encoding=\\\"unicode\\\")\\nkp.normalize_svg(source,norm)\"; assert old in cmd; cmd=cmd.replace(old,new,1); subprocess.run([\"bash\",\"-lc\",cmd],check=True)'",
+      "exit_code": 1,
+      "output": "Checked 20 packages in 9ms\nTraceback (most recent call last):\n  File \"<stdin>\", line 57, in <module>\n  File \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/src/kobra_plot.py\", line 318, in normalize_svg\n    _run_vpype([\n  File \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/src/kobra_plot.py\", line 275, in _run_vpype\n    proc = _run_process([str(vpype_executable()), *args])\n                             ^^^^^^^^^^^^^^^^^^\n  File \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/src/kobra_plot.py\", line 246, in vpype_executable\n    raise KobraPlotError(\nkobra_plot.KobraPlotError: vpype is unavailable; from projects/kobra2-neo run `uv sync` and then use `uv run kobra-plot ...`\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import json,subprocess; raw=subprocess.check_output([\"git\",\"show\",\"origin/agent-control:.agent/tasks/kobra2-neo-prepare-shaft50-showcase-20260928-15.json\"],text=True); cmd=json.loads(raw)[\"commands\"][0]; cmd=cmd.replace(\"python3 - <<PY\",\"uv run python - <<PY\",1); old=\"kp.normalize_svg(source,norm)\"; new=\"import xml.etree.ElementTree as ET\\ntree=ET.parse(source); rr=tree.getroot(); allowed={\\\"svg\\\",\\\"g\\\",\\\"path\\\",\\\"line\\\",\\\"polyline\\\",\\\"polygon\\\",\\\"rect\\\",\\\"circle\\\",\\\"ellipse\\\"}\\ndef local(tag): return tag.rsplit(\\\"}\\\",1)[-1]\\nfor parent in list(rr.iter()):\\n    for child in list(parent):\\n        if local(child.tag) not in allowed: parent.remove(child)\\ntree.write(source,encoding=\\\"unicode\\\")\\nkp.normalize_svg(source,norm)\"; assert old in cmd; cmd=cmd.replace(old,new,1); subprocess.run([\"bash\",\"-lc\",cmd],check=True)\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.13/3.13.9_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py\", line 577, in run\n    raise CalledProcessError(retcode, process.args,\n                             output=stdout, stderr=stderr)\nsubprocess.CalledProcessError: Command '['bash', '-lc', 'set -euo pipefail; git fetch origin --prune --quiet; test \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/main)\"; cd projects/kobra2-neo; uv sync --frozen; python3 - <<\\'PY\\'\\nfrom pathlib import Path\\nimport json, subprocess, sys\\nsys.path.insert(0,\\'src\\')\\nimport kobra_plot as kp\\nroot=Path(\\'.\\')\\nbase=root/\\'samples/svg/shaft-50x20-showcase-base.svg\\'\\nsource=root/\\'samples/svg/shaft-50x20-showcase.svg\\'\\nnorm=root/\\'samples/svg/shaft-50x20-showcase-normalized.svg\\'\\npreview=root/\\'samples/svg/shaft-50x20-showcase-preview.svg\\'\\ngout=root/\\'samples/gcode/shaft-50x20-showcase.gcode\\'\\nreport=root/\\'samples/gcode/shaft-50x20-showcase.report.json\\'\\n# 150 x 150 mm source sheet. Geometry only; labels are added as Hershey single-line text by vpype.\\nS=[]\\ndef line(x1,y1,x2,y2): S.append(f\\'<line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\"/>\\')\\ndef rect(x,y,w,h): S.append(f\\'<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\"/>\\')\\ndef circ(cx,cy,r): S.append(f\\'<circle cx=\"{cx}\" cy=\"{cy}\" r=\"{r}\"/>\\')\\ndef arrow(x,y,dx,dy,s=2.0):\\n    import math\\n    L=math.hypot(dx,dy); ux,uy=dx/L,dy/L; px,py=-uy,ux\\n    line(x,y,x+ux*s+px*s*0.55,y+uy*s+py*s*0.55); line(x,y,x+ux*s-px*s*0.55,y+uy*s-py*s*0.55)\\ndef dim_h(x1,x2,y,ey1,ey2):\\n    line(x1,ey1,x1,y+2); line(x2,ey2,x2,y+2); line(x1,y,x2,y); arrow(x1,y,1,0); arrow(x2,y,-1,0)\\ndef dim_v(y1,y2,x,ex1,ex2):\\n    line(ex1,y1,x+2,y1); line(ex2,y2,x+2,y2); line(x,y1,x,y2); arrow(x,y1,0,1); arrow(x,y2,0,-1)\\n# page frame and title block\\nrect(3,3,144,144); line(3,118,147,118); line(42,118,42,147); line(100,118,100,147); line(125,118,125,147); line(42,132,147,132); line(100,140,147,140)\\n# END VIEW (upper left): diameter 20\\ncirc(25,34,10); line(12,34,38,34); line(25,21,25,47); dim_h(15,35,51,44,44)\\n# MAIN VIEW (upper right): L=50, D=20, chamfers\\nrect(60,24,50,20); line(60,34,110,34); line(58,34,112,34); line(62,24,60,26); line(62,44,60,42); line(108,24,110,26); line(108,44,110,42); dim_h(60,110,52,44,44); dim_v(24,44,118,110,110)\\n# TOP VIEW (lower right): same projected rectangle for cylindrical shaft\\nrect(60,70,50,20); line(58,80,112,80); line(60,80,110,80); line(62,70,60,72); line(62,90,60,88); line(108,70,110,72); line(108,90,110,88)\\n# Small surface-finish symbol near notes\\nline(18,86,22,92); line(22,92,28,82); line(28,82,40,82)\\n# notes separator\\nline(12,98,52,98)\\nbase.write_text(\\'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"150mm\" height=\"150mm\" viewBox=\"0 0 150 150\"><g fill=\"none\" stroke=\"black\" stroke-width=\"0.25\">\\'+\\'\\'.join(S)+\\'</g></svg>\\')\\n# Add plotter-friendly Hershey text; all positions/sizes are in mm.\\ncmd=[\\'uv\\',\\'run\\',\\'vpype\\',\\'read\\',str(base)]\\ndef add(txt,size,x,y,align=\\'left\\',font=\\'scripts\\'):\\n    cmd.extend([\\'text\\',\\'--font\\',font,\\'--size\\',f\\'{size}mm\\',\\'--position\\',f\\'{x}mm\\',f\\'{y}mm\\',\\'--align\\',align,txt])\\nadd(\\'WIDOK OD CZOLA\\',3.0,25,58,\\'center\\'); add(\\'WIDOK GLOWNY\\',3.0,85,58,\\'center\\'); add(\\'WIDOK Z GORY\\',3.0,85,96,\\'center\\')\\nadd(\\'20\\',3.3,25,49,\\'center\\'); add(\\'50\\',3.3,85,50,\\'center\\'); add(\\'20\\',3.3,121,36,\\'center\\')\\nadd(\\'Ra 1.6\\',2.8,31,87,\\'left\\'); add(\\'UWAGI\\',3.0,12,103,\\'left\\'); add(\\'1  MATERIAL: STAL C45\\',2.3,12,108,\\'left\\'); add(\\'2  FAZY: 1 x 45 DEG\\',2.3,12,112,\\'left\\'); add(\\'3  TOLERANCJE: ISO 2768-mK\\',2.3,12,116,\\'left\\')\\nadd(\\'WALEK 20 x 50\\',4.6,71,128,\\'center\\',\\'rowmans\\'); add(\\'RYSUNEK POKAZOWY\\',2.1,71,135,\\'center\\')\\nadd(\\'MATERIAL\\',1.8,6,123); add(\\'STAL C45\\',2.3,6,128); add(\\'OPIS\\',1.8,6,136); add(\\'WALEK CYLINDRYCZNY\\',1.8,6,141)\\nadd(\\'SKALA 1:1\\',2.2,46,142); add(\\'JEDNOSTKI mm\\',2.2,72,142); add(\\'NR W-001\\',2.1,103,123); add(\\'WERSJA A\\',2.1,128,123); add(\\'KOBRA 2 NEO\\',2.1,103,137); add(\\'PEN PLOT\\',2.1,128,145)\\ncmd += [\\'linesimplify\\',\\'linesort\\',\\'write\\',\\'--color-mode\\',\\'none\\',\\'--dont-set-date\\',str(source)]\\nsubprocess.run(cmd,check=True)\\nimport xml.etree.ElementTree as ET\\ntree=ET.parse(source); rr=tree.getroot(); allowed={\"svg\",\"g\",\"path\",\"line\",\"polyline\",\"polygon\",\"rect\",\"circle\",\"ellipse\"}\\ndef local(tag): return tag.rsplit(\"}\",1)[-1]\\nfor parent in list(rr.iter()):\\n    for child in list(parent):\\n        if local(child.tag) not in allowed: parent.remove(child)\\ntree.write(source,encoding=\"unicode\")\\nkp.normalize_svg(source,norm)\\npolys=kp.load_normalized_svg(norm)\\nb=kp.bounds(polys)\\nscale=150.0/max(b.width,b.height)\\n# center geometry into exact 150x150 source box, then place at machine X38..188, Y58..208\\nused_w=b.width*scale; used_h=b.height*scale; ox=(150-used_w)/2; oy=(150-used_h)/2\\nmachine=[]\\nfor pl in polys:\\n    out=[]\\n    for x,y in pl:\\n        lx=ox+(x-b.min_x)*scale; ly=oy+(y-b.min_y)*scale\\n        out.append((38.0+lx, 58.0+(150.0-ly)))\\n    machine.append(out)\\nprofile=kp.load_profile()\\ngcode=kp.generate_gcode(machine,profile)\\nsafety=kp.validate_gcode(gcode,profile)\\nstats=kp.geometry_stats(machine,profile); mb=kp.bounds(machine)\\nassert safety[\\'valid\\'] is True\\nassert \\'G28\\' not in gcode and \\'M104\\' not in gcode and \\'M109\\' not in gcode and \\'M140\\' not in gcode and \\'M190\\' not in gcode and \\' E\\' not in gcode\\nassert 8 <= mb.min_x <= mb.max_x <= 218 and 41 <= mb.min_y <= mb.max_y <= 225\\ngout.write_text(gcode)\\npreview.write_text(kp.render_preview(machine,profile))\\ndata={\\'schema_version\\':1,\\'title\\':\\'Shaft 50 x 20 mm technical showcase\\',\\'sheet_mm\\':[150,150],\\'bounds_mm\\':mb.as_dict(),\\'stats\\':stats,\\'safety\\':safety,\\'pen_up_z\\':profile.tool.pen_up_z,\\'pen_down_z\\':profile.tool.pen_down_z,\\'travel_feed\\':profile.motion.travel_feed,\\'draw_feed\\':profile.motion.draw_feed,\\'z_feed\\':profile.motion.z_feed,\\'source_svg\\':str(source),\\'normalized_svg\\':str(norm),\\'preview_svg\\':str(preview)}\\nreport.write_text(json.dumps(data,indent=2)+\\'\\\\n\\')\\nprint(\\'PREPARED_OK\\',json.dumps({\\'bounds\\':mb.as_dict(),\\'stats\\':stats,\\'commands\\':sum(1 for l in gcode.splitlines() if l.strip() and not l.lstrip().startswith(\\';\\'))},sort_keys=True))\\nPY\\nuv run python - <<\\'PY\\'\\nfrom pathlib import Path\\nimport json,sys\\nsys.path.insert(0,\\'src\\'); import kobra_plot as kp\\np=kp.load_profile(); g=Path(\\'samples/gcode/shaft-50x20-showcase.gcode\\').read_text(); print(kp.validate_gcode(g,p)); print(json.loads(Path(\\'samples/gcode/shaft-50x20-showcase.report.json\\').read_text())[\\'stats\\'])\\nPY\\ngit add samples/svg/shaft-50x20-showcase-base.svg samples/svg/shaft-50x20-showcase.svg samples/svg/shaft-50x20-showcase-normalized.svg samples/svg/shaft-50x20-showcase-preview.svg samples/gcode/shaft-50x20-showcase.gcode samples/gcode/shaft-50x20-showcase.report.json; git diff --cached --check; git commit -m \\'Add shaft 50x20 showcase plot\\'; git push origin HEAD:main']' returned non-zero exit status 1.\n",
+      "elapsed_seconds": 5.629,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 115.06,
+      "output_policy": "stream",
+      "captured_output_chars": 9506,
+      "output_truncated": false,
+      "current_rss_mb": 115.06,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 5.629
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "?? projects/kobra2-neo/samples/svg/shaft-50x20-showcase-base.svg\n?? projects/kobra2-neo/samples/svg/shaft-50x20-showcase.svg\n",
+    "elapsed_seconds": 0.129
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-28T18:17:37.277312+00:00",
+  "workspace_checkpoint": {
+    "version": 2,
+    "task_id": "kobra2-neo-prepare-shaft50-showcase-20260928-18",
+    "reason": "task-exit",
+    "created_at": "2026-09-28T18:17:37.991432+00:00",
+    "base_head": "490215acabe9322b33c31c86adba13e043106265",
+    "work_branch": "agent-work",
+    "path": "/Users/michal/agent-workspace/repos/hardware-lab/checkpoints/kobra2-neo-prepare-shaft50-showcase-20260928-18/1790619457710089000-task-exit",
+    "tracked_patch": "tracked.patch",
+    "untracked_root": "untracked",
+    "untracked_files": [
+      "projects/kobra2-neo/samples/svg/shaft-50x20-showcase-base.svg",
+      "projects/kobra2-neo/samples/svg/shaft-50x20-showcase.svg"
+    ],
+    "tracked_patch_bytes": 0,
+    "untracked_bytes": 76945,
+    "total_bytes": 76945,
+    "status": "?? projects/kobra2-neo/samples/svg/shaft-50x20-showcase-base.svg\n?? projects/kobra2-neo/samples/svg/shaft-50x20-showcase.svg\n"
+  },
+  "task_digest": "9a5061932f77cfd19ad13ca61ceedf4bad9f73b5765da40f164ee7f521240b00",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "12c3e4588c74b0ec13cafba0",
+  "daemon_version": "4.19.4"
+}
