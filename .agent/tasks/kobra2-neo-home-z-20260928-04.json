@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-home-z-20260928-04",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 240,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"0f74cf44d4c4971b1ccb18fd29a7612fb955cb31\"; test -e /dev/cu.usbserial-130; python3 - <<'PY'\nimport time\nimport serial\nport = '/dev/cu.usbserial-130'\nwith serial.Serial(port, 115200, timeout=0.25, write_timeout=2) as ser:\n    time.sleep(2.0)\n    ser.reset_input_buffer()\n    ser.write(b'G28 Z\\n')\n    ser.flush()\n    print('SENT:G28 Z', flush=True)\n    deadline = time.monotonic() + 90.0\n    saw_ok = False\n    while time.monotonic() < deadline:\n        raw = ser.readline()\n        if not raw:\n            continue\n        text = raw.decode('utf-8', errors='replace').strip()\n        if text:\n            print(f'RX:{text}', flush=True)\n        lower = text.lower()\n        if lower.startswith('error') or 'printer halted' in lower or 'kill() called' in lower:\n            raise SystemExit(f'printer error: {text}')\n        if lower == 'ok' or lower.startswith('ok '):\n            saw_ok = True\n            break\n    if not saw_ok:\n        raise SystemExit('timeout waiting for final ok after G28 Z')\nprint('RESULT:Z_HOME_OK')\nPY"
+  ]
+}
