@@ -1,0 +1,16 @@
+{
+  "id": "pcb-final-prune-20260928-21",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 180,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"cc1bc31793c740246a43242e8183bc87d1be0469\"; python3 projects/pcb/validate_workspace.py; git diff --check; git status --short",
+    "set -euo pipefail; echo '=== stale markdown refs ==='; if find projects/pcb -path 'projects/pcb/archive' -prune -o -type f -name '*.md' -print0 | xargs -0 grep -nHE '/Users/|framework/module_registry.py|scripts/create_board.py|scripts/render_board.py|templates/skidl_reference'; then echo 'stale markdown refs found' >&2; exit 1; else echo 'none'; fi",
+    "set -euo pipefail; echo '=== remote heads before ==='; git ls-remote --heads origin; git ls-remote --exit-code --heads origin pcb-final-cleanup-audit >/dev/null; git push origin --delete pcb-final-cleanup-audit; git fetch --prune origin; echo '=== remote heads after ==='; git ls-remote --heads origin; test -z \"$(git ls-remote --heads origin pcb-final-cleanup-audit)\"",
+    "set -euo pipefail; heads=$(git ls-remote --heads origin | awk '{print $2}' | sort); printf '%s\n' \"$heads\"; test \"$heads\" = \"refs/heads/agent-control\nrefs/heads/main\"; git status --short"
+  ]
+}
