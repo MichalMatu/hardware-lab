@@ -1,0 +1,18 @@
+{
+  "id": "kobra2-neo-prepare-v1-implementation-20260928-04",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "feat/kobra-plot-prepare",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1200,
+  "task_timeout": 2400,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"bdb16b1ff5ae920388ec98e16e26a1c67ef2dbad\"; printf 'BRANCH=%s\\nUPSTREAM=%s\\n' \"$(git branch --show-current)\" \"$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')\"",
+    "python3 -c \"import base64,gzip;open('/tmp/kobra_plot_bootstrap.py','wb').write(gzip.decompress(base64.b64decode('"+b64+"')))\" && python3 /tmp/kobra_plot_bootstrap.py",
+    "set -euo pipefail; cd projects/kobra2-neo; uv sync; uv lock --check; uv run pytest",
+    "set -euo pipefail; cd projects/kobra2-neo; uv run kobra-plot doctor; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; uv run kobra-plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; uv run kobra-plot text 'MILEGO DNIA' -o /tmp/kobra-text-job; python3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor p in [Path('/tmp/kobra-curve-job'), Path('/tmp/kobra-text-job')]:\n    r=json.loads((p/'report.json').read_text())\n    assert r['safety']['valid'] is True\n    assert r['execution']['allowed'] is False\n    g=(p/'output.gcode').read_text()\n    for token in ['G28','G91','M104','M109','M140','M190',' E']:\n        assert token not in g, (p, token)\n    print(p.name, r['geometry']['polylines'], r['geometry']['points'], r['geometry']['output_bounds'])\nPY",
+    "set -euo pipefail; git diff --check; ! grep -R -nE '^import serial|^from serial' projects/kobra2-neo/src/kobra_plot; git status --short; git diff --stat",
+    "set -euo pipefail; git add projects/kobra2-neo; git commit -m 'Add offline Kobra plot preparation CLI'; git push git@github.com:MichalMatu/hardware-lab.git HEAD:feat/kobra-plot-prepare; test -z \"$(git status --porcelain)\"; git log -1 --oneline"
+  ]
+}
