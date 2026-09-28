@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-vpype-text-audit-20260928-05",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "feat/kobra-plot-prepare",
+  "allow_write": false,
+  "started_at": "2026-09-28T12:23:56.759974+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; uv tool run --from 'vpype==1.15.0' vpype --help | sed -n '1,240p' | grep -E '(^  text|text|write|read|linemerge|linesort|linesimplify)' || true; uv tool run --from 'vpype==1.15.0' vpype text --help | sed -n '1,220p' || true",
+      "exit_code": 0,
+      "output": "      vpype read input.svg -I my_post_processing.vpy write.output.svg\n      vpype -c my_plotter_config.toml read input.svg write -d my_plotter\n  Refer to the documentation at https://vpype.readthedocs.io/ for more\n    linemerge     Merge lines whose endings and starts overlap or are very...\n    linesimplify  Reduce the number of segments in the geometries.\n    linesort      Sort lines to minimize the pen-up travel distance.\n    read          Extract geometries from an SVG file.\n    stat          Print human-readable statistics on the current geometries.\n    write         Save geometries to a file.\n    text          Generate text using Hershey fonts.\nUsage: vpype text [OPTIONS] STRING\n\n  Generate text using Hershey fonts.\n\n  By default, `text` generates a single line of text. Automatic text wrapping\n  can be enabled using the the `--wrap` option.\n\n  In normal mode, the text starts at coordinate (0, 0) and expends right. This\n  can be controlled using the `--align` option. By passing \"center\", the text\n  is centered around (0, 0). With \"right\", the text expends left of (0, 0).\n\n  In wrap mode, the text start at (0, 0) and expends left until it reach the\n  specified width. The `--align` option controls how the text is laid out\n  within the column and behaves as typically expected. The `--hyphenate`\n  options enables hyphenation using the provided language code (en, nl, etc.)\n\n  To start the text at the different location than (0, 0), use the\n  `--position` option.\n\nOptions:\n  -f, --font [astrology|cursive|cyrilc_1|cyrillic|futural|futuram|gothgbt|gothgrt|gothiceng|gothicger|gothicita|gothitt|greek|greekc|greeks|japanese|markers|mathlow|mathupp|meteorology|music|rowmand|rowmans|rowmant|scriptc|scripts|symbolic|timesg|timesi|timesib|timesr|timesrb]\n                                  Font to use.\n  -s, --size LENGTH               Text size (default: 18).\n  -w, --wrap LENGTH               Wrap to provided width.\n  -h, --hyphenate TEXT            Hyphenate wrapped words using the provided\n                                  language code (en, nl, etc.)\n  -j, --justify                   Justify text block (wrap-mode only).\n  -p, --position LENGTH...        Position of the text (default: 0, 0).\n  -a, --align [left|right|center]\n                                  Text alignment with respect to position\n                                  (default: left).\n  -l, --layer LID                 Target layer or 'new'.\n  --help                          Show this message and exit.\n",
+      "elapsed_seconds": 3.134,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 101.19,
+      "output_policy": "stream",
+      "captured_output_chars": 2499,
+      "output_truncated": false,
+      "current_rss_mb": 101.19,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.134
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.135
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.075
+  },
+  "finished_at": "2026-09-28T12:24:02.157353+00:00",
+  "task_digest": "e2eeb0c9af29a7a97738bf2bd404c3882c40a48bf1f1f2bddcf012c47901b396",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "attempt_id": "3e6c52725721422d9f6c2a29",
+  "daemon_version": "4.19.1"
+}
