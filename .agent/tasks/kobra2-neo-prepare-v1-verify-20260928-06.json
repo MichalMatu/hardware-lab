@@ -1,0 +1,16 @@
+{
+  "id": "kobra2-neo-prepare-v1-verify-20260928-06",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1200,
+  "task_timeout": 2400,
+  "commands": [
+    "set -euo pipefail; printf 'HEAD='; git rev-parse HEAD; test \"$(git rev-parse HEAD)\" = \"0f74cf44d4c4971b1ccb18fd29a7612fb955cb31\"; git status --short --branch",
+    "set -euo pipefail; cd projects/kobra2-neo; uv lock --check; uv sync --frozen; uv run python -m py_compile src/kobra_plot.py; uv run pytest -q",
+    "set -euo pipefail; cd projects/kobra2-neo; uv run kobra-plot doctor; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; uv run kobra-plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; uv run kobra-plot text 'MILEGO DNIA' -o /tmp/kobra-text-job",
+    "set -euo pipefail; cd projects/kobra2-neo; python3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor p in [Path('/tmp/kobra-curve-job'), Path('/tmp/kobra-text-job')]:\n    r=json.loads((p/'report.json').read_text())\n    assert r['safety']['valid'] is True\n    assert r['execution']['allowed'] is False\n    assert (p/'.kobra-plot-job').is_file()\n    b=r['geometry']['output_bounds']\n    assert 8 <= b['min_x'] <= b['max_x'] <= 218\n    assert 41 <= b['min_y'] <= b['max_y'] <= 225\n    g=(p/'output.gcode').read_text()\n    for token in ['G28','G91','M104','M109','M140','M190',' E']:\n        assert token not in g, (p, token)\n    print(p.name, json.dumps({'polylines': r['geometry']['polylines'], 'points': r['geometry']['points'], 'bounds': b, 'duration_s': r['geometry'].get('nominal_duration_seconds')}, sort_keys=True))\nPY\nif grep -R -nE '^import serial|^from serial' src; then exit 1; fi; git status --short"
+  ]
+}
