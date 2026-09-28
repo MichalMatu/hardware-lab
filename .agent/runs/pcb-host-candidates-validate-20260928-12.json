@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-host-candidates-validate-20260928-12",
+  "task_digest": "3323794440da15ffc19099ed88a3afaa398dde847b8887d787e497f977e5f955",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:02:00.347969+00:00",
+  "attempt_id": "1f7b7b09a4a01a2368f78250",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 3261,
+  "updated_at": "2026-09-28T01:02:00.348032+00:00",
+  "pid": 3261
+}
