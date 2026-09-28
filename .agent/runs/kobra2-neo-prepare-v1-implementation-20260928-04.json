@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-28T11:06:09.202423+00:00",
+  "task_id": "kobra2-neo-prepare-v1-implementation-20260928-04",
+  "daemon_version": "4.19.1",
+  "pid": 60146
+}
