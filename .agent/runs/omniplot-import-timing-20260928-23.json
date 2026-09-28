@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "omniplot-import-timing-20260928-23",
+  "task_digest": "8ddbfbb7c7add4497c6cc7f915c714946727c41167aa881078df83ee6ec37dc5",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T19:08:19.658256+00:00",
+  "attempt_id": "067af1350d69e222097187ac",
+  "daemon_version": "4.19.5",
+  "daemon_pid": 48313,
+  "updated_at": "2026-09-28T19:08:19.658429+00:00",
+  "pid": 48313
+}
