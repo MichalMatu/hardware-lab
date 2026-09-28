@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-github-api-diagnose-20260928-06",
   "task_digest": "c065aafe15ebc55f4c1d554e7bc6c0b9a1d80013b4c2875b76ddd46d439b8596",
-  "idle_timeout": 300,
-  "task_timeout": 300,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T09:38:14.105729+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-28T09:38:16.962715+00:00",
   "attempt_id": "e260c0a38d6f1a4bb8fe16ca",
   "daemon_version": "4.19.1",
   "daemon_pid": 75574,
-  "updated_at": "2026-09-28T09:38:14.106120+00:00",
+  "updated_at": "2026-09-28T09:38:17.251900+00:00",
   "pid": 75574
 }
