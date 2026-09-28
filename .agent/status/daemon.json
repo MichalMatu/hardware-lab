@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.5",
-  "state": "running",
+  "state": "idle",
   "pid": 46770,
-  "updated_at": "2026-09-28T19:07:16.937934+00:00",
+  "updated_at": "2026-09-28T19:07:54.104584+00:00",
   "self_revision": "72f0a813aafc86ff2fe77fe8e3fe05dd33e008ad",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "omniplot-host-finalize-20260928-22",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -25,6 +25,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 46770,
   "supervisor_pid": 22468,
-  "active_resources": [],
+  "last_task_id": "omniplot-host-finalize-20260928-22",
   "execution_variant": "parallel"
 }
