@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-import-fusion-source-20260928-03",
   "task_digest": "fa8ca0f26aaa3feba67be0b6093055913717c34ec6f994c46445f42fe157905d",
-  "idle_timeout": 300,
-  "task_timeout": 900,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T09:30:29.117092+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-28T09:30:31.950667+00:00",
   "attempt_id": "6c12d2bfe77e645ad922f348",
   "daemon_version": "4.19.1",
   "daemon_pid": 58212,
-  "updated_at": "2026-09-28T09:30:29.117239+00:00",
+  "updated_at": "2026-09-28T09:30:32.301843+00:00",
   "pid": 58212
 }
