@@ -1,0 +1,16 @@
+{
+  "id": "pcb-workspace-validator-20260928-15",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"1d5ee4bb6f395d88bd5f6114d92c48c681b84b15\"; git show -s --oneline HEAD",
+    "set -euo pipefail; python3 projects/pcb/validate_workspace.py",
+    "set -euo pipefail; python3 - <<'PY'\nimport sys\nsys.path.insert(0, 'projects/pcb')\nfrom library.board_profile import validate_board_manifest\ninvalid = {'board': {'id': 'x', 'revision': 'A', 'status': 'prototype'}, 'host': {'profile': 'h'}, 'features': {'modules': ['i2c_bus', 'i2c_bus']}}\ntry:\n    validate_board_manifest(invalid)\nexcept ValueError as exc:\n    print('EXPECTED_BLOCK:', exc)\nelse:\n    raise SystemExit('duplicate module was not blocked')\nPY",
+    "set -euo pipefail; python3 -m compileall -q projects/pcb/library projects/pcb/validate_workspace.py; git diff --check; git status --short"
+  ]
+}
