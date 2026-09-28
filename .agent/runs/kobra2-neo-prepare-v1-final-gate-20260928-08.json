@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; cd projects/kobra2-neo; uv sync --locked; uv run python -m py_compile src/kobra_plot.py; uv run pytest -q",
-  "pid": 5558,
+  "command": "set -euo pipefail; cd projects/kobra2-neo; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; uv run kobra-plot doctor; uv run kobra-plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; uv run kobra-plot text 'MILEGO DNIA' -o /tmp/kobra-text-job",
+  "pid": 5739,
   "timeout": 1200,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T11:34:49.172936+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-28T11:34:53.956505+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "kobra2-neo-prepare-v1-final-gate-20260928-08",
@@ -18,5 +18,5 @@
   "task_digest": "0b546ee0a563157b255effcb24250c78444c53ad36391079ef793b84dc9c1516",
   "daemon_version": "4.19.1",
   "daemon_pid": 5237,
-  "updated_at": "2026-09-28T11:34:49.247981+00:00"
+  "updated_at": "2026-09-28T11:34:53.986508+00:00"
 }
