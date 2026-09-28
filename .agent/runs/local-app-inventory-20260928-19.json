@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "local-app-inventory-20260928-19",
   "task_digest": "f44c366d6c396699f47e0068ad1dbcb04f74772ff6ae41c22acb616c0ae23c33",
-  "idle_timeout": 300,
-  "task_timeout": 600,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T18:30:14.693988+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-28T18:30:17.508240+00:00",
   "attempt_id": "cbfa085d1f33e3dc8741e394",
   "daemon_version": "4.19.4",
   "daemon_pid": 78611,
-  "updated_at": "2026-09-28T18:30:14.694160+00:00",
+  "updated_at": "2026-09-28T18:30:17.872251+00:00",
   "pid": 78611
 }
