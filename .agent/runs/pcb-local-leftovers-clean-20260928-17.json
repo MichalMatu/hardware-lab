@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-local-leftovers-clean-20260928-17",
+  "task_digest": "96af7a944e9dd07e1479aee927dc510a4195bb537c58db1118dec9e1b6907f93",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:19:45.489806+00:00",
+  "attempt_id": "2edff44bfb5aa759d10617e6",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 39938,
+  "updated_at": "2026-09-28T01:19:45.489873+00:00",
+  "pid": 39938
+}
