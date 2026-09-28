@@ -1,9 +1,0 @@
-{
-  "id": "pcb-generated-board-audit-20260928-03",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-27T23:37:34.566347+00:00",
-  "daemon_version": "4.19.1",
-  "error": "JSONDecodeError: Invalid \\escape: line 12 column 355 (char 1236)"
-}
