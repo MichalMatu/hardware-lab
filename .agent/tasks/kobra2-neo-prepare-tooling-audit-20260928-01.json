@@ -1,0 +1,15 @@
+{
+  "id": "kobra2-neo-prepare-tooling-audit-20260928-01",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; printf 'BRANCH='; git branch --show-current; printf 'HEAD='; git rev-parse HEAD; git status --short --branch; test \"$(git rev-parse HEAD)\" = \"bdb16b1ff5ae920388ec98e16e26a1c67ef2dbad\"",
+    "set -u; for tool in python3 uv pipx inkscape vpype potrace convert magick ffmpeg; do printf '%-10s ' \"$tool\"; command -v \"$tool\" || true; done; printf 'PYTHON='; python3 --version 2>&1 || true; printf 'INKSCAPE='; inkscape --version 2>&1 | head -n 1 || true; printf 'VPYPE='; vpype --version 2>&1 | head -n 1 || true; printf 'POTRACE='; potrace --version 2>&1 | head -n 1 || true",
+    "set -u; printf 'PROJECT_FILES\\n'; find projects/kobra2-neo -maxdepth 3 -type f -not -path '*/cad/*' | sort; printf 'PYPROJECTS\\n'; find . -maxdepth 3 \( -name pyproject.toml -o -name requirements.txt \) -print | sort"
+  ]
+}
