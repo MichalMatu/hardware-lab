@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-live-shaft50-showcase-20260928-20",
   "task_digest": "209f41785fdde02cf87b4ca3e264c2735c61c5132b956fdd995cc6e71ae6d847",
-  "idle_timeout": 600,
-  "task_timeout": 2700,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T18:28:10.673778+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-28T18:28:13.098683+00:00",
   "attempt_id": "68f76602c972fe9b98c4bbc3",
   "daemon_version": "4.19.4",
   "daemon_pid": 75994,
-  "updated_at": "2026-09-28T18:28:10.673865+00:00",
+  "updated_at": "2026-09-28T18:28:13.415648+00:00",
   "pid": 75994
 }
