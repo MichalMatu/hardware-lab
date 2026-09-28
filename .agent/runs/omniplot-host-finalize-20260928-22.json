@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "omniplot-host-finalize-20260928-22",
+  "task_digest": "62e1099b5a541e5f1e9849970e5eb13ad70a25088d850044a3b9f44fae174c9e",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T19:07:20.711620+00:00",
+  "attempt_id": "24ab9f1c2bb0c8829b046251",
+  "daemon_version": "4.19.5",
+  "daemon_pid": 46770,
+  "updated_at": "2026-09-28T19:07:20.711717+00:00",
+  "pid": 46770
+}
