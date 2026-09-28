@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-workspace-validator-20260928-15",
+  "task_digest": "80fb798d015b376a9f53b3c556c4d08ddf6e0fe51e03e30186ba84e231d400ca",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:17:01.547162+00:00",
+  "attempt_id": "2b93d8d0ec8da9fe608ec8b2",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 34328,
+  "updated_at": "2026-09-28T01:17:01.548193+00:00",
+  "pid": 34328
+}
