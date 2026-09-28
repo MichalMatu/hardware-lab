@@ -35,4 +35,4 @@ The long-term input flow is:
 
 `SVG / text / raster image -> normalized plot geometry -> fit/orientation -> bounded G-code -> dry-run/inspection -> explicit live execution`
 
-Before adding more parser/tooling dependencies or moving software between repositories, first consolidate the current hardware documentation and add the existing Fusion 360 pen-holder design under `cad/tools/pen/`.
+The current hardware, calibration and Fusion 360 pen-holder source are now consolidated here. The next software step is to evaluate source-conversion options for complex SVG, text and raster images against the normalized-geometry boundary in `docs/WORKFLOW.md`, without moving Kobra-specific policy into `host-ops` core.
