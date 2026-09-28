@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "title": "Shaft 50 x 20 mm technical showcase",
+  "sheet_mm": [
+    150,
+    150
+  ],
+  "bounds_mm": {
+    "min_x": 38.0,
+    "min_y": 58.0,
+    "max_x": 188.0,
+    "max_y": 208.0,
+    "width": 150.0,
+    "height": 150.0
+  },
+  "stats": {
+    "polylines": 444,
+    "points": 3454,
+    "draw_distance_mm": 3035.865,
+    "travel_distance_mm": 1074.054,
+    "nominal_time_seconds": 1105.67,
+    "initial_xy_travel_included_in_estimate": false
+  },
+  "safety": {
+    "valid": true,
+    "homing_present": false,
+    "heater_commands_present": false,
+    "extrusion_present": false,
+    "xy_moves": 3454,
+    "draw_moves": 3010,
+    "command_whitelist": [
+      "G90",
+      "G0",
+      "G1",
+      "M400"
+    ]
+  },
+  "pen_up_z": 6.12,
+  "pen_down_z": 2.97,
+  "travel_feed": 3000.0,
+  "draw_feed": 1200.0,
+  "z_feed": 180.0,
+  "source_svg": "samples/svg/shaft-50x20-showcase.svg",
+  "normalized_svg": "samples/svg/shaft-50x20-showcase-normalized.svg",
+  "preview_svg": "samples/svg/shaft-50x20-showcase-preview.svg"
+}
