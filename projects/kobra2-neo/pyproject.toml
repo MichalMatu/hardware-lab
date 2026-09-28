@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kobra-plot"
 version = "0.1.0"
-description = "Offline preparation pipeline for the Anycubic Kobra 2 Neo pen plotter"
+description = "Offline preparation and bounded live execution for the Anycubic Kobra 2 Neo pen plotter"
 requires-python = ">=3.11,<3.14"
 dependencies = [
   "vpype==1.15.0",
@@ -13,6 +13,7 @@ dependencies = [
 
 [project.scripts]
 kobra-plot = "kobra_plot:main"
+kobra-live = "kobra_live:main"
 
 [dependency-groups]
 dev = [
@@ -20,7 +21,7 @@ dev = [
 ]
 
 [tool.setuptools]
-py-modules = ["kobra_plot"]
+py-modules = ["kobra_plot", "kobra_live"]
 package-dir = {"" = "src"}
 
 [tool.pytest.ini_options]
