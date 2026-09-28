@@ -14,4 +14,6 @@ Kazdy profil powinien docelowo zawierac:
 - antenna keep-out,
 - ograniczenia mechaniczne.
 
-Profile oznaczone jako `draft` nie moga byc podstawa produkcyjnego PCB bez weryfikacji.
+Szczegolowy kontrakt i warunki przejscia z `draft` do `verified` opisuje `PROFILE_CONTRACT.md`.
+
+Profile oznaczone jako `draft` nie moga byc podstawa produkcyjnego PCB bez weryfikacji. Kod w `library/host_profile.py` udostepnia wspolna walidacje tej zasady.
