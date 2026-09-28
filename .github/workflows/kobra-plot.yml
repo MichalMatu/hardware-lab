@@ -1,0 +1,71 @@
+name: Kobra plot offline gate
+
+on:
+  pull_request:
+    paths:
+      - "projects/kobra2-neo/**"
+      - ".github/workflows/kobra-plot.yml"
+  push:
+    branches: [main]
+    paths:
+      - "projects/kobra2-neo/**"
+      - ".github/workflows/kobra-plot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-v1:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/kobra2-neo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv
+      - name: Sync project
+        run: uv sync
+      - name: Unit and integration tests
+        run: uv run pytest -q
+      - name: Offline doctor
+        run: uv run kobra-plot doctor
+      - name: Prepare curved SVG and text
+        run: |
+          rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job
+          uv run kobra-plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job
+          uv run kobra-plot text "MILEGO DNIA" -o /tmp/kobra-text-job
+      - name: Verify job safety contracts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          allowed = {"G90", "G0", "G1", "M400"}
+          forbidden = ("G28", "G91", "M104", "M109", "M140", "M190", " E")
+
+          for job in (Path("/tmp/kobra-curve-job"), Path("/tmp/kobra-text-job")):
+              report = json.loads((job / "report.json").read_text())
+              assert report["safety"]["valid"] is True
+              assert report["execution"]["allowed"] is False
+              bounds = report["geometry"]["output_bounds"]
+              assert 3 <= bounds["min_x"] <= bounds["max_x"] <= 223
+              assert 36 <= bounds["min_y"] <= bounds["max_y"] <= 230
+
+              gcode = (job / "output.gcode").read_text()
+              for token in forbidden:
+                  assert token not in gcode, (job, token)
+              for raw in gcode.splitlines():
+                  code = raw.split(";", 1)[0].strip()
+                  if code:
+                      assert code.split()[0] in allowed, code
+          PY
+      - name: Static no-serial check
+        run: |
+          if grep -R -nE '^import serial|^from serial' src; then
+            echo "Serial dependency found in prepare-only V1" >&2
+            exit 1
+          fi
