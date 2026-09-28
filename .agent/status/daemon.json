@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.19.4",
   "state": "idle",
-  "pid": 63262,
-  "updated_at": "2026-09-28T18:18:46.176794+00:00",
+  "pid": 71812,
+  "updated_at": "2026-09-28T18:23:54.250440+00:00",
   "self_revision": "d6b5a0ae1b7acc9fa0644de205b4ab9f089cedc2",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 63262,
+  "worker_pid": 71812,
   "supervisor_pid": 13374,
-  "last_task_id": "kobra2-neo-prepare-shaft50-showcase-20260928-19",
   "execution_variant": "parallel"
 }
