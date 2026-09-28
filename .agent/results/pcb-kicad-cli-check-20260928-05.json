@@ -1,9 +1,0 @@
-{
-  "id": "pcb-kicad-cli-check-20260928-05",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-27T23:54:09.189989+00:00",
-  "daemon_version": "4.19.1",
-  "error": "JSONDecodeError: Invalid \\escape: line 14 column 96 (char 963)"
-}
