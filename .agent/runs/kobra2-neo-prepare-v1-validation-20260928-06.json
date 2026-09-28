@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; cd projects/kobra2-neo; python3 -m py_compile src/kobra_plot.py; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' --with 'pytest>=8.3,<9' pytest -q",
-  "pid": 85477,
+  "command": "set -euo pipefail; cd projects/kobra2-neo; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot doctor; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; PYTHONPATH=src uv run --no-project --with 'vpype==1.15.0' python -m kobra_plot text 'MILEGO DNIA' -o /tmp/kobra-text-job",
+  "pid": 85677,
   "timeout": 1200,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-28T11:20:36.337095+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-28T11:20:43.142400+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "kobra2-neo-prepare-v1-validation-20260928-06",
@@ -18,5 +18,5 @@
   "task_digest": "a8f6eba29d1715e6fd04010e17d58ad9fa098aa5ba487314c85dc7a89bf1231b",
   "daemon_version": "4.19.1",
   "daemon_pid": 85017,
-  "updated_at": "2026-09-28T11:20:36.422157+00:00"
+  "updated_at": "2026-09-28T11:20:43.209718+00:00"
 }
