@@ -22,7 +22,7 @@
 
 ## Phase 2 — Consolidate mechanical source
 
-- [ ] Add the existing Fusion 360 pen-holder source under `cad/tools/pen/`.
+- [x] Add the existing Fusion 360 pen-holder source under `cad/tools/pen/`.
 - [ ] Add neutral STEP export and printable STL/3MF where useful.
 - [ ] Add a small set of photos/renders showing installed orientation and critical clearances.
 - [ ] Document pen diameter/clamping range, compliance and tool-to-carriage offsets if they are stable and measured.
