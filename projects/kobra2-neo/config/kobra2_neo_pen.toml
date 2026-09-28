@@ -1,0 +1,26 @@
+schema_version = 1
+name = "kobra2-neo-pen"
+
+[workspace]
+min_x = 3.0
+max_x = 223.0
+min_y = 36.0
+max_y = 230.0
+margin = 5.0
+
+[motion]
+travel_feed = 3000.0
+draw_feed = 1200.0
+z_feed = 180.0
+
+[orientation]
+swap_xy = false
+flip_x = false
+flip_y = true
+
+[tool]
+pen_up_z = 6.12
+pen_down_z = 3.12
+
+[sequence]
+end = ["M400"]

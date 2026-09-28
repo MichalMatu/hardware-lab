@@ -18,17 +18,23 @@ SVG / text / raster image
     -> explicit live streaming
 ```
 
-The normalized geometry layer should represent drawable polylines/strokes independent of the Kobra. Text should become paths before machine fitting. Raster images will require an explicit rendering strategy such as contours, hatching, crosshatching, stippling or another line-based approximation; there is no generic concept of an inkjet-style filled pixel for a pen plotter.
+The normalized geometry layer represents drawable polylines/strokes independent of the Kobra. Text becomes vector strokes before machine fitting. Raster images require an explicit rendering strategy such as contours, hatching, crosshatching or stippling; there is no generic inkjet-style filled pixel for a pen plotter.
 
-## Current V1 implementation
+## Current project-local prepare V1
 
-The currently validated renderer lives in `MichalMatu/host-ops/prototype/penplotter` and implements:
+`projects/kobra2-neo` now owns the prepare-only `kobra-plot` CLI:
 
-`SVG -> strict parser -> orientation/fit -> bounded G-code`
+`SVG / text -> vpype source conversion -> normalized line SVG -> Kobra orientation/fit -> bounded G-code -> preview/report`
 
-Current V1 accepts simple SVG line geometry and path commands `M/L/H/V/Z`. It intentionally rejects unsupported curves, transforms and other constructs rather than silently approximating them.
+V1 uses pinned `vpype==1.15.0` inside the project environment. SVG curves are linearized before the strict normalized-geometry parser. Text uses vpype's bundled Hershey vector fonts.
 
-This implementation remains outside `host-ops` core. Do not expand `host-ops` with Kobra-specific policy while this project is being consolidated.
+Raster and PDF extensions are detected but deliberately rejected in V1. They stay disabled until explicit line-rendering presets are implemented and tested.
+
+The earlier `MichalMatu/host-ops/prototype/penplotter` remains prototype evidence. New Kobra-specific conversion, fitting and safety policy belongs in this project. `host-ops` remains the generic machine/serial capability layer for a future execution phase.
+
+Most importantly, V1 contains no serial dependency and no `execute` command. Every successful report says `execution.allowed = false`.
+
+See `PREPARE_CLI.md` for commands, artifacts and the validator contract.
 
 ## Current Kobra profile contract
 
@@ -40,22 +46,40 @@ This implementation remains outside `host-ops` core. Do not expand `host-ops` wi
 - pen-down: `G0 Z3.12 F180`;
 - orientation: flip Y, no XY swap, no X flip;
 - end sequence: `M400`;
-- homing exists as an opt-in sequence only and must not be included in normal render/dry-run work.
+- homing must not be included in normal render/dry-run work.
+
+The profile is stored at `config/kobra2_neo_pen.toml`. Unknown or missing keys fail closed.
+
+## Prepare output contract
+
+A prepared job contains:
+
+```text
+source.<ext>
+normalized.svg
+preview.svg
+output.gcode
+report.json
+```
+
+`normalized.svg` is the source-independent boundary. `preview.svg` displays drawing strokes and pen-up travel separately. `report.json` captures source/backend/profile identity, hashes, geometry statistics, bounds, nominal feed-time estimate and safety state.
+
+The generated G-code validator accepts only `G90`, `G0`, `G1` and `M400`. It rejects all other commands, extrusion parameter `E`, malformed/duplicate parameters, unexpected Z values and XY outside the hard pen-tip envelope.
 
 ## Required dry-run sequence
 
-Before any live plotting job:
+Before any future live plotting job:
 
 1. Convert/normalize the source without talking to the printer.
 2. Render G-code without implicit homing.
 3. Record input geometry statistics: polylines/strokes and point count.
 4. Record generated XY bounding box.
 5. Inspect every pen-up, pen-down, start/end and other profile command.
-6. Verify there is no unintended `G28`.
+6. Verify there is no unintended `G28` or relative mode.
 7. Verify there are no heater or extrusion commands.
 8. Verify all XY motion remains within the calibrated hard envelope.
-9. Preview or otherwise inspect the complete plot path.
-10. Only after operator approval open a live execution path.
+9. Inspect `preview.svg` and the complete G-code.
+10. Only after operator approval may a separate live execution path be considered.
 
 ## Live execution contract
 
@@ -64,12 +88,13 @@ There is no final plotter-specific streamer yet.
 When live execution is introduced it must:
 
 - remain project-specific or use only genuinely generic transport primitives from `host-ops`;
+- accept only a previously prepared and revalidated immutable job;
 - handle Marlin acknowledgement/error responses explicitly;
 - support bounded cancellation/error reporting;
 - never silently insert homing, heating or extrusion;
 - execute one physical operation at a time during bring-up and wait for operator confirmation between operations;
 - never send a whole artwork until the corresponding dry-run has been explicitly approved.
 
-## Next software design decision
+## Next source-conversion decision
 
-Do not choose additional programs or libraries merely because the first complex SVG exceeds V1. First preserve the current machine/CAD baseline in this repository. Then evaluate source-conversion tools against the common normalized-geometry boundary, so SVG curves, text and raster strategies can be swapped without changing the Kobra safety layer.
+The normalized geometry and Kobra safety boundary are now explicit. The next source-conversion phase is raster/photo support. Evaluate outline, hatch/crosshatch and stipple as replaceable source renderers; do not weaken or bypass the common Kobra fitting/G-code validator to support them.

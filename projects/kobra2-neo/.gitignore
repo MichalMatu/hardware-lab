@@ -1,0 +1,6 @@
+.venv/
+*.kobra-job/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
