@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-cleanup-and-drc-20260928-07",
+  "task_digest": "c24fd0fc357ff99170651fb7da146b7f8b9a013e71a45ab4dac55a63ec762b9d",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T00:12:51.374966+00:00",
+  "attempt_id": "2dd392ed529f0890639f6d5d",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 2157,
+  "updated_at": "2026-09-28T00:12:51.375025+00:00",
+  "pid": 2157
+}
