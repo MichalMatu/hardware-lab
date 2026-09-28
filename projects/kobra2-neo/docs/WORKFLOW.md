@@ -43,7 +43,7 @@ See `PREPARE_CLI.md` for commands, artifacts and the validator contract.
 - travel feed: 3000 mm/min;
 - draw feed: 1200 mm/min;
 - pen-up: `G0 Z6.12 F180`;
-- pen-down: `G0 Z3.12 F180`;
+- pen-down: `G0 Z2.97 F180`;
 - orientation: flip Y, no XY swap, no X flip;
 - end sequence: `M400`;
 - homing must not be included in normal render/dry-run work.
@@ -81,11 +81,15 @@ Before any future live plotting job:
 9. Inspect `preview.svg` and the complete G-code.
 10. Only after operator approval may a separate live execution path be considered.
 
-## Live execution contract
+## Live validation milestone — 2026-09-28
 
-There is no final plotter-specific streamer yet.
+One complete approved artwork has now been executed successfully using the current calibration. The 10 cm `MongooseLemur.svg` outline job used 283 polylines / 7046 simplified points, machine bounds X=63.79..163.00 and Y=84.21..181.79, pen-up Z=6.12 and pen-down Z=2.97. A temporary Local Agent serial streamer waited for Marlin acknowledgement after every command, completed all 7615 commands in about 14 min 44 s, ended with `M400` and left the pen up.
 
-When live execution is introduced it must:
+This is hardware/workflow validation, not a permanent execution API. The project-local `kobra-plot` CLI remains prepare-only and has no serial dependency.
+
+## Durable live execution contract
+
+There is no final plotter-specific streamer yet. A future durable execution layer must:
 
 - remain project-specific or use only genuinely generic transport primitives from `host-ops`;
 - accept only a previously prepared and revalidated immutable job;
@@ -97,4 +101,4 @@ When live execution is introduced it must:
 
 ## Next source-conversion decision
 
-The normalized geometry and Kobra safety boundary are now explicit. The next source-conversion phase is raster/photo support. Evaluate outline, hatch/crosshatch and stipple as replaceable source renderers; do not weaken or bypass the common Kobra fitting/G-code validator to support them.
+The normalized geometry and Kobra safety boundary are now explicit, and one complete live plot has validated the physical profile. The next source-conversion phase is raster/photo support plus explicit physical-size/detail controls. Evaluate outline, hatch/crosshatch and stipple as replaceable source renderers; do not weaken or bypass the common Kobra fitting/G-code validator to support them.

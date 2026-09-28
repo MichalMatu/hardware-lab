@@ -16,7 +16,7 @@ These rules apply to everything under `projects/kobra2-neo/`.
 - Homing is always a separate explicit decision; never hide `G28` inside normal plotting flow.
 - The current cylindrical sensor is verified as `z_min`, and `G28 Z` has succeeded with the present setup, but revalidate the mechanical configuration before any future Z homing.
 - Current automatic plotting bounds are the real pen-tip envelope `X=3..223`, `Y=36..230` mm. Normal plots use an additional 5 mm internal margin.
-- Current pen-up is `Z=6.12`; current pen-down is `Z=3.12`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
+- Current pen-up is `Z=6.12`; current pen-down is `Z=2.97`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
 - Render and inspect complete G-code before opening a live execution path. Never send a full image/plot without explicit operator approval.
 - Use `M400` when command completion must be proven.
 - Do not identify the printer solely by CH340 VID/PID or a remembered serial path; verify with `M115` when identity is uncertain.

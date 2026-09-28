@@ -23,7 +23,7 @@ Do not keep STL/3MF as the only design artifact.
 The current machine calibration is tied to the presently installed holder and pen:
 
 - pen-up Z=6.12;
-- pen-down Z=3.12;
+- pen-down Z=2.97;
 - hard pen-tip envelope X=3..223, Y=36..230 mm.
 
 Any CAD revision that changes pen length, clamp position, carriage offset, compliance or reference-sensor geometry invalidates the affected calibration until it is physically rechecked.

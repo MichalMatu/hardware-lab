@@ -20,7 +20,7 @@ flip_y = true
 
 [tool]
 pen_up_z = 6.12
-pen_down_z = 3.12
+pen_down_z = 2.97
 
 [sequence]
 end = ["M400"]

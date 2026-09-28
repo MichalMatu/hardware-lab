@@ -89,4 +89,4 @@ The profile lives at `config/kobra2_neo_pen.toml`. Unknown/missing keys and inva
 
 A prepared job is not permission to run it. Before any future execution layer accepts a job, review at least `preview.svg`, report bounds/stroke counts/distances, the complete G-code, and whether the current physical calibration still matches the pen/holder/paper.
 
-Live transport remains a separate future step and should reuse only generic machine/serial capabilities from `host-ops`.
+The prepare CLI remains offline-only. A separate temporary Local Agent serial streamer has successfully completed one full approved plot, but live transport is not part of this CLI. A permanent execution layer should reuse only genuinely generic machine/serial capabilities from `host-ops` while keeping Kobra-specific policy here.

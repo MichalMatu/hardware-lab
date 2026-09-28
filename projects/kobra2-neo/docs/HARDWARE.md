@@ -51,12 +51,10 @@ The cylindrical sensor was manually triggered with metal and `M119` changed `z_m
 
 ## Verified homing / motion evidence
 
-- `G28 X Y` completed successfully.
-- After XY homing, firmware reported approximately X=-5.80, Y=-1.00.
-- Motion to X=100, Y=100 completed successfully.
-- `G28 Z` completed successfully with the cylindrical sensor acting as the Z reference.
-- After Z homing, the reported Z was approximately 3.12 mm.
-- Z was later raised safely to 15 mm.
+- `G28 X Y` completed successfully; firmware reported X=-5.80, Y=-1.00.
+- `G28 Z` completed successfully with the cylindrical sensor acting as the Z reference; the 2026-09-28 session reported X=36.00, Y=206.65, Z=2.97.
+- The pen was then raised to Z=6.12 and planner completion was confirmed with `M400`.
+- A full approved 10 cm artwork subsequently completed all 7615 acknowledgement-driven commands without firmware error and ended pen-up.
 
 Homing remains an explicit operator decision even though the current Z-reference path has been physically verified.
 

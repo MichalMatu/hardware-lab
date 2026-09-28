@@ -49,9 +49,9 @@ The outer measured envelope remains the hard safety boundary for both pen-down a
 ## Z calibration
 
 - pen-up: `Z=6.12`
-- pen-down: `Z=3.12`
+- pen-down: `Z=2.97`
 
-Pen-up has been physically checked to provide clear travel above the paper. Pen-down provides light compliant contact for the current holder.
+Pen-up has been physically checked to provide clear travel above the paper. During the 2026-09-28 live session, `G28 Z` reported Z=2.97 while the pen tip was at paper contact. A complete 10 cm artwork was then drawn successfully using pen-down Z=2.97 and pen-up Z=6.12, so 2.97 is the current validated drawing value.
 
 Do not treat these as machine-independent constants. Revalidate after changing pen length, holder geometry, paper thickness/position, carriage/tool mechanics or any Z-reference geometry.
 

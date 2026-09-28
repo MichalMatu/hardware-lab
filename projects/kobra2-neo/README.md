@@ -10,8 +10,9 @@ Anycubic Kobra 2 Neo used as a reusable XY/Z motion platform. The current valida
 - The cylindrical Z sensor is present and verified as `z_min`; the rear physical button maps to `z_max`.
 - Current pen-tip work envelope: `X=3..223`, `Y=36..230` mm.
 - Normal plotting keeps an additional 5 mm internal margin.
-- Current pen calibration: pen-up `Z=6.12`, pen-down `Z=3.12`.
+- Current pen calibration: pen-up `Z=6.12`, pen-down `Z=2.97`.
 - These coordinates are specific to the current pen, holder and paper placement and must be revalidated after mechanical changes.
+- First approved full artwork plot completed successfully on 2026-09-28: a 10 cm `MongooseLemur.svg` outline job, bounded to X=63.79..163.00 and Y=84.21..181.79, completed all 7615 streamed commands in about 14 min 44 s and finished pen-up.
 
 See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md`, `docs/WORKFLOW.md` and `docs/PREPARE_CLI.md` before live motion.
 
@@ -44,7 +45,7 @@ Current V1 inputs:
 
 ## Project layout
 
-- `docs/` — current hardware state, calibration, safety, workflow, CLI contract, roadmap and historical checkpoints.
+- `docs/` — current hardware state, calibration, safety, workflow, CLI contract and roadmap.
 - `cad/` — editable Fusion 360/CAD source and derived printable exports.
 - `config/` — project-local machine/tool profiles.
 - `src/` — Kobra-specific offline preparation code; future live execution remains separate.
@@ -58,4 +59,4 @@ The long-term input flow is:
 
 `SVG / text / raster image -> normalized plot geometry -> fit/orientation -> bounded G-code -> dry-run/inspection -> explicit live execution`
 
-The current implementation establishes the source-to-job half of that boundary. The next conversion work is to add explicit raster/photo presets such as outline, hatch/crosshatch and stipple without changing the Kobra fitting/safety layer. Live serial execution remains a separate later phase.
+The current implementation establishes the source-to-job half of that boundary. The next conversion work is to add explicit raster/photo presets such as outline, hatch/crosshatch and stipple without changing the Kobra fitting/safety layer. One full live artwork has now been proven through a temporary acknowledgement-driven Local Agent serial streamer, but a permanent project-local live execution command is still intentionally separate from the prepare CLI.
