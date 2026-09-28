@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-vpype-cli-audit-20260928-03",
+  "task_digest": "f841c7409fc224e64f03a7a7b87e0c41ca17a15bbbf20983fc99c963b00155aa",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T10:58:31.110398+00:00",
+  "attempt_id": "d2d8bcaeecc771d619315191",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 46309,
+  "updated_at": "2026-09-28T10:58:31.110464+00:00",
+  "pid": 46309
+}
