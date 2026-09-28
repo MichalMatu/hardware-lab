@@ -15,5 +15,6 @@ Kazdy profil powinien docelowo zawierac:
 - ograniczenia mechaniczne.
 
 Szczegolowy kontrakt i warunki przejscia z `draft` do `verified` opisuje `PROFILE_CONTRACT.md`.
+Checklistę porownania profilu z konkretna fizyczna plytka opisuje `PHYSICAL_VERIFICATION.md`.
 
 Profile oznaczone jako `draft` nie moga byc podstawa produkcyjnego PCB bez weryfikacji. Kod w `library/host_profile.py` udostepnia wspolna walidacje tej zasady.
