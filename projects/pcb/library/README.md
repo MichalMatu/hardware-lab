@@ -5,6 +5,7 @@ Wspolna biblioteka wielokrotnego uzytku dla Growclip PCB.
 ## Aktualna zawartosc
 
 - `interfaces.py` - lekkie kontrakty magistral i domen zasilania.
+- `host_profile.py` - wspolna walidacja tozsamosci hosta i blokada uzycia profilu `draft` jako zweryfikowanej podstawy produkcyjnej.
 - `modules/axp2101_pmic.py` - reusable blok AXP2101.
 - `modules/i2c_bus.py` - reusable infrastruktura I2C.
 - `kicad/` - male, neutralne helpery do automatyzacji `pcbnew`.
@@ -22,3 +23,5 @@ Dodaj implementacje do `library/modules/`, gdy funkcja:
 Do `library/kicad/` trafiaja tylko helpery niezalezne od konkretnego boardu. Placementy, obrysy i opisy zalezne od hosta pozostaja w profilu hosta albo aktywnym boardzie.
 
 Mechanika hosta trafia do `hosts/`. Polaczenia specyficzne tylko dla jednego produktu zostaja w `boards/<board>/`.
+
+Nowy host musi przejsc kontrakt z `hosts/PROFILE_CONTRACT.md`; dopoki ma status `draft`, nie powinien byc traktowany jako podstawa produkcyjnego PCB.
