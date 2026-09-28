@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "daemon_version": "4.19.4",
+  "daemon_version": "4.19.5",
   "state": "idle",
-  "pid": 81096,
-  "updated_at": "2026-09-28T18:45:12.932241+00:00",
-  "self_revision": "d6b5a0ae1b7acc9fa0644de205b4ab9f089cedc2",
+  "pid": 22979,
+  "updated_at": "2026-09-28T18:53:04.744826+00:00",
+  "self_revision": "72f0a813aafc86ff2fe77fe8e3fe05dd33e008ad",
   "poll_seconds": 15,
   "self_update_seconds": 60,
   "command_timeout_default": 900,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 81096,
-  "supervisor_pid": 13374,
-  "last_task_id": "kobra2-neo-live-shaft50-showcase-20260928-21",
+  "worker_pid": 22979,
+  "supervisor_pid": 22468,
   "execution_variant": "parallel"
 }
