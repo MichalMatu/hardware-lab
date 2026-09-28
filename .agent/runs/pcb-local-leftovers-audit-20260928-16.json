@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-local-leftovers-audit-20260928-16",
+  "task_digest": "6d6244f186fe5fc5aa24bd632f37e1ceaf12922d65a3b4e6f26ddb84884cae1a",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:18:12.068748+00:00",
+  "attempt_id": "1919eca2bba9e32b31cfe19a",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 36982,
+  "updated_at": "2026-09-28T01:18:12.068817+00:00",
+  "pid": 36982
+}
