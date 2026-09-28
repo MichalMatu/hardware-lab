@@ -14,12 +14,23 @@ Ten katalog jest wspolna baza sprzetowa dla rodziny Growclip. Pierwsze wersje PC
 
 - `boards/` - aktywne plytki Growclip. Po cleanupie nie ma jeszcze boardu uznanego za produkcyjny.
 - `hosts/` - profile fizycznych devboardow S3/C6.
-- `library/` - wspolne interfejsy i implementacje modulow SKiDL.
+- `library/` - wspolne interfejsy, walidatory i implementacje modulow SKiDL.
 - `docs/` - datasheety, reference designy, bring-up i dokumentacja modulow.
 - `profiles/` - ogolne profile rodzin ukladow i domen funkcjonalnych.
 - `archive/` - stare boardy i legacy tooling zachowane jako referencja, nie jako aktywna baza.
+- `validate_workspace.py` - lekka kontrola spojnosc hostow, mechaniki, pinoutow i manifestow boardow.
 - `requirements.md` - aktualne zasady projektowe.
 - `SKILL.md` - workflow pracy nad tym workspace.
+
+## Walidacja
+
+Z katalogu repo:
+
+```sh
+python3 projects/pcb/validate_workspace.py
+```
+
+Validator niczego nie generuje ani nie modyfikuje. Sprawdza kontrakty profili oraz blokuje m.in. board `production` oparty o host, ktory nie ma statusu `verified`.
 
 ## Aktualny kierunek
 
