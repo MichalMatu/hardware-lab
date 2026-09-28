@@ -1,0 +1,17 @@
+{
+  "id": "kobra2-neo-prepare-v1-final-gate-20260928-08",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "feat/kobra-plot-prepare",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1200,
+  "task_timeout": 2400,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"063f445fe18d8554aaf3268a9b8adcc03a0cae4b\"; printf 'HEAD=%s\\n' \"$(git rev-parse HEAD)\"",
+    "set -euo pipefail; cd projects/kobra2-neo; uv sync --locked; uv run python -m py_compile src/kobra_plot.py; uv run pytest -q",
+    "set -euo pipefail; cd projects/kobra2-neo; rm -rf /tmp/kobra-curve-job /tmp/kobra-text-job; uv run kobra-plot doctor; uv run kobra-plot prepare samples/svg/curve-demo.svg -o /tmp/kobra-curve-job; uv run kobra-plot text 'MILEGO DNIA' -o /tmp/kobra-text-job",
+    "set -euo pipefail; python3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor p in [Path('/tmp/kobra-curve-job'), Path('/tmp/kobra-text-job')]:\n    report=json.loads((p/'report.json').read_text())\n    assert report['safety']['valid'] is True\n    assert report['execution']['allowed'] is False\n    assert report['safety']['command_whitelist'] == ['G90','G0','G1','M400']\n    b=report['geometry']['output_bounds']\n    assert 8 <= b['min_x'] <= b['max_x'] <= 218\n    assert 41 <= b['min_y'] <= b['max_y'] <= 225\n    assert (p/'.kobra-plot-job').is_file()\n    g=(p/'output.gcode').read_text()\n    for token in ['G28','G91','M104','M109','M140','M190',' E']:\n        assert token not in g, (p, token)\n    active=[line.split(';',1)[0].strip() for line in g.splitlines() if line.split(';',1)[0].strip()]\n    assert active[0] == 'G90'\n    assert active[-1] == 'M400'\n    print(p.name, report['geometry']['polylines'], report['geometry']['points'], report['geometry']['output_bounds'], report['geometry']['nominal_time_seconds'])\nPY",
+    "set -euo pipefail; git diff --check; ! grep -R -nE '^import serial|^from serial' projects/kobra2-neo/src; test -z \"$(git status --porcelain)\"; echo FINAL_GATE_OK"
+  ]
+}
