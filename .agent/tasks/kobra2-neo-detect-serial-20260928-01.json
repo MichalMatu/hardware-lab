@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-detect-serial-20260928-01",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; printf 'HEAD='; git rev-parse HEAD; git status --short --branch",
+    "set -euo pipefail; echo '--- /dev/cu.*'; ls -1 /dev/cu.* 2>/dev/null || true; echo '--- /dev/tty.*'; ls -1 /dev/tty.* 2>/dev/null || true; echo '--- USB serial summary'; system_profiler SPUSBDataType 2>/dev/null | awk '/USB 2.0-Serial|CH340|wchusbserial|Product ID|Vendor ID|Serial Number|Location ID/{print}' || true"
+  ]
+}
