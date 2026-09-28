@@ -1,33 +1,14 @@
 # docs/modules/
 
-Dokumentacja na poziomie modulu, nie calej plytki. Obecnosc dokumentacji nie oznacza automatycznie, ze istnieje gotowa implementacja w `library/modules/`.
+Ten katalog dokumentuje **wylacznie aktywne reusable modules**, czyli moduly posiadajace implementacje w `library/modules/`.
 
-## Struktura
+## Aktywne moduly
 
-- `docs/modules/<module_name>/README.md`
-- `docs/modules/<module_name>/bom.md` opcjonalnie
-- `docs/modules/<module_name>/placement.md` opcjonalnie
-- `docs/modules/<module_name>/references/`
+- `i2c_bus` - maly, podstawowy klocek wspolnej magistrali I2C.
+- `axp2101_pmic` - zaawansowany i opcjonalny blok PMIC; nie jest domyslnym elementem Growclip.
 
-## Minimalna zawartosc kontraktu
+## Regula
 
-- cel modulu,
-- wejscia i wyjscia,
-- nazwy sieci i poziomy napiec,
-- wymagane komponenty,
-- zaleznosci od innych modulow,
-- krytyczne uwagi layoutowe,
-- checklista walidacji z datasheetem.
+Dla `library/modules/<name>.py` powinien istniec `docs/modules/<name>/README.md` i odwrotnie. Kandydat na przyszly modul pozostaje w historii Gita albo jest odtwarzany dopiero wtedy, gdy wraca do aktywnego projektu.
 
-## Zasada grupowania
-
-- Grupuj dokumentacje wedlug funkcji modulu, a nie pojedynczego ukladu.
-- Jesli kilka ukladow tworzy razem jeden blok funkcjonalny, trzymaj je w jednym module.
-- Dokumentacja moze wyprzedzac implementacje. Board moze wskazac modul dopiero, gdy odpowiadajacy mu plik istnieje w `library/modules/`.
-
-## Aktualny kod reusable
-
-- `i2c_bus` - **basic reusable**. Mala infrastruktura I2C z opcjonalnymi pull-upami i headerem.
-- `axp2101_pmic` - **advanced optional**. Zachowany jako wartosciowy, zlozony blok PMIC, ale nie jest czescia domyslnej bazy Growclip i wymaga osobnego review elektrycznego/layoutowego przed uzyciem w nowym wariancie.
-
-Pozostale katalogi w `docs/modules/` sa baza wiedzy i kandydatami do przyszlych reusable blocks, a nie automatycznie aktywnymi komponentami boardu.
+Dokumentacja modulu opisuje kontrakt, ograniczenia, layout/bring-up i kuratorowane zrodla. Nie trzymamy tutaj surowych paczek vendorow ani przypadkowych reference designow.

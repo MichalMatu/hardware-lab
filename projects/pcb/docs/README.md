@@ -1,19 +1,22 @@
-# docs/
+# PCB documentation
 
-Source of Technical Truth dla aktywnego zakresu projektu: HAT pod `ESP32-DevKitC V4` zbudowany wokol PMIC `AXP2101`.
+Aktywne `docs/` zawiera tylko wiedze potrzebna do biezacej, modularnej bazy Growclip.
 
 ## Struktura
 
-- `docs/modules/<module_name>/README.md`: kontrakt modulu, wejscia/wyjscia, ograniczenia i checklista walidacji.
-- `docs/modules/<module_name>/references/`: datasheety i app notes dla danego modulu.
-- `docs/components/<component_name>/README.md`: notatki dla konkretnego ukladu, jesli datasheet nie wystarcza.
-- `docs/reference_designs/`: materialy referencyjne (gotowe plytki, devkity, decyzje kompatybilnosci).
+- `components/<name>/README.md` - syntetyczne notatki o konkretnym ukladzie. To biblioteka wiedzy; obecność wpisu nie oznacza uzycia w boardzie.
+- `modules/<name>/` - kontrakt i zrodla dla aktywnego reusable module z `library/modules/<name>.py`.
 
-## Biezacy podzial referencji
+Dokumentacja eksperymentalnych zestawow bez aktywnej implementacji nie powinna pozostawac w `docs/modules/`. Surowe paczki producentow, duplikaty datasheetow i niezaklasyfikowane pliki nie sa przechowywane w aktywnym drzewie.
 
-- `docs/modules/axp2101_pmic/`: PMIC AXP2101 z power-path, charge, gauge i 3V3 z DCDC1.
-- `docs/modules/i2c_bus/`: wspolna magistrala I2C dla AXP2101 i przyszlych peryferiow HAT-a.
-- `docs/components/axp2101/`: notatki do samego ukladu AXP2101.
-- `docs/reference_designs/esp32_hat/`: decyzja kompatybilnosci i pinout DevKitC V4 dla HAT-a.
+## Source of truth
 
-Pozostala dokumentacja (TP4056/DW01A/FS8205A, MAX17048, MT3608, AP2112, PCF8563, ESP32-S3, profile sensorow itd.) zostala usunieta razem z odpowiadajacymi modulami. Mozna ja przywrocic z gita, gdy odpowiedni modul wroci do projektu.
+Kolejnosc zaufania:
+
+1. oficjalny datasheet / design guide,
+2. oficjalny reference design producenta,
+3. zweryfikowany `host.toml` / `pinout.toml` / `mechanical.toml`,
+4. kontrakt modulu i jego kod,
+5. board-specific dokumentacja.
+
+Historyczne implementacje sa w `../archive/`. Usuniete materiały eksperymentalne mozna odzyskac z historii Gita, jesli znowu stana sie potrzebne.

@@ -1,20 +1,12 @@
 # docs/components/
 
-Notatki dla konkretnych ukladow, jesli datasheet nie wystarcza.
+Lekka baza wiedzy o konkretnych ukladach.
 
-## Kiedy dodawac wpis
+Wpis komponentu moze pozostac nawet wtedy, gdy nie ma dla niego aktywnego modulu. Sluzy do zachowania zweryfikowanych pinow, ograniczen, footprintow i decyzji projektowych bez narzucania ich konkretnemu boardowi.
 
-- gdy uklad ma kilka wariantow i trzeba zapisac wybrany wariant,
-- gdy istotne sa piny, strapowanie, footprint albo szczegoly z app note,
-- gdy chcesz zanotowac decyzje projektowe i kompromisy.
+## Zasady
 
-## Struktura
-
-- `docs/components/<component_name>/README.md`
-
-PDF-y i app notes powinny lezec przy odpowiednim module w `docs/modules/<module_name>/references/`.
-Ten katalog sluzy do syntetycznych notatek roboczych, decyzji projektowych i pinoutow.
-
-## Aktywne wpisy
-
-- `docs/components/axp2101/`: PMIC z toru zasilania HAT-a.
+- jeden katalog na komponent,
+- krotkie, syntetyczne notatki zamiast kopiowania datasheetu,
+- zrodla krytyczne dla aktywnego modulu trzymamy przy tym module w `docs/modules/<name>/references/`,
+- obecność wpisu tutaj **nie oznacza**, ze komponent jest czescia bazowego Growclip.

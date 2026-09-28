@@ -1,25 +1,17 @@
 # AXP2101
 
-Notatki do ukladu `AXP2101`.
+`AXP2101` to zaawansowany PMIC dla systemow 1S Li-Ion: charger, power-path/NVDC, telemetry/ADC, fuel gauge oraz wiele regulatorow buck/LDO.
 
-## Co daje ten uklad
-- `1S Li-Ion` charger
-- power path / `NVDC`
-- `TWSI/I2C`
-- `E-gauge 3.0`
-- ADC dla `VBAT`, `VBUS`, `VSYS`
-- wiele buckow i LDO
+## Rola w Growclip
 
-## Dlaczego trafia do repo
-- jeden uklad obsluguje cala sciezke zasilania `5V / 500mA` HAT-a: ladowanie 1S, power-path, regulacja 3V3 i fuel gauge,
-- eliminuje stos `TP4056 + DW01A + FS8205A + LDO + MAX17048`, ktory wczesniej byl realizowany jako osobne moduly.
+AXP2101 jest **opcjonalnym** komponentem dla wariantow wymagajacych rozbudowanego zasilania bateryjnego. Nie jest elementem minimalnego HAT-a i nie jest globalnym zalozeniem architektury.
 
 ## Najwazniejsze ograniczenia
-- ma jedno wejscie zasilania `VBUS`, wiec `USB + solar` wymagaja osobnego front-endu,
-- wymaga swiadomego podejscia do `PWRON`, szczegolnie przy starcie tylko z baterii,
-- to nie jest automatyczny zamiennik protection IC dla golej celi 18650,
-- obudowa `QFN-40 5x5` jest istotnie trudniejsza od prostych ladowarek typu `CN3065`.
 
-## Zrodla
-- [AXP2101 datasheet](/Users/michal/Desktop/pcb/docs/modules/axp2101_pmic/references/AXP2101_C3036461.pdf)
-- https://www.lcsc.com/product-detail/C3036461.html
+- pojedyncze wejscie `VBUS`; dodatkowe zrodla zasilania wymagaja osobnego front-endu,
+- konfiguracja startup/factory defaults i profil E-gauge musza byc potwierdzone na realnym hardware,
+- `PWRON`, `PWROK`, `TS`, domena pull-up `IRQ` i battery protection sa decyzjami systemowymi, nie uniwersalnymi defaultami,
+- QFN-40 5x5 i przetwornice impulsowe wymagaja starannego layoutu.
+
+Aktywny kontrakt: `../../modules/axp2101_pmic/README.md`.
+Datasheet: `../../modules/axp2101_pmic/references/AXP2101_C3036461.pdf`.

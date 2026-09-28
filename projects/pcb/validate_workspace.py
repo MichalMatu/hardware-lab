@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote
 
 import tomllib
 
@@ -16,10 +18,29 @@ from library.host_profile import load_host_identity
 HOSTS_DIR = ROOT / "hosts"
 BOARDS_DIR = ROOT / "boards"
 MODULES_DIR = ROOT / "library" / "modules"
+DOC_MODULES_DIR = ROOT / "docs" / "modules"
+ARCHIVE_DIR = ROOT / "archive"
+
+STALE_TEXT_MARKERS = (
+    "/Users/",
+    "framework/module_registry.py",
+    "scripts/create_board.py",
+    "scripts/render_board.py",
+    "templates/skidl_reference",
+)
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
 def _load_toml(path: Path) -> dict:
     return tomllib.loads(path.read_text(encoding="utf-8"))
+
+
+def _is_under(path: Path, parent: Path) -> bool:
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False
 
 
 def validate_host_dir(host_dir: Path) -> list[str]:
@@ -89,8 +110,7 @@ def validate_board_dir(board_dir: Path) -> list[str]:
     try:
         raw = _load_toml(board_toml)
         host_name = str(raw["host"]["profile"]).strip()
-        host_dir = HOSTS_DIR / host_name
-        host_toml = host_dir / "host.toml"
+        host_toml = HOSTS_DIR / host_name / "host.toml"
         if not host_toml.exists():
             return [f"{board_dir.name}: unknown host profile '{host_name}'"]
 
@@ -109,20 +129,70 @@ def validate_board_dir(board_dir: Path) -> list[str]:
     return errors
 
 
+def validate_module_docs() -> list[str]:
+    errors: list[str] = []
+    code_modules = {
+        path.stem for path in MODULES_DIR.glob("*.py") if path.name != "__init__.py"
+    }
+    doc_modules = {path.name for path in DOC_MODULES_DIR.iterdir() if path.is_dir()}
+
+    for name in sorted(code_modules - doc_modules):
+        errors.append(f"module '{name}' is missing docs/modules/{name}/README.md")
+    for name in sorted(doc_modules - code_modules):
+        errors.append(f"docs/modules/{name} has no active library/modules/{name}.py")
+    for name in sorted(code_modules & doc_modules):
+        if not (DOC_MODULES_DIR / name / "README.md").exists():
+            errors.append(f"docs/modules/{name} is missing README.md")
+
+    return errors
+
+
+def validate_documentation() -> list[str]:
+    errors: list[str] = []
+
+    for path in ROOT.rglob("*.md"):
+        if _is_under(path, ARCHIVE_DIR):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        rel = path.relative_to(ROOT)
+
+        for marker in STALE_TEXT_MARKERS:
+            if marker in text:
+                errors.append(f"{rel}: stale reference '{marker}'")
+
+        for match in MARKDOWN_LINK_RE.finditer(text):
+            target = match.group(1).strip().strip("<>")
+            target = target.split("#", 1)[0].strip()
+            if not target:
+                continue
+            if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+                continue
+            if target.startswith("/"):
+                errors.append(f"{rel}: absolute local markdown link '{target}'")
+                continue
+
+            resolved = (path.parent / unquote(target)).resolve()
+            if not resolved.exists():
+                errors.append(f"{rel}: missing markdown link target '{target}'")
+
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
 
     host_dirs = sorted(
         path for path in HOSTS_DIR.iterdir() if path.is_dir() and (path / "host.toml").exists()
     )
-    board_dirs = sorted(
-        path for path in BOARDS_DIR.iterdir() if path.is_dir()
-    )
+    board_dirs = sorted(path for path in BOARDS_DIR.iterdir() if path.is_dir())
 
     for host_dir in host_dirs:
         errors.extend(validate_host_dir(host_dir))
     for board_dir in board_dirs:
         errors.extend(validate_board_dir(board_dir))
+
+    errors.extend(validate_module_docs())
+    errors.extend(validate_documentation())
 
     if errors:
         print("PCB workspace validation FAILED")

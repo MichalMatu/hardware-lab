@@ -1,23 +1,20 @@
 # i2c_bus
 
-Modul dokumentacji dla wspolnej magistrali I2C.
+Maly reusable module wspolnej magistrali I2C.
 
 ## Zakres
-- wspolne pull-upy dla `SDA` i `SCL`,
-- opcjonalny breakout/header dla magistrali,
-- logiczny punkt integracji dla peryferiow I2C,
-- bez per-device sygnalow typu `ALRT` lub `INT`.
 
-## Powiazany kod
-- `library/modules/i2c_bus.py`
+- `SDA` i `SCL`,
+- wspolne pull-upy do wybranej domeny logicznej,
+- opcjonalny 4-pin breakout/header,
+- bez sygnalow per-device typu `IRQ`, `ALRT` czy `INT`.
+
+## Kod
+
+`library/modules/i2c_bus.py`
 
 ## Kontrakt
-- zasilanie logiczne: `V_3V3`
-- sygnaly: `I2C0_SDA`, `I2C0_SCL`
-- masa: `GND`
 
-## Generator
-- modul jest osobnym wpisem w `framework/module_registry.py`,
-- modul jest wymagany przez `axp2101_pmic` (sterowanie i telemetria PMIC),
-- gdy aktywny jest `axp2101_pmic`, generator ustawia pull-upy `2.2k` zamiast domyslnych `4.7k`,
-- sygnaly peryferyjne poza `SDA` i `SCL` pozostaja odpowiedzialnoscia konkretnego modulu konsumujacego magistrale.
+Module przyjmuje `PowerDomain` i `I2CBus`. Domyslne pull-upy to `4.7k`, ale board moze je zmienic lub wylaczyc, jezeli magistrala ma juz poprawne podciaganie.
+
+I2C nie jest zalezne od AXP2101. PMIC jest tylko jednym z mozliwych konsumentow tej magistrali.

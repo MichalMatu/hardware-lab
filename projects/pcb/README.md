@@ -1,43 +1,51 @@
 # Growclip PCB Workspace
 
-Ten katalog jest wspolna baza sprzetowa dla rodziny Growclip. Pierwsze wersje PCB maja byc prostymi HAT-ami / carrierami do gotowych modulow deweloperskich ESP32-S3 i ESP32-C6. Nie zakladamy jednego MCU, jednego ukladu zasilania ani jednego zestawu funkcji.
+Elastyczna baza PCB dla rodziny Growclip. Pierwsze wersje sa prostymi HAT-ami / carrierami do gotowych devboardow ESP32-S3 i ESP32-C6. Nie ma jednego obowiazkowego MCU, PMIC-a ani zestawu funkcji.
 
-## Zasady architektury
+## Stan bazowy
 
-1. **Host jest osobnym profilem.** `hosts/` opisuje konkretny devboard: mechanike, headery, pinout, zasilanie, piny strapping i keep-out anteny.
-2. **Funkcje sa wspolnymi klockami.** `library/` zawiera reusable interfejsy i moduly, np. I2C lub AXP2101. Modul nie jest obowiazkowy tylko dlatego, ze istnieje.
-3. **Board jest cienka kompozycja.** `boards/` zawiera tylko aktywne warianty Growclip i ich board-specific polaczenia, mechanike oraz layout.
-4. **Najpierw minimalna wersja.** Zlozone zasilanie, bateria, RTC, dodatkowe sensory i inne funkcje dodajemy dopiero w wariancie, ktory ich potrzebuje.
-5. **Wiedza jest wspolna.** Datasheety, reference designy, profile i checklisty w `docs/` oraz `profiles/` sa niezalezne od konkretnego boardu.
+- aktywne boardy: **0**,
+- profile hostow: **2 draft** (`ESP32-S3-DevKitC-1 v1.1`, `ESP32-C6-DevKitC-1 v1.2`),
+- aktywne reusable modules: `i2c_bus`, `axp2101_pmic`,
+- KiCad 10 workflow i wspolne helpery sa zweryfikowane lokalnie,
+- stare boardy i legacy tooling sa odseparowane w `archive/`.
 
-## Struktura
+To jest celowy stan startowy. Nowy board powstaje dopiero po potwierdzeniu konkretnego fizycznego hosta.
 
-- `boards/` - aktywne plytki Growclip. Po cleanupie nie ma jeszcze boardu uznanego za produkcyjny.
-- `hosts/` - profile fizycznych devboardow S3/C6.
-- `library/` - wspolne interfejsy, walidatory i implementacje modulow SKiDL.
-- `docs/` - datasheety, reference designy, bring-up i dokumentacja modulow.
-- `profiles/` - ogolne profile rodzin ukladow i domen funkcjonalnych.
-- `archive/` - stare boardy i legacy tooling zachowane jako referencja, nie jako aktywna baza.
-- `validate_workspace.py` - lekka kontrola spojnosc hostow, mechaniki, pinoutow i manifestow boardow.
-- `requirements.md` - aktualne zasady projektowe.
-- `SKILL.md` - workflow pracy nad tym workspace.
+## Architektura
 
-## Walidacja
+- `hosts/` - pinout, mechanika i ograniczenia konkretnego devboardu.
+- `library/` - kod wielokrotnego uzytku: kontrakty, walidatory, moduly SKiDL i neutralne helpery KiCada.
+- `docs/components/` - male notatki o komponentach; wpis nie oznacza, ze komponent jest aktywnie uzywany.
+- `docs/modules/` - dokumentacja tylko modulow, ktore maja aktywna implementacje w `library/modules/`.
+- `boards/` - tylko aktywne warianty produktu; board ma byc cienka kompozycja hosta i modulow.
+- `archive/` - historyczne implementacje i tooling, nie aktywna baza rozwoju.
 
-Z katalogu repo:
+## Zasady
 
-```sh
+1. **Host first.** Nie zgadujemy pinoutu ani geometrii podobnego devboardu.
+2. **Minimal first.** Pierwszy wariant zawiera tylko funkcje potrzebne teraz.
+3. **Reuse before copy.** Wspolna funkcja trafia do `library/`, nie do kolejnej kopii boardu.
+4. **Board jest cienki.** Nie duplikuje pinoutu ani mechaniki hosta.
+5. **Draft != production.** Produkcyjny board wymaga hosta `verified`.
+6. **2 warstwy sa normalne.** 4 warstwy stosujemy tylko wtedy, gdy uzasadnia to elektronika.
+7. **Brak autoroutera.** Krytyczny routing pozostaje kontrolowany w KiCadzie.
+
+## Start pracy
+
+Najpierw uruchom:
+
+```bash
 python3 projects/pcb/validate_workspace.py
 ```
 
-Validator niczego nie generuje ani nie modyfikuje. Sprawdza kontrakty profili oraz blokuje m.in. board `production` oparty o host, ktory nie ma statusu `verified`.
+Potem:
 
-## Aktualny kierunek
+1. wybierz fizyczny devboard,
+2. przejdz checklistę `hosts/PHYSICAL_VERIFICATION.md`,
+3. uzupelnij i zatwierdz jego profil,
+4. utworz minimalny `boards/growclip_<host>_<variant>/board.toml`,
+5. dodaj tylko wymagane moduly,
+6. wykonaj ERC, DRC i kontrole mechaniczna.
 
-Pierwsze aktywne warianty powinny zaczac od:
-- `growclip_s3_basic` - minimalny HAT do wybranego i zweryfikowanego devboardu ESP32-S3,
-- `growclip_c6_basic` - minimalny HAT do wybranego i zweryfikowanego devboardu ESP32-C6.
-
-Dokladnych pinoutow nie nalezy zgadywac. Najpierw wybieramy konkretny model devboardu i tworzymy jego profil w `hosts/`, dopiero potem skladamy board.
-
-AXP2101 pozostaje wartosciowym reusable modulem i reference designem, ale nie jest juz centrum architektury Growclip.
+Szczegoly kontraktow: `hosts/PROFILE_CONTRACT.md`, `boards/BOARD_CONTRACT.md`, `requirements.md`.
