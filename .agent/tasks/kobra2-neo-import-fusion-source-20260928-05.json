@@ -1,0 +1,15 @@
+{
+  "id": "kobra2-neo-import-fusion-source-20260928-05",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "docs/kobra2-neo-plotter-baseline",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 300,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git branch --show-current)\" = \"agent-work\"; test \"$(git rev-parse HEAD)\" = \"89b9518189d2cffe8b18aae8db872d5824f8a115\"; test \"$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')\" = \"origin/docs/kobra2-neo-plotter-baseline\"; test -r \"$HOME/Public/kobra2neo.f3d\"; actual=$(shasum -a 256 \"$HOME/Public/kobra2neo.f3d\" | awk '{print $1}'); printf 'SOURCE_SHA256=%s\\n' \"$actual\"; test \"$actual\" = \"bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6\"",
+    "set -euo pipefail; mkdir -p projects/kobra2-neo/cad/tools/pen; cp \"$HOME/Public/kobra2neo.f3d\" projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d; printf '%s  %s\\n' 'bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6' 'kobra2-neo-pen-holder.f3d' > projects/kobra2-neo/cad/tools/pen/SOURCE.sha256; test \"$(shasum -a 256 projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d | awk '{print $1}')\" = \"bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6\"; git add projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d projects/kobra2-neo/cad/tools/pen/SOURCE.sha256; git diff --cached --stat; git commit -m 'Add Fusion 360 pen holder source'; git push origin HEAD:docs/kobra2-neo-plotter-baseline",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"$(git ls-remote origin refs/heads/docs/kobra2-neo-plotter-baseline | awk '{print $1}')\"; test \"$(shasum -a 256 projects/kobra2-neo/cad/tools/pen/kobra2-neo-pen-holder.f3d | awk '{print $1}')\" = \"bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6\"; git log -1 --oneline"
+  ]
+}
