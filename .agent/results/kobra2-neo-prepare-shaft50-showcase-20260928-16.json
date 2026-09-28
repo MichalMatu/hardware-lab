@@ -1,0 +1,9 @@
+{
+  "id": "kobra2-neo-prepare-shaft50-showcase-20260928-16",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-28T18:16:06.494731+00:00",
+  "daemon_version": "4.19.4",
+  "error": "JSONDecodeError: Invalid control character at: line 11 column 774 (char 1049)"
+}
