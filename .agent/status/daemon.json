@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.2",
-  "state": "idle",
-  "pid": 41548,
-  "updated_at": "2026-09-28T14:58:10.755911+00:00",
+  "state": "running",
+  "pid": 44253,
+  "updated_at": "2026-09-28T14:59:03.869767+00:00",
   "self_revision": "e54cfc46e2be31a1f18c7328f3222e147a11fd68",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "kobra2-neo-live-lemur-10cm-20260928-06",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,8 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 41548,
+  "worker_pid": 44253,
   "supervisor_pid": 34851,
-  "last_task_id": "kobra2-neo-find-mongoose-20260928-08",
+  "active_resources": [],
   "execution_variant": "parallel"
 }
