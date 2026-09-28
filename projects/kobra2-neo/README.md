@@ -1,24 +1,38 @@
-# Kobra 2 Neo modular motion platform
+# Kobra 2 Neo pen plotter / motion platform
 
-Anycubic Kobra 2 Neo converted from a stock FDM printer into a reusable three-axis motion platform with interchangeable toolheads.
+Anycubic Kobra 2 Neo used as a reusable XY/Z motion platform. The current validated tool is a pen/marker holder; later tools may reuse the same project-level hardware and safety model.
 
-## Current direction
+## Current validated state — 2026-09-28
 
-- Stock print head and original Z probe are removed.
-- Stock Marlin remains in use while it satisfies the motion requirements.
-- USB serial control is already validated through CH340 at 115200 baud.
-- The first tool is a pen/marker module.
-- The mechanical interface must remain suitable for later clay/paste and other toolheads.
-- `host-ops` is an external generic execution/tooling layer; Kobra-specific behavior lives here.
+- Stock Marlin `bugfix-2.1.x` remains the firmware baseline.
+- USB serial is CH340 at 115200 baud; identify the printer with `M115`, not by port name alone.
+- A pen holder is installed and usable for bounded plotting motion.
+- The cylindrical Z sensor is present and verified as `z_min`; the rear physical button maps to `z_max`.
+- Current pen-tip work envelope: `X=3..223`, `Y=36..230` mm.
+- Normal plotting keeps an additional 5 mm internal margin.
+- Current pen calibration: pen-up `Z=6.12`, pen-down `Z=3.12`.
+- These coordinates are specific to the current pen, holder and paper placement and must be revalidated after mechanical changes.
+
+See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md` and `docs/WORKFLOW.md` before live motion.
+
+## Repository boundary
+
+This project is the canonical home for Kobra-specific hardware state, CAD, calibration, G-code policy and plotter workflow.
+
+`host-ops` remains an external generic machine/serial capability layer. The currently validated SVG-to-bounded-G-code implementation lives temporarily in `MichalMatu/host-ops/prototype/penplotter`; do not move more Kobra-specific policy into `host-ops` core.
 
 ## Project layout
 
-- `docs/` — hardware state, safety contract, roadmap and checkpoints.
-- `cad/` — editable carriage/interface and toolhead CAD plus derived printable exports.
-- `src/` — device-specific host-side motion/protocol/calibration code when it becomes necessary.
-- `scripts/` — bounded operator utilities and project workflows.
-- `samples/` — known-safe sample G-code/SVG inputs.
+- `docs/` — current hardware state, calibration, safety, workflow, roadmap and historical checkpoints.
+- `cad/` — editable Fusion 360/CAD source and derived printable exports.
+- `src/` — future Kobra-specific host-side software when justified.
+- `scripts/` — future bounded operator utilities and project workflows.
+- `samples/` — future known-safe source files and generated dry-run artifacts.
 
-## Immediate next step
+## Direction
 
-Measure and document the bare X-carriage geometry, then define a repeatable common adapter datum before designing the first pen holder.
+The long-term input flow is:
+
+`SVG / text / raster image -> normalized plot geometry -> fit/orientation -> bounded G-code -> dry-run/inspection -> explicit live execution`
+
+Before adding more parser/tooling dependencies or moving software between repositories, first consolidate the current hardware documentation and add the existing Fusion 360 pen-holder design under `cad/tools/pen/`.
