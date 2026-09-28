@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-prepare-shaft50-showcase-20260928-18",
+  "task_digest": "9a5061932f77cfd19ad13ca61ceedf4bad9f73b5765da40f164ee7f521240b00",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T18:17:28.775729+00:00",
+  "attempt_id": "12c3e4588c74b0ec13cafba0",
+  "daemon_version": "4.19.4",
+  "daemon_pid": 61485,
+  "updated_at": "2026-09-28T18:17:28.778429+00:00",
+  "pid": 61485
+}
