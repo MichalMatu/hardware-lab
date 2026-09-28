@@ -1,0 +1,61 @@
+{
+  "id": "omniplot-host-finalize-20260928-22",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-28T19:07:20.711669+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; ROOT=\"$HOME/.local/share/plotter-tools/omniplot\"; V=\"$ROOT/backend/.venv\"; echo 'FILES'; test -x \"$V/bin/uvicorn\" && echo UVICORN_OK; test -f \"$ROOT/frontend/dist/index.html\" && echo FRONTEND_OK; ls -ld \"$HOME/Applications/OmniPlot.app\" 2>/dev/null || true; echo 'PROCESSES'; pgrep -af 'uvicorn.*pen_plotter|finalize-omniplot' || true; echo 'DIRECT_LOG'; tail -100 /tmp/omniplot-direct.log 2>/dev/null || true; echo 'OLD_LOG'; tail -100 /tmp/omniplot-smoke.log 2>/dev/null || true; echo 'HEALTH_CURRENT'; curl -sS --max-time 2 http://127.0.0.1:18020/health || true; echo; echo 'KILL_STALE'; pkill -f 'uvicorn pen_plotter.main:app --host 127.0.0.1 --port 18020' 2>/dev/null || true; sleep 1; cd \"$ROOT/backend\"; OMNIPLOT_FAKE_HARDWARE=1 OMNIPLOT_BIND_HOST=127.0.0.1 \"$V/bin/uvicorn\" pen_plotter.main:app --host 127.0.0.1 --port 18021 >/tmp/omniplot-final.log 2>&1 & P=$!; OK=0; for i in {1..50}; do if curl -fsS --max-time 1 http://127.0.0.1:18021/health >/tmp/omniplot-final-health.txt 2>/dev/null; then OK=1; break; fi; if ! kill -0 \"$P\" 2>/dev/null; then break; fi; sleep 0.2; done; if [ \"$OK\" = 1 ]; then echo HEALTH_OK; cat /tmp/omniplot-final-health.txt; else echo HEALTH_FAIL; cat /tmp/omniplot-final.log; fi; kill \"$P\" 2>/dev/null || true; sleep 1; kill -9 \"$P\" 2>/dev/null || true; test \"$OK\" = 1; APP=\"$HOME/Applications/OmniPlot.app\"; rm -rf \"$APP\"; mkdir -p \"$APP/Contents/MacOS\"; cat > \"$APP/Contents/Info.plist\" <<'PLIST'\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\"><dict><key>CFBundleName</key><string>OmniPlot</string><key>CFBundleDisplayName</key><string>OmniPlot</string><key>CFBundleIdentifier</key><string>local.plottertools.omniplot</string><key>CFBundleVersion</key><string>1</string><key>CFBundleExecutable</key><string>launcher</string><key>LSMinimumSystemVersion</key><string>11.0</string></dict></plist>\nPLIST\ncat > \"$APP/Contents/MacOS/launcher\" <<'SH'\n#!/bin/zsh\nROOT=\"$HOME/.local/share/plotter-tools/omniplot\"\nV=\"$ROOT/backend/.venv\"\nexport OMNIPLOT_FAKE_HARDWARE=1 OMNIPLOT_BIND_HOST=127.0.0.1\ncd \"$ROOT/backend\"\n\"$V/bin/uvicorn\" pen_plotter.main:app --host 127.0.0.1 --port 8020 >/tmp/omniplot.log 2>&1 &\npid=$!\nfor i in {1..50}; do if /usr/bin/curl -fsS --max-time 1 http://127.0.0.1:8020/health >/dev/null 2>&1; then /usr/bin/open http://127.0.0.1:8020; break; fi; sleep 0.2; done\nwait $pid\nSH\nchmod +x \"$APP/Contents/MacOS/launcher\"; /usr/bin/file \"$V/bin/python\"; echo OMNIPLOT_READY",
+      "exit_code": 1,
+      "output": "FILES\nUVICORN_OK\nFRONTEND_OK\ndrwxr-xr-x@ 3 michal  staff  96 Sep 28 21:03 /Users/michal/Applications/OmniPlot.app\nPROCESSES\n46960\nDIRECT_LOG\nOLD_LOG\nHEALTH_CURRENT\ncurl: (7) Failed to connect to 127.0.0.1 port 18020 after 0 ms: Couldn't connect to server\n\nKILL_STALE\nHEALTH_FAIL\n/bin/sh: line 4: 46998 Terminated: 15          OMNIPLOT_FAKE_HARDWARE=1 OMNIPLOT_BIND_HOST=127.0.0.1 \"$V/bin/uvicorn\" pen_plotter.main:app --host 127.0.0.1 --port 18021 > /tmp/omniplot-final.log 2>&1\n",
+      "elapsed_seconds": 13.363,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 241.5,
+      "output_policy": "stream",
+      "captured_output_chars": 479,
+      "output_truncated": false,
+      "current_rss_mb": 2.92,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 13.363
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.148
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-28T19:07:36.169243+00:00",
+  "task_digest": "62e1099b5a541e5f1e9849970e5eb13ad70a25088d850044a3b9f44fae174c9e",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "attempt_id": "24ab9f1c2bb0c8829b046251",
+  "daemon_version": "4.19.5"
+}
