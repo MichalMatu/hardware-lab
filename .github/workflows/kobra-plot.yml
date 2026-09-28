@@ -29,8 +29,10 @@ jobs:
         run: python -m pip install --disable-pip-version-check uv
       - name: Sync project
         run: uv sync
-      - name: Unit and integration tests
-        run: uv run pytest -q
+      - name: Compile and test
+        run: |
+          uv run python -m py_compile src/kobra_plot.py
+          uv run pytest -q
       - name: Offline doctor
         run: uv run kobra-plot doctor
       - name: Prepare curved SVG and text
@@ -48,20 +50,26 @@ jobs:
           forbidden = ("G28", "G91", "M104", "M109", "M140", "M190", " E")
 
           for job in (Path("/tmp/kobra-curve-job"), Path("/tmp/kobra-text-job")):
+              assert (job / ".kobra-plot-job").is_file()
               report = json.loads((job / "report.json").read_text())
               assert report["safety"]["valid"] is True
               assert report["execution"]["allowed"] is False
+              assert report["safety"]["command_whitelist"] == ["G90", "G0", "G1", "M400"]
               bounds = report["geometry"]["output_bounds"]
-              assert 3 <= bounds["min_x"] <= bounds["max_x"] <= 223
-              assert 36 <= bounds["min_y"] <= bounds["max_y"] <= 230
+              assert 8 <= bounds["min_x"] <= bounds["max_x"] <= 218
+              assert 41 <= bounds["min_y"] <= bounds["max_y"] <= 225
 
               gcode = (job / "output.gcode").read_text()
               for token in forbidden:
                   assert token not in gcode, (job, token)
+              active = []
               for raw in gcode.splitlines():
                   code = raw.split(";", 1)[0].strip()
                   if code:
+                      active.append(code)
                       assert code.split()[0] in allowed, code
+              assert active[0] == "G90"
+              assert active[-1] == "M400"
           PY
       - name: Static no-serial check
         run: |
