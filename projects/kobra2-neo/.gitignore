@@ -1,2 +1,5 @@
 .venv/
 *.kobra-job/
+
+__pycache__/
+*.py[cod]

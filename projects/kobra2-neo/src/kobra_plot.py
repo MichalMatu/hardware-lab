@@ -476,16 +476,26 @@ def load_normalized_svg(path: Path) -> list[Polyline]:
 
     lines: list[Polyline] = []
     element_count = 0
-    for elem in root.iter():
+    stack: list[ET.Element] = [root]
+    while stack:
+        elem = stack.pop()
         element_count += 1
         if element_count > MAX_SVG_ELEMENTS:
             raise GeometryError(f"normalized SVG exceeds {MAX_SVG_ELEMENTS} elements")
-        if "transform" in elem.attrib:
-            raise GeometryError("normalized SVG unexpectedly contains transform attributes")
 
         tag = _local_name(elem.tag)
-        if tag in {"svg", "g", "metadata", "defs"}:
+        if tag in {"metadata", "defs"}:
+            # vpype emits RDF metadata. It is non-drawable and its subtree is
+            # deliberately excluded from the normalized-geometry contract.
             continue
+        if "transform" in elem.attrib:
+            raise GeometryError("normalized SVG unexpectedly contains transform attributes")
+        if tag in {"svg", "g"}:
+            stack.extend(reversed(list(elem)))
+            continue
+        if list(elem):
+            raise GeometryError(f"unexpected child elements in <{tag}>")
+
         if tag == "path":
             lines.extend(parse_linear_path(elem.get("d", "")))
         elif tag == "line":
