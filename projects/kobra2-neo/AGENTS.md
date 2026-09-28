@@ -4,28 +4,33 @@ These rules apply to everything under `projects/kobra2-neo/`.
 
 ## Scope
 
-- Keep Kobra-specific code, calibration, CAD, G-code policy and toolhead design in this project.
-- Treat `host-ops` as an external generic machine/device capability layer. Do not modify `host-ops` from this project unless a genuinely reusable cross-project capability is separately justified.
+- Keep Kobra-specific hardware state, calibration, CAD, G-code policy and toolhead design in this project.
+- Treat `host-ops` as an external generic machine/device capability layer. Do not put Kobra-specific plotting policy into `host-ops` core.
+- The current `host-ops/prototype/penplotter` is an external prototype dependency, not the canonical home of Kobra hardware state.
 - Prefer small evidence-driven changes over speculative frameworks.
 
-## Hardware safety
+## Live hardware safety
 
-- The stock print head and original Z probe are currently removed.
-- Do not run `G28 Z`, mesh leveling or probe-dependent routines until a new Z-reference strategy is installed and validated.
-- Do not flash firmware without an explicit requirement, exact board/MCU identification and a recovery path.
-- Do not heat, extrude or energize future tool actuators unless the current task explicitly requires it.
-- Before physical motion, establish operator-confirmed clearance and use bounded moves. Use `M400` when command completion must be proven.
-- Never infer true physical coordinates solely from `M114` while the machine lacks a valid homing/reference contract.
+- Perform exactly one physical printer operation at a time and wait for operator confirmation before the next one.
+- Do not enable heaters, extrusion or firmware flashing unless the current task explicitly requires and reviews it.
+- Homing is always a separate explicit decision; never hide `G28` inside normal plotting flow.
+- The current cylindrical sensor is verified as `z_min`, and `G28 Z` has succeeded with the present setup, but revalidate the mechanical configuration before any future Z homing.
+- Current automatic plotting bounds are the real pen-tip envelope `X=3..223`, `Y=36..230` mm. Normal plots use an additional 5 mm internal margin.
+- Current pen-up is `Z=6.12`; current pen-down is `Z=3.12`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
+- Render and inspect complete G-code before opening a live execution path. Never send a full image/plot without explicit operator approval.
+- Use `M400` when command completion must be proven.
+- Do not identify the printer solely by CH340 VID/PID or a remembered serial path; verify with `M115` when identity is uncertain.
 
 ## Mechanical design
 
-- Design around a common rigid adapter/tool interface rather than a one-off pen holder.
-- Keep moving mass low and close to the carriage plane.
-- Preserve a repeatable datum, Z adjustment, strain relief and space for a future independent Z-reference module.
-- Prefer editable source CAD. Keep generated STL/3MF exports beside or below their source design, never as the only design artifact.
+- The current pen holder is a real calibrated tool, not a hypothetical future design.
+- Preserve editable Fusion 360/CAD source as the canonical mechanical artifact. Printable STL/3MF and neutral STEP exports are derived artifacts, not substitutes for source CAD.
+- Keep moving mass low, preserve cable clearance and document any change that affects the pen-tip coordinate envelope or Z calibration.
+- A future modular tool interface may supersede the current holder, but do not discard the working pen baseline before the replacement is physically validated.
 
 ## Software
 
-- Stock Marlin is the current baseline.
-- Kobra-specific G-code sequences belong here, not in generic `host-ops` capabilities.
+- Stock Marlin is the current firmware baseline.
+- Kobra-specific profiles, limits, tool commands and live workflow belong here.
+- Source conversion should eventually normalize SVG, text and raster images into a common plot-geometry representation before machine-specific fitting and G-code generation.
 - Safety checks and calibration state must be explicit rather than inferred from printer model defaults.

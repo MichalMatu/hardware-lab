@@ -3,24 +3,63 @@
 ## Machine
 
 - Anycubic Kobra 2 Neo.
-- Original print head removed.
-- Original Z-distance/probe sensor removed with the head.
-- X/Y/Z motion system remains operational.
-
-## Verified USB path
-
-- Mac host connection: USB-A -> USB-C through the current hub.
-- USB bridge: QinHeng CH340, VID `0x1a86`, PID `0x7523`.
-- macOS serial device observed: `/dev/cu.usbserial-1120`.
-- Stock firmware serial rate: 115200 baud.
-- USB-C -> USB-C did not enumerate in the tested setup.
-
-## Verified firmware
-
 - Stock Marlin `bugfix-2.1.x`, build Jul 28 2023.
-- Software endstops observed enabled.
-- Verified bounded relative motion on X, Y and Z, a 20 x 20 mm XY square and coordinated XY diagonal motion.
+- X/Y/Z motion is operational.
+- Current plotting setup has a working pen holder and a cylindrical Z sensor verified as `z_min`.
+- Rear physical button near the wipe/calibration area is verified as `z_max`.
+
+Earlier project bootstrap notes described a temporary headless state with the original probe removed. That state is historical and must not be used as the current operating contract.
+
+## Verified USB / serial path
+
+- USB bridge: QinHeng CH340, VID `0x1a86`, PID `0x7523`.
+- Serial rate: 115200 baud.
+- Current observed macOS device: `/dev/cu.usbserial-130`.
+- `M115` reports `MACHINE_TYPE:AnycubicKobra`.
+- A short serial settle interval is required by the current host workflow; `--settle 2` is the validated value.
+
+The serial device path is not a stable identity. Another CH340 device exists in the environment, so use `M115` when printer identity is uncertain.
+
+## Verified software limits
+
+`M211` reported software endstops enabled with:
+
+- X: `-5.80 .. 230.00` mm;
+- Y: `-1.00 .. 230.00` mm;
+- Z: `0.00 .. 250.00` mm.
+
+These firmware limits are not the same as the safe plotting envelope of the pen tip. See `CALIBRATION.md`.
+
+## Verified endstop / sensor mapping
+
+Baseline with Z raised and the rear button released:
+
+- `x_min: open`
+- `y_min: open`
+- `z_min: open`
+- `z_max: open`
+- `filament: TRIGGERED`
+
+Physical mapping:
+
+- X endstop -> `x_min`;
+- Y endstop -> `y_min`;
+- cylindrical proximity/level sensor -> `z_min`;
+- rear physical button -> `z_max`.
+
+The cylindrical sensor was manually triggered with metal and `M119` changed `z_min` to `TRIGGERED`. The rear button was manually pressed with Z raised and `M119` changed `z_max` to `TRIGGERED`.
+
+## Verified homing / motion evidence
+
+- `G28 X Y` completed successfully.
+- After XY homing, firmware reported approximately X=-5.80, Y=-1.00.
+- Motion to X=100, Y=100 completed successfully.
+- `G28 Z` completed successfully with the cylindrical sensor acting as the Z reference.
+- After Z homing, the reported Z was approximately 3.12 mm.
+- Z was later raised safely to 15 mm.
+
+Homing remains an explicit operator decision even though the current Z-reference path has been physically verified.
 
 ## Controller identity
 
-Exact physical MCU revision is still unverified. Do not choose a Klipper/firmware target from internet model assumptions alone.
+Exact physical MCU revision is still unverified. Do not choose a firmware-flash target from internet model assumptions alone.
