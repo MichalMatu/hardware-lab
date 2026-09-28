@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-pen-up-20260928-05",
+  "task_digest": "7e7dc4fd8054630d855120099e126f0d19fd4dce5d2c9d1cf6121caf31cda59b",
+  "idle_timeout": 300,
+  "task_timeout": 180,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T14:11:51.677506+00:00",
+  "attempt_id": "3ddc7dcb2ce8f2260ec9355f",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 44204,
+  "updated_at": "2026-09-28T14:11:51.677576+00:00",
+  "pid": 44204
+}
