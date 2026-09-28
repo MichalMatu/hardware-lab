@@ -1,0 +1,60 @@
+{
+  "id": "local-app-inventory-20260928-19",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-28T18:30:14.694016+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; echo '=== GUI APPS ==='; (find /Applications \"$HOME/Applications\" -maxdepth 2 -name '*.app' -print 2>/dev/null || true) | sed 's#^.*/##' | sort -fu | grep -Ei 'inkscape|cura|orca|prusa|slicer|repetier|pronterface|printrun|octoprint|freecad|fusion|openscad|blender|vscode|visual studio|bambu|idea|arduino|platformio|serial|terminal|gcode|laser|lightburn|kicad' || true; echo '=== BREW CASKS ==='; (brew list --cask 2>/dev/null || true) | grep -Ei 'inkscape|cura|orca|prusa|slicer|repetier|pronterface|printrun|freecad|fusion|openscad|blender|bambu|lightburn|serial' || true; echo '=== BREW FORMULAE ==='; (brew list --formula 2>/dev/null || true) | grep -Ei 'vpype|printrun|octoprint|serial|gcode|openscad' || true; echo '=== COMMANDS ==='; for c in vpype kobra-plot pronterface pronsole printcore cura orca-slicer prusa-slicer slic3r openscad FreeCAD inkscape octoprint hostops uv python3; do p=$(command -v \"$c\" 2>/dev/null || true); [ -n \"$p\" ] && echo \"$c => $p\"; done; echo '=== UV TOOLS ==='; (uv tool list 2>/dev/null || true); echo '=== PYTHON PACKAGES ==='; (python3 -m pip list 2>/dev/null || true) | grep -Ei 'vpype|printrun|octoprint|pyserial' || true; echo '=== SERIAL PORTS ==='; ls /dev/cu.* 2>/dev/null | grep -Ei 'usb|serial|wch|ch34|modem' || true",
+      "exit_code": 0,
+      "output": "=== GUI APPS ===\nAutodesk Fusion Service Utility.app\nAutodesk Fusion.app\nBambuStudio.app\nKiCad.app\nRemove Autodesk Fusion.app\nVisual Studio Code.app\n=== BREW CASKS ===\nserial\nwch-ch34x-usb-serial-driver\n=== BREW FORMULAE ===\n=== COMMANDS ===\nuv => /Users/michal/.platformio/penv/bin/uv\npython3 => /Users/michal/.platformio/penv/bin/python3\n=== UV TOOLS ===\n=== PYTHON PACKAGES ===\npyserial           3.5\n=== SERIAL PORTS ===\n/dev/cu.usbmodem1101\n/dev/cu.usbserial-120\n/dev/cu.usbserial-130\n",
+      "elapsed_seconds": 0.907,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.52,
+      "output_policy": "stream",
+      "captured_output_chars": 490,
+      "output_truncated": false,
+      "current_rss_mb": 4.52,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.907
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.123
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.075
+  },
+  "finished_at": "2026-09-28T18:30:17.508240+00:00",
+  "task_digest": "f44c366d6c396699f47e0068ad1dbcb04f74772ff6ae41c22acb616c0ae23c33",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "cbfa085d1f33e3dc8741e394",
+  "daemon_version": "4.19.4"
+}
