@@ -1,0 +1,27 @@
+[source]
+kind = "official_dimensions"
+url = "https://dl.espressif.com/dl/schematics/esp_idf/DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf"
+revision = "v1.1"
+
+[board]
+width_mm = 25.40
+height_mm = 62.74
+antenna_edge = "top"
+usb_edge = "bottom"
+usb_port_count = 2
+
+[headers]
+count = 2
+pins_per_header = 22
+pitch_mm = 2.54
+row_spacing_mm = 22.86
+center_from_side_edge_mm = 1.27
+
+[keepout]
+antenna = "required"
+usb = "required"
+normalized_geometry = false
+
+[verification]
+official_dimensions = true
+physical_board_match = false
