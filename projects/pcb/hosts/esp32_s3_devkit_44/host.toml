@@ -2,5 +2,19 @@
 id = "esp32_s3_devkit_44"
 family = "esp32-s3"
 status = "draft"
-vendor = ""
-model = ""
+vendor = "Espressif"
+model = "ESP32-S3-DevKitC-1"
+revision = "v1.1"
+
+[reference]
+official_guide = "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html"
+
+[headers]
+count = 2
+pins_per_header = 22
+pitch_mm = 2.54
+
+[verification]
+official_pinout = true
+local_mechanics = false
+physical_board_match = false
