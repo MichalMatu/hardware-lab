@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-prepare-v1-implementation-20260928-05",
+  "task_digest": "6568774571755b02cc10057d114e1aebccbae022f78ab2d80fadf68589f9aa2a",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T11:12:07.881719+00:00",
+  "attempt_id": "6da319b4e1ec5dee0b0110ef",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 71854,
+  "updated_at": "2026-09-28T11:12:07.881802+00:00",
+  "pid": 71854
+}
