@@ -15,7 +15,7 @@ Anycubic Kobra 2 Neo used as a reusable XY/Z motion platform. The current valida
 - First approved full artwork plot completed successfully on 2026-09-28: a 10 cm `MongooseLemur.svg` outline job, bounded to X=63.79..163.00 and Y=84.21..181.79, completed all 7615 streamed commands in about 14 min 44 s and finished pen-up.
 - Durable live execution is now provided by the project-local `kobra-live` runner. Do not rebuild an ad-hoc serial streamer in Local Agent task payloads.
 
-See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md`, `docs/WORKFLOW.md`, `docs/PREPARE_CLI.md` and especially `docs/GOLDEN_LIVE_FLOW.md` before live motion.
+See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md`, `docs/WORKFLOW.md`, `docs/PREPARE_CLI.md`, `docs/GOLDEN_LIVE_FLOW.md` and `docs/THIRD_PARTY_PLOTTER_SOFTWARE.md` before extending the workflow or trying external plotter software.
 
 ## Repository boundary
 
