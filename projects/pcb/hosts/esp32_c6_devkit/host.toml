@@ -2,5 +2,19 @@
 id = "esp32_c6_devkit"
 family = "esp32-c6"
 status = "draft"
-vendor = ""
-model = ""
+vendor = "Espressif"
+model = "ESP32-C6-DevKitC-1"
+revision = "v1.2"
+
+[reference]
+official_guide = "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/user_guide.html"
+
+[headers]
+count = 2
+pins_per_header = 16
+pitch_mm = 2.54
+
+[verification]
+official_pinout = true
+local_mechanics = false
+physical_board_match = false
