@@ -4,9 +4,10 @@ This directory is the canonical home for the current Kobra 2 Neo pen-holder mech
 
 ## Source of truth
 
-Keep the editable Fusion 360 source here when it is exported/provided:
+The editable Fusion 360 source is tracked here:
 
-- `kobra2-neo-pen-holder.f3d` — canonical editable design source.
+- `kobra2-neo-pen-holder.f3d` — canonical editable design source, imported from the validated `kobra2neo.f3d` supplied on 2026-09-28;
+- `SOURCE.sha256` — SHA-256 checksum for the imported source (`bc16edd5d3cf2a7c41ad647d8ffd3002380ad13c0c92f998f67f786b275e85c6`).
 
 Recommended derived artifacts:
 
