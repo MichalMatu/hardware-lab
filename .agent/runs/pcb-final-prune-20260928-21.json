@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-final-prune-20260928-21",
+  "task_digest": "f47152ac7a50903e281ef0ab951dd4add1fd959da07793fa134ba18e581223e4",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:33:37.556033+00:00",
+  "attempt_id": "c54f90ae889bca163f486345",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 65491,
+  "updated_at": "2026-09-28T01:33:37.556207+00:00",
+  "pid": 65491
+}
