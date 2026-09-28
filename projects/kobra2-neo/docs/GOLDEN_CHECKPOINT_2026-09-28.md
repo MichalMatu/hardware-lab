@@ -1,12 +1,12 @@
 # Golden checkpoint — Kobra 2 Neo — 2026-09-28
 
-This file names the post-incident software/workflow baseline for the Kobra 2 Neo pen plotter. The commit that adds this file is the canonical `golden` checkpoint for future sessions.
+This file names the post-incident software/workflow baseline for the Kobra 2 Neo pen plotter. The commit containing the finalized version of this file is the canonical `golden` checkpoint for future sessions.
 
 It is a **software/workflow checkpoint**, not a statement that the physical printer is currently cleared for another plot.
 
 ## Cross-repository baseline
 
-- `hardware-lab`: baseline immediately before this checkpoint file: `c5606d244816cf297f7a854c7ea31d31dae5e270` (`Align workflow with thermal live gate`). The commit containing this file supersedes that SHA as the named hardware-lab checkpoint.
+- `hardware-lab`: baseline before checkpoint finalization: `ff20e3f516b552be6806c25a5687bc0a7ef836ed` (`Create post-incident Kobra golden checkpoint`). The commit containing this finalized file supersedes that SHA as the named hardware-lab checkpoint.
 - `host-ops`: `20a27f7b930cf083c7ea998508f8b4b2f1153ea6` (`Clarify serial boundary for downstream live protocols`).
 - `local-agent`: `72f0a813aafc86ff2fe77fe8e3fe05dd33e008ad` (`Document observable physical task progress`).
 
@@ -65,13 +65,14 @@ Marlin thermal/kill states are terminal and explicitly report final pen state un
 - `host-ops`: only `main` and required `agent-control`.
 - `local-agent`: infrastructure/state branches `chat-bridge-state` and `operator-control` remain; diverged development branches with unique commits remain; `fix/chat-bridge-grouped-turn-fallback` and `fix/chat-bridge-mixed-dom-ordering` were identified as fully contained in `main` and therefore stale. The connected GitHub control surface used for this audit did not expose branch/ref deletion, so those two refs were not falsely claimed as deleted.
 
-## CI / validation status at checkpoint creation
+## CI / validation status at checkpoint finalization
 
-- `hardware-lab` Kobra offline gate was green on `c5606d244816cf297f7a854c7ea31d31dae5e270`, including compile, tests and committed `kobra-live --validate-only` coverage. Gitleaks was also green.
-- `local-agent` CI was green on `72f0a813aafc86ff2fe77fe8e3fe05dd33e008ad`.
-- `host-ops` global `quality` was red on `20a27f7b930cf083c7ea998508f8b4b2f1153ea6`, but the immediately preceding main revision was already red as well; the documentation-only serial-boundary change did not introduce the first failure. Exact root cause remained a separate repository CI debt because GitHub job logs were unavailable through the connected control surface and the host-ops worker was already occupied by another existing host task. A no-write local quality audit was queued behind that task rather than interrupting it.
+- `hardware-lab`: the checkpoint precursor `ff20e3f516b552be6806c25a5687bc0a7ef836ed` passed both the Kobra offline gate and Gitleaks. The Kobra gate includes compilation, project tests and committed `kobra-live --validate-only` coverage.
+- `local-agent`: CI passed on `72f0a813aafc86ff2fe77fe8e3fe05dd33e008ad`.
+- `host-ops`: a no-write local quality audit was executed on exact main SHA `20a27f7b930cf083c7ea998508f8b4b2f1153ea6` and completed exit 0: architecture contract PASS, design contract PASS, Ruff PASS, format PASS, mypy PASS, Bandit completed, `pip check` PASS and 716 tests completed under the repository verification script. This proves the current main is healthy in the actual Local Agent macOS environment.
+- `host-ops` GitHub Actions `quality` is still red on the current and immediately preceding main revisions. The connected GitHub surface did not expose usable job logs/steps for the failure, so that hosted-runner discrepancy remains an explicit CI debt rather than being guessed at or hidden. It predates the documentation-only serial-boundary change made during this audit.
 
-Therefore this checkpoint means **the Kobra flow and its direct Local Agent evidence contract are golden**, not that every unrelated check in every touched repository is globally green.
+Therefore this checkpoint means **the Kobra flow, the host-side core verification and the Local Agent evidence contract are validated**, while the separate host-ops hosted-GitHub-runner failure remains open and visible.
 
 ## Incident result that this checkpoint preserves
 
