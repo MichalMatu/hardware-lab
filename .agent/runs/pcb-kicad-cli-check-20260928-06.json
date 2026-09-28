@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-kicad-cli-check-20260928-06",
+  "task_digest": "a4b900066008adc7c4a942109d4db18a815bb0d16618dd0b02b4477d023ba265",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T00:04:18.043482+00:00",
+  "attempt_id": "eaa1148107f20b3a64e45f52",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 84663,
+  "updated_at": "2026-09-28T00:04:18.043640+00:00",
+  "pid": 84663
+}
