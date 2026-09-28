@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-live-lemur10-20260928-06",
+  "task_digest": "9a2dbe7093ed09336155badfd45b24b41d7cd0337d17f650f191b0b0d1a1c536",
+  "idle_timeout": 300,
+  "task_timeout": 3000,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T14:42:13.156253+00:00",
+  "attempt_id": "a1db0f5488486642ddfcc957",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 13130,
+  "updated_at": "2026-09-28T14:42:13.156312+00:00",
+  "pid": 13130
+}
