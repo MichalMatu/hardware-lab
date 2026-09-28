@@ -1,0 +1,27 @@
+[source]
+kind = "official_dimensions"
+url = "https://dl.espressif.com/dl/schematics/esp32-c6-devkitc-1-dimensions_v1.2.pdf"
+revision = "v1.2"
+
+[board]
+width_mm = 25.40
+height_mm = 51.80
+antenna_edge = "top"
+usb_edge = "bottom"
+usb_port_count = 2
+
+[headers]
+count = 2
+pins_per_header = 16
+pitch_mm = 2.54
+row_spacing_mm = 22.86
+center_from_side_edge_mm = 1.27
+
+[keepout]
+antenna = "required"
+usb = "required"
+normalized_geometry = false
+
+[verification]
+official_dimensions = true
+physical_board_match = false
