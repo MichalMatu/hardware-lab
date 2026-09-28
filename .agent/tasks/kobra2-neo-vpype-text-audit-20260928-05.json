@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-vpype-text-audit-20260928-05",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "feat/kobra-plot-prepare",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 600,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; uv tool run --from 'vpype==1.15.0' vpype --help | sed -n '1,240p' | grep -E '(^  text|text|write|read|linemerge|linesort|linesimplify)' || true; uv tool run --from 'vpype==1.15.0' vpype text --help | sed -n '1,220p' || true"
+  ]
+}
