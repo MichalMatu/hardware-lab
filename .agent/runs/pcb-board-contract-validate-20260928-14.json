@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "pcb-board-contract-validate-20260928-14",
+  "task_digest": "4bcde3cae6994bc65df18318b90c3468cdb565e231b8849b285daf52771dbd1d",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T01:14:46.113166+00:00",
+  "attempt_id": "74a54ffc15d0b139b620d1ca",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 28970,
+  "updated_at": "2026-09-28T01:14:46.114156+00:00",
+  "pid": 28970
+}
