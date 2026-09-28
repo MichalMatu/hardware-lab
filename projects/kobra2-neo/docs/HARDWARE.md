@@ -4,7 +4,7 @@
 
 - Anycubic Kobra 2 Neo.
 - Stock Marlin `bugfix-2.1.x`, build Jul 28 2023.
-- X/Y/Z motion is operational.
+- X/Y/Z motion is operational when firmware is not in a halted safety state.
 - Current plotting setup has a working pen holder and a cylindrical Z sensor verified as `z_min`.
 - Rear physical button near the wipe/calibration area is verified as `z_max`.
 
@@ -16,9 +16,9 @@ Earlier project bootstrap notes described a temporary headless state with the or
 - Serial rate: 115200 baud.
 - Current observed macOS device: `/dev/cu.usbserial-130`.
 - `M115` reports `MACHINE_TYPE:AnycubicKobra`.
-- A short serial settle interval is required by the current host workflow; `--settle 2` is the validated value.
+- A short serial settle interval is required by the current host workflow; `--settle 2` is the previously validated host-ops probe value.
 
-The serial device path is not a stable identity. Another CH340 device exists in the environment, so use `M115` when printer identity is uncertain.
+The serial device path is not a stable identity. Another CH340 device exists in the environment, so the live executor verifies printer identity with `M115` before motion.
 
 ## Verified software limits
 
@@ -54,9 +54,23 @@ The cylindrical sensor was manually triggered with metal and `M119` changed `z_m
 - `G28 X Y` completed successfully; firmware reported X=-5.80, Y=-1.00.
 - `G28 Z` completed successfully with the cylindrical sensor acting as the Z reference; the 2026-09-28 session reported X=36.00, Y=206.65, Z=2.97.
 - The pen was then raised to Z=6.12 and planner completion was confirmed with `M400`.
-- A full approved 10 cm artwork subsequently completed all 7615 acknowledgement-driven commands without firmware error and ended pen-up.
+- A full approved 10 cm artwork completed all 7615 acknowledgement-driven commands without firmware error and ended pen-up.
 
 Homing remains an explicit operator decision even though the current Z-reference path has been physically verified.
+
+## Thermal-monitor dependency discovered 2026-09-28
+
+The later `shaft-50x20-showcase` live task proved that heater commands being disabled is not sufficient to ignore the stock hotend thermal circuit. The task successfully identified the printer, completed XY and Z homing, raised the pen and streamed through command 3300/4345. Marlin then emitted:
+
+```text
+Error:MINTEMP triggered, system stopped! Heater_ID: E0
+```
+
+The firmware halted the machine and the task failed after 801.199 s. The old ad-hoc runner did not obtain a final pen-up acknowledgement, so the physical final pen state from that run is unknown until inspected/reset.
+
+Treat the hotend thermistor/sensor circuit as a required health dependency even for pen-only motion. The durable `kobra-live` path now queries `M105` before motion and periodically during long streams, reports thermal health as structured progress and treats Marlin thermal kill states as terminal with final pen state explicitly unknown.
+
+The repository does not yet prove whether the 2026-09-28 `MINTEMP` was an intermittent connector/sensor fault or another physical thermal-input issue. Do not guess; inspect the thermistor wiring/connector and obtain stable `M105` room-temperature readings before the next physical plot.
 
 ## Controller identity
 
