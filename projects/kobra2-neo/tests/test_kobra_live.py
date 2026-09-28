@@ -6,7 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from kobra_live import LivePlotError, PROGRESS_PREFIX, main, validate_job
+from kobra_live import (
+    LivePlotError,
+    PROGRESS_PREFIX,
+    extract_hotend_temperature,
+    main,
+    validate_job,
+)
 
 
 PROFILE = Path(__file__).resolve().parents[1] / "config" / "kobra2_neo_pen.toml"
@@ -75,6 +81,15 @@ def test_validate_sha_pin(tmp_path: Path) -> None:
     )
     with pytest.raises(LivePlotError, match="SHA-256 mismatch"):
         validate_job(gcode, report, PROFILE, expected_sha256="0" * 64)
+
+
+def test_extract_hotend_temperature_from_m105() -> None:
+    assert extract_hotend_temperature(["ok T:23.41 /0.00 B:24.00 /0.00"]) == pytest.approx(23.41)
+
+
+def test_extract_hotend_temperature_requires_t_field() -> None:
+    with pytest.raises(LivePlotError, match="did not contain hotend temperature"):
+        extract_hotend_temperature(["ok B:24.00 /0.00"])
 
 
 def test_cli_validate_only_emits_agent_progress(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
