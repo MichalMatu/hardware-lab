@@ -4,10 +4,11 @@ These rules apply to everything under `projects/kobra2-neo/`.
 
 ## Scope
 
-- Keep Kobra-specific hardware state, calibration, CAD, G-code policy and toolhead design in this project.
+- Keep Kobra-specific hardware state, calibration, CAD, G-code policy, Marlin protocol policy and toolhead design in this project.
 - Treat `host-ops` as an external generic machine/device capability layer. Do not put Kobra-specific plotting policy into `host-ops` core.
-- The current `host-ops/prototype/penplotter` is an external prototype dependency, not the canonical home of Kobra hardware state.
+- The current `host-ops/prototype/penplotter` is historical prototype evidence, not the canonical home of Kobra hardware state.
 - Prefer small evidence-driven changes over speculative frameworks.
+- For approved prepared jobs, use the committed `kobra-live` runner and `docs/GOLDEN_LIVE_FLOW.md`; do not rebuild a serial streamer inside an ad-hoc Local Agent task.
 
 ## Live hardware safety
 
@@ -19,7 +20,17 @@ These rules apply to everything under `projects/kobra2-neo/`.
 - Current pen-up is `Z=6.12`; current pen-down is `Z=2.97`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
 - Render and inspect complete G-code before opening a live execution path. Never send a full image/plot without explicit operator approval.
 - Use `M400` when command completion must be proven.
-- Do not identify the printer solely by CH340 VID/PID or a remembered serial path; verify with `M115` when identity is uncertain.
+- Do not identify the printer solely by CH340 VID/PID or a remembered serial path; the live executor must verify identity with `M115` before motion.
+- Never open a second serial session/probe while a live task already owns the printer port.
+
+## Live orchestration and evidence
+
+- Read the hardware-lab daemon/run state before enqueueing a physical task. An active physical task wins; do not enqueue or probe around it.
+- `host-ops` may discover/probe a serial path when needed, but the Kobra long-running protocol executor is `kobra-live` in this repository.
+- Never assume the `hostops` command is installed in the hardware-lab worker PATH. Likewise, do not assume hardware-lab project commands exist in the host-ops worker.
+- Long physical operations must emit `[AGENT_PROGRESS]` markers so Local Agent exposes the current physical checkpoint through `last_progress_message`.
+- Do not claim `homing passed`, `drawing started` or `complete` from process liveness, heartbeat age or recent stdout alone. Require the corresponding structured checkpoint or terminal result.
+- Report any missing artifact, worker-capability mismatch, serial identity failure, firmware error, resend or timeout immediately. Diagnose that exact boundary before retrying; no silent speculative retry chains.
 
 ## Mechanical design
 
@@ -32,5 +43,6 @@ These rules apply to everything under `projects/kobra2-neo/`.
 
 - Stock Marlin is the current firmware baseline.
 - Kobra-specific profiles, limits, tool commands and live workflow belong here.
-- Source conversion should eventually normalize SVG, text and raster images into a common plot-geometry representation before machine-specific fitting and G-code generation.
+- `kobra-plot` prepares jobs and remains serial-free; `kobra-live` executes only already-prepared and approved jobs.
+- Source conversion should normalize SVG, text and raster images into a common plot-geometry representation before machine-specific fitting and G-code generation.
 - Safety checks and calibration state must be explicit rather than inferred from printer model defaults.
