@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-drive-bridge-diagnose-20260928-04",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "docs/kobra2-neo-plotter-baseline",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -u; printf 'CLOUDSTORAGE\\n'; ls -ld \"$HOME/Library/CloudStorage\" \"$HOME/Library/CloudStorage\"/* 2>&1 || true; printf 'MATCHES\\n'; find \"$HOME/Library/CloudStorage\" -maxdepth 5 -type f -name 'kobra2neo.f3d' -print 2>/dev/null | head -n 10 || true; printf 'TOOLS\\n'; command -v rclone || true; command -v gdrive || true"
+  ]
+}
