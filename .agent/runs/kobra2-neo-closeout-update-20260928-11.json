@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-closeout-update-20260928-11",
+  "task_digest": "ce767fa678303363c1cf40d5ead5698741e772412a782bc68b900b93cc9f9965",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T16:24:03.563726+00:00",
+  "attempt_id": "41481398c3d9a5a6e57faaeb",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 78240,
+  "updated_at": "2026-09-28T16:24:03.564375+00:00",
+  "pid": 78240
+}
