@@ -1,0 +1,15 @@
+{
+  "id": "pcb-mechanical-profiles-validate-20260928-13",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"1720d05b47d6922d028be72c5935ae6a5f3d0848\"; git show -s --oneline HEAD",
+    "set -euo pipefail; python3 - <<'PY'\nfrom pathlib import Path\nimport tomllib\nroot = Path('projects/pcb/hosts')\nexpected = {\n    'esp32_s3_devkit_44': (25.40, 62.74, 22, 22.86),\n    'esp32_c6_devkit': (25.40, 51.80, 16, 22.86),\n}\nfor name, (width, height, pins, spacing) in expected.items():\n    d = root / name\n    host = tomllib.loads((d / 'host.toml').read_text())\n    mech = tomllib.loads((d / 'mechanical.toml').read_text())\n    pinout = tomllib.loads((d / 'pinout.toml').read_text())\n    assert host['verification']['official_mechanics'] is True\n    assert host['verification']['physical_board_match'] is False\n    assert mech['board']['width_mm'] == width\n    assert mech['board']['height_mm'] == height\n    assert mech['headers']['pins_per_header'] == pins\n    assert mech['headers']['row_spacing_mm'] == spacing\n    assert mech['headers']['pitch_mm'] == host['headers']['pitch_mm']\n    assert mech['headers']['count'] == host['headers']['count'] == len(pinout['headers'])\n    assert mech['keepout']['normalized_geometry'] is False\n    print(name, mech['board'], mech['headers'])\nPY",
+    "set -euo pipefail; python3 -m compileall -q projects/pcb/library; git diff --check; git status --short"
+  ]
+}
