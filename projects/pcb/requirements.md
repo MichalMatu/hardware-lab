@@ -1,45 +1,81 @@
-# Wymagania ogólne: PCB workspace
+# Wymagania ogolne: Growclip PCB workspace
 
-Ten dokument opisuje wspólne wymagania jakościowe, inżynieryjne i biznesowe dla płytek w tym repozytorium. Złotym standardem jest obecnie projekt `ESP32-DevKitC V4 HAT` oparty o `AXP2101`.
+Ten dokument definiuje zasady dla elastycznej rodziny plytek Growclip. Domyslny model rozwoju to prosty HAT / carrier do gotowego devboardu, a nie od razu kompletna plytka z wlasnym MCU i rozbudowanym PMIC.
 
-## 1. Cel dokumentu
-Zdefiniować podstawowy standard jakości: strukturę katalogów, wymagania projektowe, praktyki layoutu oraz listę kontrolną gotowości produkcyjnej (commercialization).
+## 1. Host najpierw
 
-## 2. Organizacja i Środowisko
-Każda płytka jest osobnym folderem pod `boards/` (np. `boards/esp32_devkitc_hat/`).
-Używamy **KiCad** (do ręcznego routingu i podglądu) oraz biblioteki **SKiDL** (do generowania schematów kodem Python).
+Kazdy board musi wskazywac konkretny profil hosta z `hosts/`.
+Profil hosta powinien zawierac:
+- dokladny model / wariant devboardu,
+- liczbe i geometrie headerow,
+- zweryfikowany pinout,
+- dostepne 5 V / 3.3 V / GND,
+- piny EN/BOOT/strapping oraz ograniczenia startowe,
+- antenna keep-out i istotne ograniczenia mechaniczne.
 
-Typowe ustawienie zmiennych środowiskowych:
-- `KICAD_SYMBOL_DIR` - ścieżka do symboli KiCada.
-- `KICAD_FOOTPRINT_DIR` - ścieżka do footprintów.
+Nie wolno uzupelniac brakujacego pinoutu na podstawie podobnego devboardu.
 
-## 3. Minimalne Wymagania Funkcjonalne
-Każdy projekt w repozytorium **musi** jasno definiować:
-- Budżet prądowy i logikę zasilania (Power Path).
-- Piny i interfejsy (I2C, SPI, UART).
-- Wymagania mechaniczne (rozmiar, złącza THT, keep-out zone dla anten).
-- Wygenerowany plik **BOM (.csv)** dopasowany pod usługę montażu (np. JLCPCB SMT).
+## 2. Minimalna kompozycja
 
-## 4. Wymagania Technologiczne (Stackup)
-- Dla zaawansowanych układów zasilających (PMIC impulsowy) **wymagany jest stackup 4-warstwowy**. Zapewnia on litą płaszczyznę masy (GND Plane) kluczową dla:
-  - Odprowadzania ciepła (thermal pad z przelotkami do wylewki).
-  - Zapobiegania emisji EMI (krótkie pętle powrotne prądu pod cewkami).
-  - Ułatwienia routingu dla napięć dystrybucyjnych (5V, 3V3).
+Nowy board zaczynamy od najmniejszego zestawu funkcji potrzebnego dla danego wariantu Growclip.
+Funkcje takie jak bateria, PMIC, RTC, boost, dodatkowe sensory lub wyjscia mocy sa opcjonalnymi modulami.
 
-## 5. Dobre Praktyki Projektowe
-- **Zasilanie (Decoupling):** Lokalne odsprzęganie blisko pinów układu. Dla PMIC kondensatory `VIN` oraz cewki przetwornic muszą leżeć maksymalnie blisko pinów wykonawczych układu (np. na tej samej warstwie, odsunięte o max 2-3 mm).
-- **Zasada Rotacji Elementów:** Elementy (zwłaszcza dwupadowe) należy obracać w skrypcie layoutu tak, aby linie wirtualne (Ratsnest) nie przecinały się nawzajem. Upraszcza to manualny routing i eliminuje konieczność przelotek dla kluczowych sygnałów.
-- **RF i Boot:** Brak ścieżek pod anteną układu bezprzewodowego. Piny strappingowe ESP32 (`IO0`, `IO2`, `IO12`, `IO15`) traktować jako "do not pull" przy starcie, by nie zepsuć bootloadera.
+Nie ma globalnego wymagania uzywania AXP2101 ani konkretnego ukladu zasilania.
 
-## 6. Lista Kontrolna Komercjalizacji (Dev Board Productization)
-Zwykły działający obwód to nie produkt. Płytki przygotowywane do sprzedaży muszą bezwzględnie posiadać:
-- [ ] **Otwory Montażowe:** Przynajmniej 2-4 otwory o standardowych średnicach (M2.5 lub M3) w narożnikach.
-- [ ] **Złącze Baterii:** Wykorzystywać standard rynkowy `JST-PH 2.0mm` zamiast ogólnych footprintów pin-header.
-- [ ] **Oznaczenia Silkscreen:** Czytelnie opisać polaryzację złącza baterii (`+`/`-`), oznaczyć piny wejścia/wyjścia na złączach i dodać logiczną nazwę/URL projektu.
-- [ ] **Zabezpieczenie Polaryzacji (Opcjonalnie):** W przypadku wpinania baterii zaleca się implementację Reverse Polarity Protection na P-MOSFET, aby chronić wrażliwy układ ładowania PMIC-a przed pomyłką użytkownika.
-- [ ] **Wyprowadzenie Interfejsów:** Jeżeli PMIC posiada wolne LDO, należy wystawić je na dostępne headery dla docelowego developera.
+## 3. Wspolne moduly
 
-## 7. Wymagania Jakościowe i Weryfikacja
-- Brak błędów ERC (Electrical Rules Check) na wygenerowanej netliście.
-- Brak kolizji fizycznych (Courtyard Overlaps) - do walidacji przez skrypt Pythona zanim płytka trafi do KiCada.
-- Elementy w BOM przyporządkowane do "Basic Parts" fabryki, gdy to możliwe, aby obniżyć koszty produkcji partii.
+Reusable logika powinna trafic do `library/`, jezeli:
+- ma sens dla wiecej niz jednego boardu,
+- ma jasno zdefiniowane wejscia/wyjscia,
+- jest opisana w `docs/modules/`,
+- nie zawiera zalozen mechanicznych konkretnego hosta.
+
+Kod board-specific zostaje w `boards/<board>/`.
+
+## 4. Technologia PCB
+
+Domyslnie wybieramy najprostszy stackup, ktory spelnia wymagania elektryczne i mechaniczne.
+- 2 warstwy sa akceptowalne dla prostych HAT-ow.
+- 4 warstwy stosujemy wtedy, gdy uzasadnia to power integrity, EMI, gestosc routingu, USB/RF lub wymagania konkretnego ukladu.
+- Zaawansowany PMIC impulsowy moze wymagac 4 warstw, ale nie jest to globalna regula dla calego workspace.
+
+## 5. Zasilanie i interfejsy
+
+Kazdy board musi jawnie opisac:
+- skad bierze zasilanie,
+- czy moze zasilac hosta i w jakich warunkach,
+- zabezpieczenie przed back-feedem, jesli istnieje wiecej niz jedno zrodlo,
+- budzet pradowy,
+- uzywane I2C/SPI/UART/USB/GPIO,
+- poziomy napiec i pull-up/pull-down.
+
+## 6. Mechanika i RF
+
+Przed routingiem nalezy zweryfikowac:
+- rozstaw headerow i orientacje hosta,
+- dostep do USB, BOOT, RESET i innych wymaganych elementow,
+- brak kolizji z elementami na devboardzie,
+- keep-out anteny,
+- sensowne polozenie zlacz zewnetrznych,
+- courtyard i edge clearance.
+
+## 7. Weryfikacja
+
+Przed uznaniem boardu za gotowy:
+- ERC bez niewyjasnionych bledow,
+- DRC bez niewyjasnionych bledow,
+- brak niezamierzonych unconnected pads,
+- zweryfikowany pinout hosta,
+- zweryfikowane footprinty krytycznych elementow,
+- przejrzany power path,
+- BOM i oznaczenia produkcyjne dopiero wtedy, gdy wariant ma isc do produkcji.
+
+## 8. Produkcja
+
+JLCPCB/LCSC jest preferowanym workflow, ale optymalizacja pod Basic Parts nie moze wymuszac gorszego ukladu elektrycznego.
+Silkscreen powinien jasno opisywac zasilanie, polaryzacje i istotne zlacza.
+
+## 9. Zasada prostoty
+
+Jesli funkcja nie jest potrzebna w pierwszej wersji boardu, nie dodajemy jej "na przyszlosc".
+Elastycznosc ma wynikac ze wspolnych host profiles i reusable modules, a nie z jednego przeladowanego PCB.

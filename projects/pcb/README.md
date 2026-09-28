@@ -1,24 +1,32 @@
-# PCB Workspace
+# Growclip PCB Workspace
 
-Główne repozytorium (monorepo) przechowujące zautomatyzowane projekty płytek PCB oparte na Pythonie (SKiDL + API KiCad).
+Ten katalog jest wspolna baza sprzetowa dla rodziny Growclip. Pierwsze wersje PCB maja byc prostymi HAT-ami / carrierami do gotowych modulow deweloperskich ESP32-S3 i ESP32-C6. Nie zakladamy jednego MCU, jednego ukladu zasilania ani jednego zestawu funkcji.
 
-Aktualnie aktywnym i rozwijanym produktem jest **HAT pod `ESP32-DevKitC V4`** oparty o zaawansowany PMIC **AXP2101** w katalogu `boards/esp32_devkitc_hat/`.
+## Zasady architektury
 
-Najważniejsze zasady jakościowe, organizacyjne i biznesowe opisane są w pliku `requirements.md`.
+1. **Host jest osobnym profilem.** `hosts/` opisuje konkretny devboard: mechanike, headery, pinout, zasilanie, piny strapping i keep-out anteny.
+2. **Funkcje sa wspolnymi klockami.** `library/` zawiera reusable interfejsy i moduly, np. I2C lub AXP2101. Modul nie jest obowiazkowy tylko dlatego, ze istnieje.
+3. **Board jest cienka kompozycja.** `boards/` zawiera tylko aktywne warianty Growclip i ich board-specific polaczenia, mechanike oraz layout.
+4. **Najpierw minimalna wersja.** Zlozone zasilanie, bateria, RTC, dodatkowe sensory i inne funkcje dodajemy dopiero w wariancie, ktory ich potrzebuje.
+5. **Wiedza jest wspolna.** Datasheety, reference designy, profile i checklisty w `docs/` oraz `profiles/` sa niezalezne od konkretnego boardu.
 
-## Struktura repozytorium
+## Struktura
 
-- `boards/esp32_devkitc_hat/`: Główna, aktywna płytka HAT-a. Kompletny workflow opisany jest w jej lokalnym `README.md`.
-- `library/interfaces.py`: Kontrakty pomiędzy fizycznymi modułami.
-- `library/modules/`: Współdzielone bloki sprzętowe (np. `axp2101_pmic`, `i2c_bus`), projektowane tak, by można je było reużywać w innych płytkach.
-- `docs/`: Centralna dokumentacja, PDF-y (datasheety), kontrakty modułów oraz strategie komercjalizacji (np. `monetization_plan.md`).
-- `framework/`: Prototypowy generator deklaratywny (przygotowany pod przyszłe, mniej skomplikowane płytki oparte o `board.toml`).
-- `requirements.md`: Twarde wymagania techniczne i biznesowe dla wszystkich projektów w repozytorium.
-- `SKILL.md`: Konfiguracja i workflow pracy inżynieryjnej (przydatne jako persona dla asystentów AI).
+- `boards/` - aktywne plytki Growclip. Po cleanupie nie ma jeszcze boardu uznanego za produkcyjny.
+- `hosts/` - profile fizycznych devboardow S3/C6.
+- `library/` - wspolne interfejsy i implementacje modulow SKiDL.
+- `docs/` - datasheety, reference designy, bring-up i dokumentacja modulow.
+- `profiles/` - ogolne profile rodzin ukladow i domen funkcjonalnych.
+- `archive/` - stare boardy i legacy tooling zachowane jako referencja, nie jako aktywna baza.
+- `requirements.md` - aktualne zasady projektowe.
+- `SKILL.md` - workflow pracy nad tym workspace.
 
-## Architektura i Podejście
+## Aktualny kierunek
 
-1. **Schematy generowane kodem (SKiDL):** Nie rysujemy schematów ręcznie. Cała logika połączeń (netlisty) wynika z kodu w Pythonie. Ułatwia to wersjonowanie (Git), ponowne użycie bloków (jak AXP2101) i audyty bezpieczeństwa.
-2. **Precyzyjny Layout Automatyczny:** Footprinty i ich współrzędne aplikowane są skryptowo (`layout_automation.py`), co zapobiega powstawaniu kolizji mechanicznych (courtyards) i gwarantuje, że przy każdej przebudowie układ pozostaje "czysty".
-3. **Ręczny Routing Krytyczny:** Ścieżki zasilania (DCDC) i wylewki miedzi (poligony) prowadzone są ostatecznie ręcznie. Skrypty auto-routingu zostały usunięte z produkcyjnego workflowu, ponieważ ręczne rozlanie litel masy (GND) na 4-warstwowej płytce ma kluczowe znaczenie dla stabilności PMIC.
-4. **Gotowość Produkcyjna (JLCPCB):** Wymuszamy stosowanie standardowych komponentów ("Basic parts" w LCSC) z wygenerowanym `jlcpcb_bom.csv`, aby minimalizować koszty produkcji PCBA.
+Pierwsze aktywne warianty powinny zaczac od:
+- `growclip_s3_basic` - minimalny HAT do wybranego i zweryfikowanego devboardu ESP32-S3,
+- `growclip_c6_basic` - minimalny HAT do wybranego i zweryfikowanego devboardu ESP32-C6.
+
+Dokladnych pinoutow nie nalezy zgadywac. Najpierw wybieramy konkretny model devboardu i tworzymy jego profil w `hosts/`, dopiero potem skladamy board.
+
+AXP2101 pozostaje wartosciowym reusable modulem i reference designem, ale nie jest juz centrum architektury Growclip.
