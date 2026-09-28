@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-drive-bridge-diagnose-20260928-04",
+  "task_digest": "9c8ee28bf56ba2158e57af9a3aefd132f1a57eed13d853edd09630a306e9c6f8",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-28T09:31:34.640671+00:00",
+  "attempt_id": "581e13576b3c36498dfe2ca5",
+  "daemon_version": "4.19.1",
+  "daemon_pid": 60444,
+  "updated_at": "2026-09-28T09:31:34.640742+00:00",
+  "pid": 60444
+}
