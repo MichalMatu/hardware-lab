@@ -1,0 +1,24 @@
+[meta]
+source = "Espressif ESP32-C6-DevKitC-1 v1.2 user guide"
+revision = "v1.2"
+
+[headers.J1]
+pins = [
+  "3V3", "RST", "GPIO4", "GPIO5", "GPIO6", "GPIO7", "GPIO0", "GPIO1",
+  "GPIO8", "GPIO10", "GPIO11", "GPIO2", "GPIO3", "5V", "GND", "NC"
+]
+
+[headers.J3]
+pins = [
+  "GND", "GPIO16_TX", "GPIO17_RX", "GPIO15", "GPIO23", "GPIO22", "GPIO21",
+  "GPIO20", "GPIO19", "GPIO18", "GPIO9", "GND", "GPIO13_USB_DP",
+  "GPIO12_USB_DM", "GND", "NC"
+]
+
+[constraints]
+strapping = ["GPIO4", "GPIO5", "GPIO8", "GPIO9", "GPIO15"]
+native_usb = ["GPIO12_USB_DM", "GPIO13_USB_DP"]
+onboard = ["GPIO8"]
+
+[notes]
+rgb_led = "GPIO8 is used by the onboard RGB LED"
