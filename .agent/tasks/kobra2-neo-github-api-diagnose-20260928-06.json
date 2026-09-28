@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-github-api-diagnose-20260928-06",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "docs/kobra2-neo-plotter-baseline",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -u; printf 'GH='; command -v gh || true; if command -v gh >/dev/null 2>&1; then gh auth status 2>&1 | sed -E 's/(token:).*/\\1 [redacted]/'; fi; printf 'REMOTE='; git remote get-url origin"
+  ]
+}
