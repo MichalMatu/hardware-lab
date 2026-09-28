@@ -96,7 +96,8 @@ There is no final plotter-specific streamer yet. A future durable execution laye
 - handle Marlin acknowledgement/error responses explicitly;
 - support bounded cancellation/error reporting;
 - never silently insert homing, heating or extrusion;
-- execute one physical operation at a time during bring-up and wait for operator confirmation between operations;
+- after one explicit approval of the complete transaction, allow a continuous start flow of XY homing -> Z homing -> pen-up -> travel to the first point -> full artwork -> final `M400` -> pen-up, without artificial confirmation stops between those stages;
+- keep `G28` out of prepare-generated artwork so homing remains an execution-layer preamble that is visible in the approved live plan;
 - never send a whole artwork until the corresponding dry-run has been explicitly approved.
 
 ## Next source-conversion decision
