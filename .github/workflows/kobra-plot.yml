@@ -31,7 +31,7 @@ jobs:
         run: uv sync
       - name: Compile and test
         run: |
-          uv run python -m py_compile src/kobra_plot.py
+          uv run python -m py_compile src/kobra_plot.py src/kobra_live.py
           uv run pytest -q
       - name: Offline doctor
         run: uv run kobra-plot doctor
@@ -71,9 +71,15 @@ jobs:
               assert active[0] == "G90"
               assert active[-1] == "M400"
           PY
-      - name: Static no-serial check
+      - name: Validate committed live-showcase job without serial I/O
         run: |
-          if grep -R -nE '^import serial|^from serial' src; then
+          uv run kobra-live \
+            samples/gcode/shaft-50x20-showcase.gcode \
+            --report samples/gcode/shaft-50x20-showcase.report.json \
+            --validate-only
+      - name: Keep prepare pipeline serial-free
+        run: |
+          if grep -nE '^import serial|^from serial' src/kobra_plot.py; then
             echo "Serial dependency found in prepare-only V1" >&2
             exit 1
           fi
