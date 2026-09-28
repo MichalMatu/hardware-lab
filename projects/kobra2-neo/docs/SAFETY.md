@@ -12,5 +12,7 @@ This contract describes the current pen-plotter setup. Historical headless-state
 8. Reject prepared plots containing unintended `G28`, heater commands, extrusion commands or XY moves outside the allowed envelope.
 9. Never send a complete artwork to the printer without explicit operator approval after dry-run inspection.
 10. Use `M400` when a workflow depends on confirmed planner completion.
-11. Do not identify the printer only by CH340 VID/PID or a remembered device path. Confirm with `M115` when identity is uncertain.
+11. Do not identify the printer only by CH340 VID/PID or a remembered device path. The live executor must confirm with `M115` before motion.
 12. A new tool or mechanical revision invalidates calibration values that depend on tool geometry until they are physically re-measured.
+13. Stock Marlin thermal protection remains active even though plotting never enables heaters. The hotend thermistor/sensor circuit must remain healthy. `kobra-live` must query `M105` before motion and periodically during long plots; an implausible temperature, `MINTEMP`, `MAXTEMP`, `Printer halted` or equivalent kill-state evidence is a terminal stop condition.
+14. After a firmware kill/halt, do not claim that a recovery pen-up succeeded and do not repeatedly send motion commands. The final pen state is unknown until the machine is physically inspected/reset and safe motion is re-established.
