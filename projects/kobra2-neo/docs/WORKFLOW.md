@@ -18,14 +18,28 @@ SVG / text / raster image
     -> explicit operator approval
     -> kobra-live revalidation
     -> M115 identity
-    -> M105 thermal-health gate
+    -> headless pen-plotter profile check
     -> XY home -> Z home -> pen up
-    -> acknowledged artwork stream + periodic M105
+    -> acknowledged artwork stream
     -> M400 -> final pen up
     -> structured result evidence
 ```
 
 The normalized geometry layer represents drawable polylines/strokes independent of the Kobra. Text becomes vector strokes before machine fitting. Raster images require an explicit rendering strategy such as contours, hatching, crosshatching or stippling.
+
+## Current hardware mode
+
+The machine is a dedicated pen plotter, not a complete stock 3D-printer toolhead configuration:
+
+- original printhead / hotend removed;
+- no hotend heater cartridge;
+- no hotend thermistor;
+- no printhead fans;
+- pen/marker is the active tool;
+- cylindrical magnetic/proximity sensor is the verified `z_min` used for Z homing;
+- `M105` hotend `T:0.00` is expected normal state for the intentionally absent thermistor.
+
+Do not add an `M105` room-temperature gate to this workflow and do not require the hotend thermistor to be reconnected. Heater commands remain forbidden. If Marlin itself enters a kill/halt state during a transaction, that is still a terminal execution failure.
 
 ## Project-local prepare V1
 
@@ -39,7 +53,7 @@ Preparation never opens serial. Every prepare report keeps execution disabled; p
 
 ## Repository boundary
 
-- `hardware-lab/projects/kobra2-neo` owns Kobra-specific conversion, calibration, limits, thermal-health policy, Marlin protocol policy and long-running plot streaming.
+- `hardware-lab/projects/kobra2-neo` owns Kobra-specific conversion, calibration, limits, hardware-profile policy, Marlin protocol policy and long-running plot streaming.
 - `host-ops` owns generic host/device capabilities such as macOS serial enumeration and bounded raw serial transactions. It is not the Kobra protocol executor.
 - Local Agent owns repository binding, task scheduling/watchdogs and task/run/result evidence.
 - A binary available in one Local Agent binding must never be assumed available in another worker PATH.
@@ -54,9 +68,10 @@ Preparation never opens serial. Every prepare report keeps execution disabled; p
 - pen-down: `G0 Z2.97 F180`;
 - orientation: flip Y, no XY swap, no X flip;
 - end sequence: `M400`;
-- homing is forbidden in prepare-generated artwork and belongs only to the approved live preamble.
+- homing is forbidden in prepare-generated artwork and belongs only to the approved live preamble;
+- hotend/thermistor presence must not be assumed for the pen profile.
 
-The profile is stored at `config/kobra2_neo_pen.toml`. Unknown or missing keys fail closed.
+The profile is stored at `config/kobra2_neo_pen.toml`. Unknown or missing safety-critical keys fail closed.
 
 ## Prepare output contract
 
@@ -73,7 +88,8 @@ Before live plotting:
 5. Verify there is no unintended `G28`, relative mode, heater or extrusion command.
 6. Verify all XY motion remains within the calibrated envelope.
 7. Inspect `preview.svg` and the complete G-code.
-8. Obtain explicit approval for the complete physical transaction.
+8. Verify the physical XY path is clear, especially the rear Y-bed path and printer power cable.
+9. Obtain explicit approval for the complete physical transaction.
 
 ## Durable live execution
 
@@ -93,16 +109,15 @@ Before opening serial the runner revalidates the report, command whitelist, norm
 
 1. opens exactly the explicit serial path at 115200;
 2. requires `M115` evidence identifying Anycubic Kobra;
-3. queries `M105` and requires a plausible heater-off hotend temperature before any deliberate motion;
+3. uses the current headless pen-plotter hardware contract; the intentionally absent hotend thermistor / `T:0.00` is not a motion blocker;
 4. sends `G28 X Y` and waits for `ok`;
 5. sends `G28 Z` and waits for `ok`;
 6. selects absolute mode and raises the pen;
 7. streams the already-approved artwork command by command, waiting for Marlin acknowledgement after every command;
-8. periodically queries `M105` during long jobs so an E0 thermistor problem is surfaced before a later opaque firmware halt where possible;
-9. treats firmware errors, resend requests and acknowledgement timeouts as terminal failures rather than blind retry opportunities;
-10. treats `MINTEMP`, `MAXTEMP`, `Printer halted` and equivalent Marlin kill states as terminal, with final pen state unknown unless a later acknowledgement proves otherwise;
-11. after the artwork `M400`, raises the pen again and waits for a final `M400`;
-12. emits a terminal pen-up result only after that final safe state is acknowledged.
+8. treats firmware errors, resend requests and acknowledgement timeouts as terminal failures rather than blind retry opportunities;
+9. treats a firmware-emitted `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or equivalent Marlin kill state during execution as terminal, with final pen state unknown unless a later acknowledgement proves otherwise;
+10. after the artwork `M400`, raises the pen again and waits for a final `M400`;
+11. emits a terminal pen-up result only after that final safe state is acknowledged.
 
 For a non-fatal streaming/transport failure after successful Z homing, the runner makes one bounded best-effort pen-up recovery attempt and reports whether it was acknowledged. After a Marlin kill state it does not pretend that additional motion is reliable.
 
@@ -114,20 +129,21 @@ Long physical tasks must emit Local Agent native markers:
 [AGENT_PROGRESS] {"stage_name":"kobra-live",...}
 ```
 
-The runner reports `PREFLIGHT_OK`, `PRINTER_IDENTIFIED`, `THERMAL_MONITOR_OK`, `HOMING_XY_OK`, `HOMING_Z_OK`, `PEN_UP_OK`, `DRAWING_STARTED`, periodic drawing/thermal progress and `COMPLETE_PEN_UP`. A fatal Marlin safety stop reports `FIRMWARE_HALTED_FINAL_PEN_STATE_UNKNOWN`.
+The runner reports `PREFLIGHT_OK`, `PRINTER_IDENTIFIED`, `HOMING_XY_OK`, `HOMING_Z_OK`, `PEN_UP_OK`, `DRAWING_STARTED`, periodic drawing progress and `COMPLETE_PEN_UP`. A fatal Marlin safety stop reports `FIRMWARE_HALTED_FINAL_PEN_STATE_UNKNOWN`.
 
 Never infer a physical stage from process liveness or `seconds_since_output`. Say a stage passed only when its structured progress/result evidence exists.
 
 ## Fast-path transport rule
 
-A new chat does not require a new host-ops probe when the host/cabling session is unchanged and the serial path is known. The live runner always performs its own `M115` identity check and `M105` thermal-health check before motion. Use host-ops discovery/probe only if the port is unknown, changed, ambiguous or the runner's identity check fails.
+A new chat does not require a new host-ops probe when the host/cabling session is unchanged and the serial path is known. The live runner performs its own `M115` identity check before motion. Use host-ops discovery/probe only if the port is unknown, changed, ambiguous or the runner's identity check fails.
 
 Never open a host-ops serial probe concurrently with an active live task on the same printer.
 
 ## Live validation milestones
 
-- 2026-09-28: 10 cm `MongooseLemur.svg` outline completed all 7615 acknowledged commands in about 14 min 44 s and finished pen-up, validating the physical profile and acknowledgement-driven streaming model.
+- 2026-09-28: 10 cm `MongooseLemur.svg` outline completed all 7615 acknowledged commands in about 14 min 44 s and finished pen-up, validating the physical pen profile and acknowledgement-driven streaming model.
 - 2026-09-28: the slow-start incident exposed missing durable execution/orchestration. `kobra-live`, structured progress and the golden runbook were added as corrective actions.
-- 2026-09-28: `shaft-50x20-showcase` later reached command 3300/4345 before stock Marlin halted on `MINTEMP` for E0. That run finished failed after 801.199 s with no confirmed final pen-up. The thermal-health gate is therefore part of the permanent live contract; disabling thermal protection is not an acceptable workaround.
+- 2026-09-28: `shaft-50x20-showcase` later reached command 3300/4345 before stock Marlin halted on `MINTEMP` for E0. That run finished failed after 801.199 s with no confirmed final pen-up. The corrected interpretation is that a live firmware kill is terminal; it does not mean the intentionally removed thermistor must be present or that `T:0.00` should block the current pen-only configuration.
+- 2026-09-29: `G28 X Y -> G28 Z -> G0 Z6.12 F180 -> G0 X90.69 Y134.14 F3000` was re-verified. An initial failed Y homing attempt was traced to the printer power cable physically blocking bed travel; after clearing the cable, the same sequence worked normally.
 
-See `GOLDEN_LIVE_FLOW.md` for the authoritative operator flow and `INCIDENT_2026-09-28_SLOW_LIVE_START.md` for the incident review.
+See `GOLDEN_LIVE_FLOW.md` for the authoritative operator flow and `HARDWARE.md` for the canonical physical configuration.
