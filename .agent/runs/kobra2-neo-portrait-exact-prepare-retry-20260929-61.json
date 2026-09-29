@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-portrait-exact-prepare-retry-20260929-61",
   "task_digest": "deefef9fe07e9ecab2b79ec90874a370d4e9defe44930777a61b077aa706efbc",
-  "idle_timeout": 300,
-  "task_timeout": 1200,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T20:40:11.627437+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-29T20:40:15.239817+00:00",
   "attempt_id": "667c313a1b54027b15e18d89",
   "daemon_version": "4.19.8",
   "daemon_pid": 11842,
-  "updated_at": "2026-09-29T20:40:11.627524+00:00",
+  "updated_at": "2026-09-29T20:40:15.484706+00:00",
   "pid": 11842
 }
