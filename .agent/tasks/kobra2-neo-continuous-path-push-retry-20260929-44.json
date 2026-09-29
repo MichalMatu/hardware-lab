@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-continuous-path-push-retry-20260929-44",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail\ngit cat-file -e b358070^{commit}\ngit fetch origin main\nBASE=$(git merge-base b358070 origin/main)\ntest \"$BASE\" = \"$(git rev-parse origin/main)\"\ngit push origin b358070:main\necho RESULT:CONTINUOUS_PATH_PUSH_OK"
+  ]
+}
