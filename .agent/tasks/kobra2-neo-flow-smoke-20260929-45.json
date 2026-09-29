@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-flow-smoke-20260929-45",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 600,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail\ngit fetch origin main\ngit reset --hard origin/main\ntest -z \"$(git status --porcelain)\"\ncd projects/kobra2-neo\nuv sync --frozen >/dev/null\nTMP=$(mktemp -d /tmp/kobra-flow-smoke.XXXXXX)\nSTART=$(python3 -c 'import time; print(time.monotonic())')\nuv run kobra-plot prepare samples/svg/curve-demo.svg -o \"$TMP/job\"\nSHA=$(python3 - \"$TMP/job/report.json\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['execution']['allowed'] is False\nassert r['safety']['valid'] is True\nassert r['profile']['pen_up_z'] == 4.97\nassert r['profile']['pen_down_z'] == 2.97\nassert r['profile']['motion']['travel_feed'] == 6000.0\nassert r['profile']['motion']['draw_feed'] == 2400.0\nassert r['profile']['motion']['z_feed'] == 360.0\nprint(r['artifacts']['gcode_sha256'])\nPY\n)\nuv run kobra-live \"$TMP/job/output.gcode\" --report \"$TMP/job/report.json\" --profile config/kobra2_neo_pen.toml --expect-sha256 \"$SHA\" --validate-only\nEND=$(python3 -c 'import time; print(time.monotonic())')\nELAPSED=$(python3 - \"$START\" \"$END\" <<'PY'\nimport sys\nprint(f'{float(sys.argv[2])-float(sys.argv[1]):.3f}')\nPY\n)\necho RESULT:READY_TO_PRINT elapsed_seconds=$ELAPSED source=samples/svg/curve-demo.svg sha256=$SHA"
+  ]
+}
