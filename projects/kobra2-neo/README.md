@@ -1,86 +1,83 @@
-# Kobra 2 Neo pen plotter / motion platform
+# Kobra 2 Neo pen plotter
 
-Anycubic Kobra 2 Neo converted into a reusable XY/Z pen-plotter motion platform. The current validated tool is a pen/marker holder; later tools may reuse the same project-level hardware and safety model.
+Anycubic Kobra 2 Neo converted into a dedicated XY/Z pen plotter. The project owns the physical calibration, offline source preparation, G-code safety policy and bounded Marlin execution contract.
 
-## Current validated state — 2026-09-29
+## Start here
 
-- Stock Marlin `bugfix-2.1.x` remains the firmware baseline.
-- USB serial is CH340 at 115200 baud; identify the printer with `M115`, not by port name alone.
-- The original printhead / hotend assembly is intentionally removed.
-- The current plotter has **no hotend heater cartridge, no hotend thermistor and no printhead fans**.
-- `M105` hotend `T:0.00` is therefore an **expected normal reading** for this machine and must not block pen plotting.
-- Heater and extrusion commands remain forbidden in plot jobs. Do not use nozzle-temperature controls on the printer screen during pen plotting.
-- A pen holder is installed and usable for bounded plotting motion.
-- The cylindrical magnetic/proximity Z sensor is present and verified as `z_min`; it is the active Z homing reference for the pen setup. The rear physical button maps to `z_max`.
-- Current pen-tip work envelope: `X=3..223`, `Y=36..230` mm.
-- Normal plotting keeps an additional 5 mm internal margin.
-- Current pen calibration: pen-up `Z=6.12`, pen-down `Z=2.97`.
-- These coordinates are specific to the current pen, holder and paper placement and must be revalidated after mechanical changes.
-- Verified start sequence: `G28 X Y` -> `G28 Z` -> `G0 Z6.12 F180`; the 2026-09-29 session also verified travel to `X90.69 Y134.14` after homing.
-- Before XY homing, physically clear the complete Y-bed path. A printer power cable blocking rear travel caused a failed homing attempt on 2026-09-29; after moving the cable, the same homing sequence worked normally.
-- First approved full artwork plot completed successfully on 2026-09-28: a 10 cm `MongooseLemur.svg` outline job completed all 7615 streamed commands in about 14 min 44 s and finished pen-up.
-- Durable live execution is provided by the project-local `kobra-live` runner. Do not rebuild an ad-hoc serial streamer in Local Agent task payloads.
+For any continuation or handoff, read in this order:
 
-A firmware-reported `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or equivalent kill state **during an active transaction** remains a terminal failure. That is separate from the expected idle `T:0.00` caused by the intentionally absent hotend thermistor.
+1. `docs/HANDOFF.md`
+2. `docs/WORKFLOW.md`
+3. `config/kobra2_neo_pen.toml`
+4. `docs/GOLDEN_LIVE_FLOW.md`
+5. `docs/HARDWARE.md`, `docs/CALIBRATION.md`, `docs/SAFETY.md`
 
-See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md`, `docs/WORKFLOW.md`, `docs/PREPARE_CLI.md`, `docs/GOLDEN_LIVE_FLOW.md` and `docs/THIRD_PARTY_PLOTTER_SOFTWARE.md` before extending the workflow or trying external plotter software.
+`docs/README.md` explains which documents are authoritative and which are historical only.
 
-## Repository boundary
+## Current physical state — 2026-09-29
 
-This project is the canonical home for Kobra-specific hardware state, CAD, calibration, G-code policy, Marlin streaming policy and plotter workflow.
+- Stock Marlin `bugfix-2.1.x`.
+- CH340 serial at 115200 baud; always prove printer identity with `M115`, never by port name alone.
+- Original printhead/hotend assembly intentionally removed.
+- No hotend heater cartridge, hotend thermistor or printhead fans.
+- Pen/marker is the active tool.
+- Cylindrical magnetic/proximity sensor is verified as `z_min` for Z homing; rear physical button maps to `z_max`.
+- Idle hotend `T:0.00` is expected for the absent thermistor. A firmware-emitted halt/kill during an active transaction remains terminal.
+- Hard pen-tip envelope: `X=3..223`, `Y=36..230` mm.
+- Normal drawing envelope: `X=8..218`, `Y=41..225` mm.
+- Current pen-down: `Z=2.97`.
+- Current pen-up: `Z=4.97` — exactly 2.00 mm above pen-down.
+- Current feeds: travel `6000`, draw `2400`, Z `360` mm/min.
+- Orientation: Y flip, no XY swap, no X flip.
+- Before XY homing, clear the full Y-bed path, especially the printer power cable.
 
-`host-ops` remains an external generic machine/serial capability layer. Its earlier `prototype/penplotter` remains useful historical/prototype evidence, but new Kobra-specific source conversion, fitting, safety policy and long-running plot protocol belong here rather than in `host-ops` core.
+The executable profile is `config/kobra2_neo_pen.toml`. If documentation or code disagrees with that profile, stop before physical execution and resolve the mismatch in a dedicated maintenance change.
 
-## Offline preparation CLI
+## Canonical architecture
 
-The project contains the prepare-only `kobra-plot` CLI. Preparation never opens serial.
+```text
+ARTWORK
+  one immutable source file + SHA-256
+      -> PREPARE
+  offline normalization / optimization / fit / validation
+  -> output.gcode + preview + report + hashes
+      -> REVIEW / APPROVAL
+      -> PRINT
+  immutable prepared job only; no code edits, no generation, no repo writes
+```
+
+One task has one responsibility. Do not combine code maintenance, artwork transport, preparation, Git synchronization and physical printing in one Local Agent task.
+
+Generated artwork must be transferred as one normal file. Do not use hand-built gzip/base64 chunks or partial task payloads as an asset-transfer protocol.
+
+## Offline preparation
 
 From `projects/kobra2-neo`:
 
 ```bash
 uv sync
 uv run kobra-plot doctor
-uv run kobra-plot prepare samples/svg/curve-demo.svg
-uv run kobra-plot text "MILEGO DNIA" -o /tmp/milego-dnia-job
+uv run kobra-plot prepare path/to/drawing.svg -o /tmp/drawing-job
 ```
 
-A successful prepare job contains the copied source, normalized line SVG, path preview, bounded G-code and a JSON report. Preparation reports still mark execution as disabled because live execution is a separate explicit command. See `docs/PREPARE_CLI.md` for the artifact and safety contract.
+Preparation never opens serial. It produces inspectable source/normalized geometry, preview, bounded G-code and a report. See `docs/PREPARE_CLI.md`.
 
-Current V1 inputs:
+## Live execution
 
-- SVG, including curves flattened by the pinned `vpype` backend;
-- UTF-8 text / literal text through vpype Hershey vector fonts;
-- raster images and PDF are recognized but fail closed until explicit rendering strategies are implemented and tested.
+`kobra-live` is the project-local bounded runner for one already prepared and approved job. It revalidates the immutable job, proves printer identity, homes, streams command-by-command with acknowledgements and requires a terminal pen-up result.
 
-## Live execution CLI
-
-For an already prepared, inspected and explicitly approved job, use the dedicated runner rather than embedding Python serial code into a Local Agent task:
-
-```bash
-uv run kobra-live \
-  samples/gcode/JOB.gcode \
-  --report samples/gcode/JOB.report.json \
-  --port /dev/cu.usbserial-130 \
-  --expect-sha256 EXPECTED_SHA256
-```
-
-`kobra-live` performs full offline revalidation before opening the port, proves printer identity with `M115`, applies the current headless pen-plotter hardware profile, executes the explicit XY-home -> Z-home -> pen-up preamble, streams with acknowledgement after every command, emits Local Agent `[AGENT_PROGRESS]` checkpoints, waits for completion and finishes pen-up. See `docs/GOLDEN_LIVE_FLOW.md` for the authoritative fast path and evidence rules.
+**Current handoff note:** the committed profile has the tuned values above, while the visible `main` implementation still has known runner/generator drift documented in `docs/HANDOFF.md`. Resolve that code-only maintenance gate and pass tests before the next unattended live job. Do not treat the existence of `kobra-live` as proof that the current revision is ready for physical execution.
 
 ## Project layout
 
-- `docs/` — current hardware state, calibration, safety, workflow, CLI contracts, incident reviews and golden live runbook.
-- `cad/` — editable Fusion 360/CAD source and derived printable exports.
-- `config/` — project-local machine/tool profiles.
+- `docs/` — current operating contract, handoff and historical evidence.
+- `config/` — machine/tool profile; executable calibration source of truth.
 - `src/kobra_plot.py` — offline source-to-job preparation.
-- `src/kobra_live.py` — bounded execution of one already-approved prepared job.
-- `tests/` — geometry, safety, offline integration and live-preflight tests; tests do not move hardware.
-- `scripts/` — bounded operator utilities and project workflows.
-- `samples/` — known-safe source files and generated dry-run examples.
+- `src/kobra_live.py` — bounded execution of one prepared job.
+- `tests/` — offline geometry/safety/live-preflight tests; tests do not intentionally move hardware.
+- `cad/` — pen-holder/tool CAD.
+- `samples/` — small known inputs/examples, not an asset-transfer staging area.
 
-## Direction
+## Repository boundary
 
-The canonical flow is:
-
-`SVG / text / raster image -> normalized plot geometry -> fit/orientation -> bounded G-code -> dry-run/inspection -> explicit approval -> kobra-live -> structured progress/result evidence`
-
-The preparation and execution boundaries stay separate. Raster/photo support may add outline, hatch/crosshatch and stipple renderers later without weakening the common fitting, G-code validation or live safety layer.
+Kobra-specific conversion, calibration, bounds, G-code policy and Marlin execution belong here. `host-ops` remains a generic host/device capability layer. Local Agent owns task scheduling/evidence; it is not the place to encode ad-hoc Kobra protocols.
