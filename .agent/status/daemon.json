@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.8",
-  "state": "running",
+  "state": "idle",
   "pid": 89334,
-  "updated_at": "2026-09-29T14:14:58.303952+00:00",
+  "updated_at": "2026-09-29T14:15:24.610012+00:00",
   "self_revision": "e1c6f93401cbd3f75076d167d99dc85e512bad65",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "kobra2-neo-botanical-prepare-v2-20260929-40",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -25,6 +25,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 89334,
   "supervisor_pid": 87808,
-  "active_resources": [],
+  "last_task_id": "kobra2-neo-botanical-prepare-v2-20260929-40",
   "execution_variant": "parallel"
 }
