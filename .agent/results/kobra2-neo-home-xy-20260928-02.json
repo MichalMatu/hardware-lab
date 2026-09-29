@@ -1,9 +1,0 @@
-{
-  "id": "kobra2-neo-home-xy-20260928-02",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-28T14:03:00.229201+00:00",
-  "daemon_version": "4.19.2",
-  "error": "ValueError: invalid resource name: 'serial:/dev/cu.usbserial-130'"
-}
