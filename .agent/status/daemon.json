@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.8",
-  "state": "waiting_resource",
-  "pid": 77877,
-  "updated_at": "2026-09-29T16:19:00.247326+00:00",
+  "state": "running",
+  "pid": 79948,
+  "updated_at": "2026-09-29T16:20:32.118303+00:00",
   "self_revision": "c951b6e54223ce1e1d4ed47a281597903f869f74",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "kobra2-neo-botanical-print-live-20260929-49",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,13 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 77877,
+  "worker_pid": 79948,
   "supervisor_pid": 17429,
-  "pending_task_id": "kobra2-neo-botanical-print-live-20260929-49",
-  "blocked_resources": [
-    "machine"
-  ],
-  "waiting_since": "2026-09-29T16:19:00.246859+00:00",
-  "retrying": true,
+  "active_resources": [],
   "execution_variant": "parallel"
 }
