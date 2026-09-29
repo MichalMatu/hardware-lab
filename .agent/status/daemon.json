@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.8",
-  "state": "idle",
-  "pid": 47155,
-  "updated_at": "2026-09-29T14:50:24.625109+00:00",
+  "state": "running",
+  "pid": 52718,
+  "updated_at": "2026-09-29T14:52:48.954214+00:00",
   "self_revision": "7b436126cb2029d8757a38c32b31ed8e1e7430e2",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "kobra2-neo-continuous-path-closeout-20260929-43",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -23,8 +23,8 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 47155,
+  "worker_pid": 52718,
   "supervisor_pid": 21394,
-  "last_task_id": "kobra2-neo-maintenance-closeout-retry-20260929-42",
+  "active_resources": [],
   "execution_variant": "parallel"
 }
