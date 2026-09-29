@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-serial-diagnose-20260929-52",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 60,
+  "task_timeout": 120,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -euo pipefail\npython3 - <<'PY'\nfrom glob import glob\npatterns=['/dev/cu.usbserial-*','/dev/cu.wchusbserial*','/dev/cu.usbmodem*','/dev/cu.*']\nfor p in patterns:\n    print(p, sorted(glob(p)))\nPY"
+  ]
+}
