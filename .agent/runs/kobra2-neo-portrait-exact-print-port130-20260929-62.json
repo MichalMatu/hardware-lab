@@ -1,14 +1,43 @@
 {
-  "event": "task_started",
+  "event": "stage_progress",
+  "stage_progress": {
+    "stage_name": "kobra-live",
+    "message": "PREFLIGHT_OK",
+    "current": 0,
+    "total": 100240,
+    "metrics": {
+      "max_x": 187.916,
+      "max_y": 208.0,
+      "min_x": 38.0,
+      "min_y": 58.084,
+      "sha256": "d16d66c567e830458cc79742112bb9bb48a2bd30760dbedb24c6b852e39102ab"
+    }
+  },
+  "phase": "commands",
+  "index": 1,
+  "total": 1,
+  "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-portrait-final-20260929-61/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-130\nEXPECTED_SOURCE=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nEXPECTED_GCODE=d16d66c567e830458cc79742112bb9bb48a2bd30760dbedb24c6b852e39102ab\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"$EXPECTED_GCODE\"\n.venv/bin/python - \"$R\" \"$EXPECTED_SOURCE\" \"$EXPECTED_GCODE\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r[\"source\"][\"sha256\"] == sys.argv[2]\nassert r[\"source\"][\"conversion\"] == \"none\"\nassert r[\"source\"][\"page_mm\"] == [150.0,150.0]\nassert r[\"geometry\"][\"geometry_preserved\"] is True\nassert r[\"geometry\"][\"path_simplification\"] is False\nassert r[\"geometry\"][\"path_merge\"] is False\nassert r[\"geometry\"][\"path_reversal\"] is False\nassert r[\"geometry\"][\"source_polylines\"] == 6587\nassert r[\"geometry\"][\"source_points\"] == 87063\nassert r[\"artifacts\"][\"gcode_sha256\"] == sys.argv[3]\nassert r[\"safety\"][\"valid\"] is True\np=r[\"profile\"]\nassert p[\"pen_up_z\"] == 4.97 and p[\"pen_down_z\"] == 2.97\nassert p[\"motion\"][\"travel_feed\"] == 6000.0\nassert p[\"motion\"][\"draw_feed\"] == 2400.0\nassert p[\"motion\"][\"z_feed\"] == 360.0\nPY\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 500 --thermal-check-every 5000\n",
+  "pid": 14252,
+  "stage_name": "kobra-live",
+  "stage_index": 1,
+  "stage_total": 1,
+  "stage_phase": "commands",
+  "message": "PREFLIGHT_OK",
+  "progress_current": 0,
+  "progress_total": 100240,
+  "metrics": {
+    "max_x": 187.916,
+    "max_y": 208.0,
+    "min_x": 38.0,
+    "min_y": 58.084,
+    "sha256": "d16d66c567e830458cc79742112bb9bb48a2bd30760dbedb24c6b852e39102ab"
+  },
+  "last_progress_at": "2026-09-29T20:41:32.806386+00:00",
+  "last_progress_message": "PREFLIGHT_OK",
   "task_id": "kobra2-neo-portrait-exact-print-port130-20260929-62",
-  "task_digest": "663af8c48c098b5633a8cd73922caab19f6a041205c11da99e1189c7f6d749c7",
-  "idle_timeout": 600,
-  "task_timeout": 9000,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T20:41:31.040437+00:00",
   "attempt_id": "ceeb3f01f13bd712262bf15c",
+  "task_digest": "663af8c48c098b5633a8cd73922caab19f6a041205c11da99e1189c7f6d749c7",
   "daemon_version": "4.19.8",
   "daemon_pid": 14080,
-  "updated_at": "2026-09-29T20:41:31.040505+00:00",
-  "pid": 14080
+  "updated_at": "2026-09-29T20:41:32.806475+00:00"
 }
