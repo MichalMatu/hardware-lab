@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-beauty-map-balanced-20260929-31",
+  "task_digest": "ac867acd7e78d8bb6b935c30de524c7fefc6883d198ef36fbb1c684e45e0bbda",
+  "idle_timeout": 300,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T11:30:27.030840+00:00",
+  "attempt_id": "2e83d1317643198aa17a55dd",
+  "daemon_version": "4.19.7",
+  "daemon_pid": 47893,
+  "updated_at": "2026-09-29T11:30:27.030912+00:00",
+  "pid": 47893
+}
