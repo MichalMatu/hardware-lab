@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-botanical-prepare-v2-20260929-40",
+  "task_digest": "7045def28aa42c512f3cc7a75eff10833f93467e3fbdeb0898f7f83134e76bf1",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T14:15:02.181718+00:00",
+  "attempt_id": "721a5e28073e05a2830d5500",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 89334,
+  "updated_at": "2026-09-29T14:15:02.181796+00:00",
+  "pid": 89334
+}
