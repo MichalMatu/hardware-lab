@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-portrait-artwork-path-20260929-58",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "plot-inbox",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 180,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "commands": [
+    "set -euo pipefail\nEXPECTED=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nSRC='/Users/michal/Downloads/portrait_plotter_150x150mm.svg'\ntest -f \"$SRC\"\nACTUAL=$(shasum -a 256 \"$SRC\" | awk '{print $1}')\ntest \"$ACTUAL\" = \"$EXPECTED\"\ngit fetch origin plot-inbox\ngit reset --hard origin/plot-inbox\nDEST=projects/kobra2-neo/inbox/current.svg\nmkdir -p \"$(dirname \"$DEST\")\"\ncp \"$SRC\" \"$DEST\"\nVERIFY=$(shasum -a 256 \"$DEST\" | awk '{print $1}')\ntest \"$VERIFY\" = \"$EXPECTED\"\ngit add \"$DEST\"\nif git diff --cached --quiet; then\n  echo RESULT:ARTWORK_ALREADY_PINNED source_sha256=$VERIFY commit=$(git rev-parse HEAD)\nelse\n  git commit -m 'Stage exact 150mm portrait SVG for plotting'\n  git push origin HEAD:plot-inbox\n  echo RESULT:ARTWORK_PINNED source_sha256=$VERIFY commit=$(git rev-parse HEAD)\nfi\n"
+  ]
+}
