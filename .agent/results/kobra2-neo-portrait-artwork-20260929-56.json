@@ -1,0 +1,9 @@
+{
+  "id": "kobra2-neo-portrait-artwork-20260929-56",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-29T20:27:39.179458+00:00",
+  "daemon_version": "4.19.8",
+  "error": "JSONDecodeError: Expecting ',' delimiter: line 12 column 462 (char 760)"
+}
