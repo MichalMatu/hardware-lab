@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-botanical-print-final-20260929-37",
+  "task_digest": "d6861235d31dd81144e8f8bd6cbf6a41f9afbf2add8f0742f1d870d451d40cd6",
+  "idle_timeout": 3600,
+  "task_timeout": 10800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T13:44:19.947001+00:00",
+  "attempt_id": "2b3c3aee4ff8c955d39180e8",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 34363,
+  "updated_at": "2026-09-29T13:44:19.947072+00:00",
+  "pid": 34363
+}
