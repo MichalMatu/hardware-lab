@@ -1,0 +1,58 @@
+{
+  "id": "kobra2-neo-serial-diagnose-20260929-52",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T16:59:29.504754+00:00",
+  "command_timeout": 60,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\npython3 - <<'PY'\nfrom glob import glob\npatterns=['/dev/cu.usbserial-*','/dev/cu.wchusbserial*','/dev/cu.usbmodem*','/dev/cu.*']\nfor p in patterns:\n    print(p, sorted(glob(p)))\nPY",
+      "exit_code": 125,
+      "output": "",
+      "elapsed_seconds": 0.0,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limited": false,
+      "not_started": true,
+      "budget_exhausted": true,
+      "budget_remaining_seconds": 118.455,
+      "required_budget_seconds": 120.0,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "not_started",
+      "elapsed_seconds": 0.0
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.084
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "failure_reason": "task_budget_exhausted",
+  "finished_at": "2026-09-29T16:59:31.203667+00:00",
+  "task_digest": "7377082110bdc628292d1160da1ede57786fb39e35740563c8790a26d6445a7c",
+  "idle_timeout": 300,
+  "task_timeout": 120,
+  "memory_limit_mb": 512,
+  "attempt_id": "99babe8c34b29051508d24a9",
+  "daemon_version": "4.19.8"
+}
