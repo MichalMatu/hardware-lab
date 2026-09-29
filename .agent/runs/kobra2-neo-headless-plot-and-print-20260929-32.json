@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-29T11:41:10.618900+00:00",
+  "task_id": "kobra2-neo-headless-plot-and-print-20260929-32",
+  "daemon_version": "4.19.7",
+  "pid": 59140
+}
