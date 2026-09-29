@@ -2,47 +2,135 @@
 
 These rules apply to everything under `projects/kobra2-neo/`.
 
-## Scope
+## Start / authority
 
-- Keep Kobra-specific hardware state, calibration, CAD, G-code policy, Marlin protocol policy and toolhead design in this project.
-- Treat `host-ops` as an external generic machine/device capability layer. Do not put Kobra-specific plotting policy into `host-ops` core.
-- The current `host-ops/prototype/penplotter` is historical prototype evidence, not the canonical home of Kobra hardware state.
-- Prefer small evidence-driven changes over speculative frameworks.
-- For approved prepared jobs, use the committed `kobra-live` runner and `docs/GOLDEN_LIVE_FLOW.md`; do not rebuild a serial streamer inside an ad-hoc Local Agent task.
+Before continuing Kobra work, read:
 
-## Live hardware safety
+1. `docs/HANDOFF.md`
+2. `docs/WORKFLOW.md`
+3. `config/kobra2_neo_pen.toml`
+4. `docs/GOLDEN_LIVE_FLOW.md`
 
-- Do not enable heaters, extrusion or firmware flashing unless the current task explicitly requires and reviews it.
-- A fully reviewed live plot may be approved as one complete physical transaction: home XY, home Z, raise the pen, travel to the first plot point, stream the complete approved job, wait for final `M400`, and finish pen-up. Do not require intermediate confirmations inside that approved flow unless the operator asks to pause or an error/unsafe condition occurs.
-- The whole start-and-draw transaction still requires explicit operator approval before it begins. Keep `G28` out of normal prepare-generated G-code; the live executor owns the explicit homing preamble and must never add it without job-level approval.
-- The current cylindrical sensor is verified as `z_min`, and `G28 Z` has succeeded with the present setup, but revalidate the mechanical configuration before any future Z homing after a hardware/tool change.
-- Current automatic plotting bounds are the real pen-tip envelope `X=3..223`, `Y=36..230` mm. Normal plots use an additional 5 mm internal margin.
-- Current pen-up is `Z=6.12`; current pen-down is `Z=2.97`. Any pen, holder, paper or mechanical change invalidates these values until revalidated.
-- Render and inspect complete G-code before opening a live execution path. Never send a full image/plot without explicit operator approval.
-- Use `M400` when command completion must be proven.
-- Do not identify the printer solely by CH340 VID/PID or a remembered serial path; the live executor must verify identity with `M115` before motion.
-- Never open a second serial session/probe while a live task already owns the printer port.
+`config/kobra2_neo_pen.toml` is the executable source of truth for current plotting values. If profile, code, tests or docs disagree, stop before physical execution and resolve the mismatch in a dedicated maintenance change.
+
+Historical dated incident/checkpoint files are evidence only, not operator instructions.
+
+## Core workflow rule
+
+**One task = one responsibility.**
+
+Use these explicit stages:
+
+```text
+MAINTENANCE (only if needed) -> ARTWORK -> PREPARE -> REVIEW/APPROVAL -> PRINT
+```
+
+Never combine code edits, asset transfer, preparation, Git synchronization and physical printing in one task.
+
+A stage failure stops the pipeline. One corrective retry is allowed only after the exact root cause is identified and the fix is deterministic. If the retry fails, stop and hand off the blocker. Do not create speculative retry chains.
+
+## Repository boundary
+
+- Keep Kobra-specific hardware state, calibration, CAD, G-code policy, Marlin protocol policy and tool design in this project.
+- Treat `host-ops` as an external generic machine/device capability layer; do not put Kobra-specific plotting policy into `host-ops` core.
+- Local Agent owns task scheduling/watchdogs/evidence, not Kobra protocol logic.
+- Never assume a command available in one worker binding is available in another.
+
+## Artwork transport
+
+- The output of ARTWORK is one immutable normal source file plus SHA-256.
+- Prefer one pen-compatible SVG.
+- Do not transport generated artwork using hand-built gzip/base64 chunks, task JSON blobs or sequences of partial GitHub files.
+- If a one-file transfer path is unavailable, stop before PREPARE and choose a proper transfer mechanism.
+- `samples/` is for durable examples, not temporary chunk staging.
+
+## PREPARE
+
+`kobra-plot` is offline and serial-free.
+
+PREPARE may normalize/vectorize, simplify/order paths, fit/orient geometry, generate preview/report/G-code and validate safety. It must not edit code, commit/push as part of normal preparation, access serial or approve physical execution.
+
+Prepared artwork contains no homing. It must fail closed on heaters, extrusion, unexpected relative mode, out-of-envelope motion, unexpected Z values or unexpected feeds.
+
+Path-lift optimization may merge consecutive path boundaries only when endpoints genuinely touch within a tested conservative tolerance; never draw an unintended connector across a real gap.
+
+## Current physical profile
+
+At the 2026-09-29 handoff the committed profile is:
+
+```text
+hard envelope: X=3..223, Y=36..230 mm
+normal drawing envelope: X=8..218, Y=41..225 mm
+pen down: Z=2.97
+pen up: Z=4.97
+travel feed: 6000 mm/min
+draw feed: 2400 mm/min
+Z feed: 360 mm/min
+orientation: flip Y; no XY swap; no X flip
+end: M400
+```
+
+Do not copy old `Z6.12`, `F180`, `3000` or `1200` values from historical logs into new jobs.
+
+Changing pen, holder, paper thickness/placement, tool mechanics or Z-reference geometry invalidates dependent calibration until revalidated.
+
+## Current hardware contract
+
+- Dedicated pen plotter, stock Marlin baseline.
+- Original printhead/hotend removed.
+- No hotend heater cartridge, hotend thermistor or printhead fans.
+- Pen/marker is the active tool.
+- Cylindrical magnetic/proximity sensor is verified as `z_min` for Z homing.
+- Rear physical button maps to `z_max`.
+- Idle hotend `T:0.00` is expected for the absent thermistor and must not by itself block plotting.
+- Heater commands remain forbidden.
+- Firmware-emitted `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or equivalent during an active transaction is terminal.
+
+Before `G28 X Y`, verify the complete travel path is physically clear, especially the rear Y-bed path and printer power cable.
+
+## PRINT / live hardware safety
+
+PRINT consumes one already prepared, reviewed and approved immutable job.
+
+PRINT must not modify code, regenerate artwork, change profile values, commit, pull/rebase or push.
+
+The approved transaction is bounded to:
+
+```text
+M115 identity -> G28 X Y -> G28 Z -> pen up -> immutable artwork stream -> M400 -> final pen up -> terminal acknowledgement
+```
+
+Additional rules:
+
+- explicit operator approval is required before the full physical transaction;
+- never identify the printer solely by CH340 VID/PID or remembered port path; require `M115` identity;
+- never open a second serial session while a live task owns the printer;
+- wait for Marlin acknowledgement according to the live runner contract;
+- use `M400` where planner completion must be proven;
+- a firmware halt, timeout or unsupported protocol/resend condition terminates the transaction.
 
 ## Live orchestration and evidence
 
-- Read the hardware-lab daemon/run state before enqueueing a physical task. An active physical task wins; do not enqueue or probe around it.
-- `host-ops` may discover/probe a serial path when needed, but the Kobra long-running protocol executor is `kobra-live` in this repository.
-- Never assume the `hostops` command is installed in the hardware-lab worker PATH. Likewise, do not assume hardware-lab project commands exist in the host-ops worker.
-- Long physical operations must emit `[AGENT_PROGRESS]` markers so Local Agent exposes the current physical checkpoint through `last_progress_message`.
-- Do not claim `homing passed`, `drawing started` or `complete` from process liveness, heartbeat age or recent stdout alone. Require the corresponding structured checkpoint or terminal result.
-- Report any missing artifact, worker-capability mismatch, serial identity failure, firmware error, resend or timeout immediately. Diagnose that exact boundary before retrying; no silent speculative retry chains.
+- Read daemon/run state before enqueueing a physical task; an active physical task wins.
+- Long physical operations must emit structured `[AGENT_PROGRESS]` evidence.
+- Do not claim `homing passed`, `drawing started` or `complete` from process liveness, heartbeat age or recent stdout.
+- Say `drawing started` only after `DRAWING_STARTED` evidence.
+- Say `complete` only after `COMPLETE_PEN_UP` or equivalent final acknowledgement.
+- Report missing artifacts, repository mismatch, worker mismatch, serial identity failure, firmware errors and timeouts immediately.
+
+## Known handoff gate
+
+`docs/HANDOFF.md` records that the committed profile is ahead of parts of the visible `main` implementation: the runner/generator drift must be resolved and tests passed before the next unattended live plot. Do not bypass that maintenance gate just because `kobra-live` exists.
 
 ## Mechanical design
 
-- The current pen holder is a real calibrated tool, not a hypothetical future design.
-- Preserve editable Fusion 360/CAD source as the canonical mechanical artifact. Printable STL/3MF and neutral STEP exports are derived artifacts, not substitutes for source CAD.
-- Keep moving mass low, preserve cable clearance and document any change that affects the pen-tip coordinate envelope or Z calibration.
-- A future modular tool interface may supersede the current holder, but do not discard the working pen baseline before the replacement is physically validated.
+- Preserve editable Fusion 360/CAD source as the canonical mechanical artifact.
+- Keep moving mass low and preserve cable clearance.
+- Document any change affecting pen-tip envelope or Z calibration.
+- Do not discard the working pen baseline before a replacement tool is physically validated.
 
 ## Software
 
-- Stock Marlin is the current firmware baseline.
-- Kobra-specific profiles, limits, tool commands and live workflow belong here.
-- `kobra-plot` prepares jobs and remains serial-free; `kobra-live` executes only already-prepared and approved jobs.
-- Source conversion should normalize SVG, text and raster images into a common plot-geometry representation before machine-specific fitting and G-code generation.
-- Safety checks and calibration state must be explicit rather than inferred from printer model defaults.
+- Stock Marlin remains the firmware baseline until a concrete requirement justifies change.
+- `kobra-plot` prepares jobs; `kobra-live` executes only already-prepared and approved jobs.
+- Safety/calibration state must be explicit rather than inferred from printer-model defaults.
