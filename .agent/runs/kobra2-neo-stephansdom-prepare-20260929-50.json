@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-stephansdom-prepare-20260929-50",
+  "task_digest": "e1186e690b5f35a0595bf3aecb5603da822b12783f0ae5977ed938d5fa0d0643",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T16:56:38.095053+00:00",
+  "attempt_id": "978a855ed780969008d2afe5",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 24142,
+  "updated_at": "2026-09-29T16:56:38.095135+00:00",
+  "pid": 24142
+}
