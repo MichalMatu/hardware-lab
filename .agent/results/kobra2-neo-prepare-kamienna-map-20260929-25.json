@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-prepare-kamienna-map-20260929-25",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T10:39:09.186618+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; SRC=\"$HOME/Desktop/kamienna110-map-150x150.svg\"; JOB=\"$HOME/Desktop/kamienna110-map-150x150-kobra-job-20260929\"; OUT=\"$HOME/Desktop/kamienna110-map-150x150-kobra.gcode\"; PREVIEW=\"$HOME/Desktop/kamienna110-map-150x150-kobra-preview.svg\"; REPORT=\"$HOME/Desktop/kamienna110-map-150x150-kobra-report.json\"; test -s \"$SRC\"; test ! -e \"$JOB\"; cd projects/kobra2-neo; uv sync --frozen; uv run kobra-plot doctor; uv run kobra-plot prepare \"$SRC\" -o \"$JOB\"; test -s \"$JOB/output.gcode\"; test -s \"$JOB/preview.svg\"; test -s \"$JOB/report.json\"; cp \"$JOB/output.gcode\" \"$OUT\"; cp \"$JOB/preview.svg\" \"$PREVIEW\"; cp \"$JOB/report.json\" \"$REPORT\"; echo '=== FILES ==='; ls -lh \"$OUT\" \"$PREVIEW\" \"$REPORT\"; echo '=== REPORT SUMMARY ==='; python3 -c 'import json,pathlib; r=json.loads((pathlib.Path.home()/\"Desktop/kamienna110-map-150x150-kobra-report.json\").read_text()); [print(k, json.dumps(r[k], ensure_ascii=False, sort_keys=True)) for k in (\"source\",\"geometry\",\"gcode\",\"safety\",\"execution\") if k in r]'; echo '=== GCODE SANITY ==='; head -8 \"$OUT\"; echo '...'; tail -8 \"$OUT\"; if grep -En '(^|[[:space:]])(G28|G91|M10[49]|M140|M190|M82|M83)([[:space:]]|$)|(^|[[:space:]])E[-+0-9.]' \"$OUT\"; then echo 'DISALLOWED_COMMAND_FOUND'; exit 22; else echo 'NO_DISALLOWED_COMMANDS'; fi; echo -n 'SHA256='; shasum -a 256 \"$OUT\" | awk '{print $1}'; echo PREPARE_MAP_DONE",
+      "exit_code": 0,
+      "output": "   Building kobra-plot @ file:///Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo\n      Built kobra-plot @ file:///Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo\nPrepared 1 package in 892ms\nUninstalled 1 package in 1ms\nInstalled 1 package in 2ms\n ~ kobra-plot==0.1.0 (from file:///Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo)\n{\n  \"execute_command\": false,\n  \"kobra_plot\": \"0.1.0\",\n  \"profile\": \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/config/kobra2_neo_pen.toml\",\n  \"serial_transport\": false,\n  \"vpype\": \"vpype 1.15.0\"\n}\njob: /Users/michal/Desktop/kamienna110-map-150x150-kobra-job-20260929\ngeometry: 442 polylines, 1040 points, draw 3284.426 mm, travel 1189.65 mm\nnominal time: 1116.21 s\nsafety: PASS\nexecution: disabled (prepare-only V1)\n=== FILES ===\n-rw-r--r--@ 1 michal  staff    42K Sep 29 12:39 /Users/michal/Desktop/kamienna110-map-150x150-kobra-preview.svg\n-rw-r--r--@ 1 michal  staff   2.2K Sep 29 12:39 /Users/michal/Desktop/kamienna110-map-150x150-kobra-report.json\n-rw-r--r--@ 1 michal  staff    37K Sep 29 12:39 /Users/michal/Desktop/kamienna110-map-150x150-kobra.gcode\n=== REPORT SUMMARY ===\nsource {\"bytes\": 26601, \"conversion\": \"vpype-svg-linearize-simplify-linesort\", \"filename\": \"kamienna110-map-150x150.svg\", \"kind\": \"svg\", \"sha256\": \"e99259c077602a9ac343522e833fac3555f08ecacbb5533e31661f87996d38e0\"}\ngeometry {\"draw_distance_mm\": 3284.426, \"initial_xy_travel_included_in_estimate\": false, \"input_bounds\": {\"height\": 460.6793, \"max_x\": 540.4727, \"max_y\": 513.8044, \"min_x\": 26.4567, \"min_y\": 53.1251, \"width\": 514.0160000000001}, \"nominal_time_seconds\": 1116.21, \"output_bounds\": {\"height\": 184.0, \"max_x\": 215.65161035019372, \"max_y\": 225.0, \"min_x\": 10.348389649806265, \"min_y\": 41.0, \"width\": 205.30322070038744}, \"points\": 1040, \"polylines\": 442, \"travel_distance_mm\": 1189.65}\nsafety {\"command_whitelist\": [\"G90\", \"G0\", \"G1\", \"M400\"], \"draw_moves\": 598, \"extrusion_present\": false, \"heater_commands_present\": false, \"homing_present\": false, \"valid\": true, \"xy_moves\": 1040}\nexecution {\"allowed\": false, \"reason\": \"prepare-only V1 has no live transport or execute command\"}\n=== GCODE SANITY ===\n; kobra-plot generated offline job\n; profile=kobra2-neo-pen\n; homing intentionally omitted\nG90\nG0 Z6.12 F180\nG0 X79.33 Y134.72 F3000\nG0 Z2.97 F180\nG1 X52.41 Y143.70 F1200\n...\nG0 Z2.97 F180\nG1 X152.97 Y113.56 F1200\nG0 Z6.12 F180\nG0 X152.97 Y113.56 F3000\nG0 Z2.97 F180\nG1 X159.57 Y115.57 F1200\nG0 Z6.12 F180\nM400\nNO_DISALLOWED_COMMANDS\n-n SHA256=\nfdeccae82e15e675866830a8c77f5ca073618de30a864f48f9198ea6a7ebf257\nPREPARE_MAP_DONE\n",
+      "elapsed_seconds": 5.134,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 88.81,
+      "output_policy": "stream",
+      "captured_output_chars": 2660,
+      "output_truncated": false,
+      "current_rss_mb": 58.03,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 5.134
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.093
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "finished_at": "2026-09-29T10:39:15.997703+00:00",
+  "task_digest": "485e5c3a0f3c74e87bcd7b23c4ac783753c01aca11208bbc6ee62f25ee23d7e3",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "01f12869bb98112d2d5ccf79",
+  "daemon_version": "4.19.6"
+}
