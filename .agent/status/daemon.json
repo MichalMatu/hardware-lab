@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.8",
-  "state": "idle",
-  "pid": 69006,
-  "updated_at": "2026-09-29T16:14:56.474081+00:00",
+  "state": "waiting_resource",
+  "pid": 77877,
+  "updated_at": "2026-09-29T16:19:00.247326+00:00",
   "self_revision": "c951b6e54223ce1e1d4ed47a281597903f869f74",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,13 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 69006,
+  "worker_pid": 77877,
   "supervisor_pid": 17429,
-  "last_task_id": "kobra2-neo-drawing-start-marker-20260929-48",
+  "pending_task_id": "kobra2-neo-botanical-print-live-20260929-49",
+  "blocked_resources": [
+    "machine"
+  ],
+  "waiting_since": "2026-09-29T16:19:00.246859+00:00",
+  "retrying": true,
   "execution_variant": "parallel"
 }
