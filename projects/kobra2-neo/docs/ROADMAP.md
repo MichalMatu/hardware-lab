@@ -4,51 +4,56 @@
 
 - [x] Working USB serial path identified and Marlin communication verified.
 - [x] Firmware software endstops and `M119` sensor/endstop mapping recorded.
-- [x] X/Y/Z motion and the cylindrical `z_min` reference verified.
+- [x] X/Y/Z motion and cylindrical `z_min` reference verified.
 - [x] Project isolated under `hardware-lab/projects/kobra2-neo`.
 
 ## Phase 1 — Working pen plotter baseline
 
-- [x] Physical pen holder installed and usable.
-- [x] Pen-up calibrated to Z=6.12.
-- [x] Pen-down physically revalidated to Z=2.97.
-- [x] Real pen-tip envelope measured: X=3..223, Y=36..230 mm.
-- [x] Additional 5 mm normal plotting margin defined.
-- [x] Project-local SVG/text preparation pipeline produces bounded G-code, preview and report.
-- [x] First approved full artwork plot completed successfully on 2026-09-28.
+- [x] Pen holder installed and usable.
+- [x] Pen-down calibrated to `Z=2.97`.
+- [x] Pen-up tuned to `Z=4.97` (2.00 mm lift).
+- [x] Pen-tip envelope measured: X=3..223, Y=36..230 mm.
+- [x] 5 mm normal plotting margin defined.
+- [x] Current feeds set to travel 6000, draw 2400, Z 360 mm/min.
+- [x] First approved full artwork completed successfully.
+- [x] 2026-09-29 map plot completed successfully with current physical setup before the subsequent tuning request.
 
 ## Phase 2 — Mechanical source
 
 - [x] Canonical Fusion 360 pen-holder source stored under `cad/tools/pen/`.
 - [ ] Add neutral STEP and printable STL/3MF exports where useful.
-- [ ] Add a small set of installation photos/renders and stable measured tool offsets.
+- [ ] Add stable installation photos/renders and measured offsets.
 - [ ] Decide whether the current holder remains the reference tool or is superseded by a modular adapter.
 
 ## Phase 3 — Universal source pipeline
 
 - [x] SVG curves/basic shapes -> normalized line geometry through pinned vpype.
-- [x] Text -> vector strokes through Hershey fonts.
-- [x] Geometry simplification, line ordering and pen-up travel preview.
-- [x] Kobra orientation, fit and bounds remain a separate machine-specific stage.
-- [ ] Add explicit strategies for filled regions where simple outlines are insufficient.
+- [x] Text -> vector strokes.
+- [x] Kobra orientation, fit and bounds are a machine-specific stage.
+- [x] Preview/report/G-code preparation exists offline.
+- [ ] Merge tested contiguous-path optimization into `main` and keep conservative no-gap semantics.
+- [ ] Add explicit filled-region strategies.
 - [ ] Add raster/photo presets: outline, hatch/crosshatch and stipple.
-- [ ] Add user-facing controls for physical target size and detail/simplification presets.
+- [ ] Add user-facing target-size/detail presets.
 
 ## Phase 4 — Durable live execution
 
-- [x] Keep Kobra-specific preparation/policy in `hardware-lab`; keep `host-ops` generic.
-- [x] Prove one complete live artwork using acknowledgement-driven serial streaming and final `M400`.
-- [ ] Implement a permanent Kobra live streamer that accepts only a prepared, revalidated immutable job.
-- [ ] Add explicit cancellation, progress and serial error/resend handling.
-- [ ] Tie live preflight to the current calibration identity/freshness rather than profile values alone.
-- [ ] Next live regression/demo job: execute `samples/gcode/shaft-120x20-technical-demo.job.json` — a professional technical drawing of a 120 x Ø20 mm cylindrical shaft on an approximately 150 x 150 mm sheet. Run it as one approved continuous flow: home XY -> home Z -> pen-up -> travel to start -> draw -> final `M400` -> pen-up.
+- [x] Kobra-specific live runner exists as `kobra-live`.
+- [x] Acknowledgement-driven streaming and terminal progress markers are implemented conceptually and have physical evidence from prior runs.
+- [x] Kobra-specific execution remains in `hardware-lab`; `host-ops` stays generic.
+- [ ] Resolve the 2026-09-29 `main` drift documented in `HANDOFF.md`: headless `T:0.00` policy, profile-driven Z feed and tested path merge must be aligned with the committed profile/tests.
+- [ ] Add/standardize a small immutable `plot-job.json` manifest binding source hash, profile identity, G-code hash, bounds and validation state.
+- [ ] Add explicit operator cancellation semantics if needed.
+- [ ] Tie live preflight to calibration identity/freshness, not profile numbers alone.
+
+The next physical regression job must not be chosen until the code-maintenance gate above is green. Once green, use the exact ARTWORK -> PREPARE -> REVIEW -> PRINT flow in `WORKFLOW.md` rather than a combined task.
 
 ## Phase 5 — Mechanical evolution / additional tools
 
-- [ ] Revisit a quick-change tool interface only when another real tool justifies it.
-- [ ] Preserve a repeatable independent Z-reference strategy for future toolheads.
+- [ ] Revisit quick-change tooling only when another real tool justifies it.
+- [ ] Preserve an independent repeatable Z-reference strategy for future tools.
 - [ ] Recalibrate the pen-tip envelope after any carriage/tool redesign.
-- [ ] Define clay/paste delivery architecture only after the pen workflow is stable.
+- [ ] Define clay/paste delivery only after the pen workflow is stable.
 
 ## Phase 6 — Firmware decision
 
