@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-stephansdom-print-retry-20260929-53",
+  "task_digest": "3f2a52c79231478cf701db4b0c3cc59d6ae557ecd0acc6481f3c7d89f704082b",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T17:00:16.955512+00:00",
+  "attempt_id": "20688afd5d9c07cf8eebdb5b",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 29283,
+  "updated_at": "2026-09-29T17:00:16.955598+00:00",
+  "pid": 29283
+}
