@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-stephansdom-print-port130-20260929-55",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T17:04:29.625665+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-130\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nPY\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
+      "exit_code": 0,
+      "output": "[AGENT_PROGRESS] {\"current\":0,\"message\":\"PREFLIGHT_OK\",\"metrics\":{\"max_x\":178.58,\"max_y\":225.0,\"min_x\":47.42,\"min_y\":41.0,\"sha256\":\"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"},\"stage_name\":\"kobra-live\",\"stage_phase\":\"preflight\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PRINTER_IDENTIFIED\",\"metrics\":{\"port\":\"/dev/cu.usbserial-130\"},\"stage_name\":\"kobra-live\",\"stage_phase\":\"identity\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"THERMAL_MONITOR_OK\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"HOMING_XY_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"homing\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"HOMING_Z_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"homing\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PEN_UP_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"start\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":5,\"message\":\"DRAWING_STARTED\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":100,\"message\":\"DRAWING 100/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":200,\"message\":\"DRAWING 200/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":250,\"message\":\"THERMAL_MONITOR_OK 250/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":300,\"message\":\"DRAWING 300/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":400,\"message\":\"DRAWING 400/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":500,\"message\":\"THERMAL_MONITOR_OK 500/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":500,\"message\":\"DRAWING 500/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":600,\"message\":\"DRAWING 600/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":700,\"message\":\"DRAWING 700/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":750,\"message\":\"THERMAL_MONITOR_OK 750/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":800,\"message\":\"DRAWING 800/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":900,\"message\":\"DRAWING 900/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1000,\"message\":\"THERMAL_MONITOR_OK 1000/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1000,\"message\":\"DRAWING 1000/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1100,\"message\":\"DRAWING 1100/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1200,\"message\":\"DRAWING 1200/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1250,\"message\":\"THERMAL_MONITOR_OK 1250/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1300,\"message\":\"DRAWING 1300/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1400,\"message\":\"DRAWING 1400/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1500,\"message\":\"THERMAL_MONITOR_OK 1500/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1500,\"message\":\"DRAWING 1500/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1600,\"message\":\"DRAWING 1600/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1700,\"message\":\"DRAWING 1700/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1750,\"message\":\"THERMAL_MONITOR_OK 1750/1784\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1784,\"message\":\"DRAWING 1784/1784\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":1784}\n[AGENT_PROGRESS] {\"current\":1784,\"message\":\"COMPLETE_PEN_UP\",\"metrics\":{\"elapsed_seconds\":363.946},\"stage_name\":\"kobra-live\",\"stage_phase\":\"complete\",\"total\":1784}\nRESULT:KOBRA_LIVE_COMPLETE_PEN_UP elapsed_seconds=363.946\n",
+      "elapsed_seconds": 364.376,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 21.22,
+      "output_policy": "stream",
+      "captured_output_chars": 4677,
+      "output_truncated": false,
+      "current_rss_mb": 9.14,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 364.376
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.116
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "finished_at": "2026-09-29T17:10:35.913807+00:00",
+  "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "bb587503cfe62df2d41bfbb4",
+  "daemon_version": "4.19.8"
+}
