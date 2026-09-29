@@ -1,22 +1,43 @@
 {
-  "event": "command_started",
+  "event": "stage_progress",
+  "stage_progress": {
+    "stage_name": "kobra-live",
+    "message": "PREFLIGHT_OK",
+    "current": 0,
+    "total": 5352,
+    "metrics": {
+      "max_x": 177.09,
+      "max_y": 201.0,
+      "min_x": 48.91,
+      "min_y": 65.0,
+      "sha256": "99a1f19815e4d5464a2be295e8c387747266e0754caf13cad9320c4d0e0b85be"
+    }
+  },
   "phase": "commands",
   "index": 1,
   "total": 1,
   "command": "set -euo pipefail; cd projects/kobra2-neo; PLOTTER=\"$HOME/.local/share/plotter-tools/plottter/.venv/bin/plottter\"; test -x \"$PLOTTER\"; uv sync --frozen >/dev/null; BASE=\"$HOME/Desktop/kamienna110-map-beauty-150\"; PROFILE=\"${BASE}-profile.toml\"; test -s \"$PROFILE\"; RAW=\"${BASE}-balanced-raw.svg\"; rm -f \"$RAW\"; \"$PLOTTER\" --generator Map --preset \"Full City\" --paper Custom --width 150 --height 150 --margin 7 --param 'location=Kamienna 110, Wroclaw, Poland' --param radius_km=0.55 --param extent_mode=radius --param road_detail=standard --param include_roads=true --param include_rail=true --param include_water=true --param include_waterways=true --param include_parks=true --param include_buildings=true --param include_coastline=false --param area_fill=none --param major_road_strokes=1 --param simplify_mm=0.16 --param min_feature_mm=1.0 --param include_attribution=false --param include_water_labels=false --param include_park_labels=false --param include_place_labels=false --param include_waterway_labels=false --param include_road_labels=false --format svg --no-registration-marks --output \"$RAW\"; test -s \"$RAW\"; uv run python - <<'PY'\nfrom pathlib import Path\nimport copy, math, re, xml.etree.ElementTree as ET\nbase=Path.home()/\"Desktop/kamienna110-map-beauty-150\"\nraw=Path(f'{base}-balanced-raw.svg')\nET.register_namespace('', 'http://www.w3.org/2000/svg')\nET.register_namespace('inkscape', 'http://www.inkscape.org/namespaces/inkscape')\nns='{http://www.w3.org/2000/svg}'\nink='{http://www.inkscape.org/namespaces/inkscape}'\norig=ET.parse(raw)\nroot0=orig.getroot()\ndef pts(s):\n    out=[]\n    for chunk in re.split(r'\\s+', (s or '').strip()):\n        if not chunk: continue\n        try:\n            x,y=chunk.split(','); out.append((float(x),float(y)))\n        except Exception: pass\n    return out\ndef size_mm(el):\n    ps=pts(el.get('points',''))\n    if not ps: return 999.0\n    xs=[p[0] for p in ps]; ys=[p[1] for p in ps]\n    return max(max(xs)-min(xs), max(ys)-min(ys))\nfor threshold in (1.4,2.0,2.6):\n    root=copy.deepcopy(root0)\n    bgroups=[]\n    for g in root.iter(ns+'g'):\n        ident=(g.get('id','')+' '+g.get(ink+'label','')).lower()\n        if 'building' in ident:\n            bgroups.append(g)\n    before=after=0\n    for g in bgroups:\n        for parent in list(g.iter()):\n            for child in list(parent):\n                if child.tag in (ns+'polyline',ns+'polygon'):\n                    before+=1\n                    if size_mm(child) < threshold:\n                        parent.remove(child)\n                    else:\n                        after+=1\n    out=Path(f'{base}-balanced-b{str(threshold).replace(\".\",\"p\")}.svg')\n    ET.ElementTree(root).write(out,encoding='utf-8',xml_declaration=True)\n    print(f'FILTER threshold={threshold} building_groups={len(bgroups)} building_polylines_before={before} kept={after} removed={before-after} out={out}')\nPY\nfor T in 1p4 2p0 2p6; do SVG=\"${BASE}-balanced-b${T}.svg\"; JOB=\"${BASE}-balanced-b${T}.job\"; if [ -d \"$JOB\" ]; then test -f \"$JOB/.kobra-plot-job\" && rm -rf \"$JOB\" || { echo \"REFUSING_UNMARKED_JOB:$JOB\"; exit 40; }; fi; uv run kobra-plot prepare \"$SVG\" --profile \"$PROFILE\" -o \"$JOB\"; done; uv run python - <<'PY'\nfrom pathlib import Path\nimport json, shutil, hashlib\nbase=Path.home()/\"Desktop/kamienna110-map-beauty-150\"\ncands=[]\nfor threshold,tag in [(1.4,'1p4'),(2.0,'2p0'),(2.6,'2p6')]:\n    job=Path(f'{base}-balanced-b{tag}.job')\n    rep=json.loads((job/'report.json').read_text())\n    g=rep['geometry']; s=rep['safety']\n    if not s.get('valid'): raise SystemExit(f'safety failed {tag}')\n    c={'threshold_mm':threshold,'tag':tag,'job':job,'time':float(g['nominal_time_seconds']),'polylines':int(g['polylines']),'points':int(g['points']),'draw':float(g['draw_distance_mm']),'travel':float(g['travel_distance_mm']),'bounds':g['output_bounds']}\n    cands.append(c); print('CANDIDATE',json.dumps({k:v for k,v in c.items() if k!='job'},sort_keys=True))\nfeasible=[c for c in cands if c['time']<=3900 and c['polylines']<=1600]\nchosen=min(feasible,key=lambda c:c['threshold_mm']) if feasible else min(cands,key=lambda c:c['time'])\nprint('CHOSEN',json.dumps({k:v for k,v in chosen.items() if k!='job'},sort_keys=True))\njob=chosen['job']; tag=chosen['tag']\nfor srcname,dst in [('output.gcode',f'{base}-kobra.gcode'),('preview.svg',f'{base}-kobra-preview.svg'),('report.json',f'{base}-kobra-report.json')]: shutil.copy2(job/srcname,Path(dst))\nshutil.copy2(Path(f'{base}-balanced-b{tag}.svg'),Path(f'{base}.svg'))\nsel={'selected_radius_km':0.55,'building_min_dimension_mm':chosen['threshold_mm'],'road_detail':'standard','features':['roads','rail','water','waterways','parks','buildings'],'selection_reason':'maximum retained building detail within bounded lift-heavy runtime when possible','geometry':{k:v for k,v in chosen.items() if k not in {'job','tag'}},'gcode_sha256':hashlib.sha256(Path(f'{base}-kobra.gcode').read_bytes()).hexdigest()}\nPath(f'{base}-selection.json').write_text(json.dumps(sel,indent=2,sort_keys=True)+'\\n'); print('FINAL_SELECTION',json.dumps(sel,sort_keys=True))\nPY\nFINAL_G=\"${BASE}-kobra.gcode\"; FINAL_R=\"${BASE}-kobra-report.json\"; SHA=$(shasum -a 256 \"$FINAL_G\" | awk '{print $1}'); echo \"FINAL_SHA256=$SHA\"; uv run kobra-live \"$FINAL_G\" --report \"$FINAL_R\" --profile \"$PROFILE\" --expect-sha256 \"$SHA\" --validate-only; PORT=$(uv run python - <<'PY'\nimport glob\nfrom kobra_live import PosixSerial,_identify\nfor p in sorted(glob.glob('/dev/cu.usbserial-*')):\n    try:\n        with PosixSerial(p) as s: _identify(s)\n        print(p); break\n    except Exception: pass\nPY\n); test -n \"$PORT\"; echo \"KOBRA_PORT=$PORT\"; set +e; uv run kobra-live \"$FINAL_G\" --report \"$FINAL_R\" --profile \"$PROFILE\" --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250 > \"${BASE}-live.log\" 2>&1; RC=$?; set -e; cat \"${BASE}-live.log\"; if [ \"$RC\" -eq 0 ]; then echo RESULT:PRINT_COMPLETED; elif grep -q 'hotend thermal monitor implausible' \"${BASE}-live.log\"; then echo RESULT:PRINT_BLOCKED_THERMISTOR_BEFORE_MOTION; else echo \"RESULT:PRINT_FAILED_UNEXPECTED rc=$RC\"; exit \"$RC\"; fi; ls -lh \"${BASE}.svg\" \"$FINAL_G\" \"${BASE}-kobra-preview.svg\" \"$FINAL_R\" \"$PROFILE\" \"${BASE}-selection.json\"; echo BEAUTY_MAP_BALANCED_FLOW_DONE",
   "pid": 48164,
-  "timeout": 3600,
-  "idle_timeout": 300,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T11:30:28.418583+00:00",
-  "stage_name": "command-1",
+  "stage_name": "kobra-live",
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
+  "message": "PREFLIGHT_OK",
+  "progress_current": 0,
+  "progress_total": 5352,
+  "metrics": {
+    "max_x": 177.09,
+    "max_y": 201.0,
+    "min_x": 48.91,
+    "min_y": 65.0,
+    "sha256": "99a1f19815e4d5464a2be295e8c387747266e0754caf13cad9320c4d0e0b85be"
+  },
+  "last_progress_at": "2026-09-29T11:30:51.884203+00:00",
+  "last_progress_message": "PREFLIGHT_OK",
   "task_id": "kobra2-neo-beauty-map-balanced-20260929-31",
   "attempt_id": "2e83d1317643198aa17a55dd",
   "task_digest": "ac867acd7e78d8bb6b935c30de524c7fefc6883d198ef36fbb1c684e45e0bbda",
   "daemon_version": "4.19.7",
   "daemon_pid": 47893,
-  "updated_at": "2026-09-29T11:30:28.418758+00:00"
+  "updated_at": "2026-09-29T11:30:51.884318+00:00"
 }
