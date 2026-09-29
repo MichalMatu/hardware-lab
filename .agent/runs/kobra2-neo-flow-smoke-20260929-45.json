@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-flow-smoke-20260929-45",
+  "task_digest": "064773dc76a10b065139ac98e145d4cd7a10772565a97690426836a23fac1634",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T14:56:49.797904+00:00",
+  "attempt_id": "fdc556d35fa95ad480b65356",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 58889,
+  "updated_at": "2026-09-29T14:56:49.798132+00:00",
+  "pid": 58889
+}
