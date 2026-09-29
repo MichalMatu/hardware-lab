@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-portrait-artwork-20260929-56",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "plot-inbox",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 180,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "commands": [
+    "set -euo pipefail\nEXPECTED=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nNAME='portrait_plotter_150x150mm(1).svg'\nSRC=$(python3 - \"$EXPECTED\" \"$NAME\" <<'PY'\nfrom pathlib import Path\nimport hashlib, subprocess, sys\nexpected, name = sys.argv[1], sys.argv[2]\nhome = Path.home()\ncands = {home/'Downloads'/name, home/'Desktop'/name, home/'Documents'/name}\ntry:\n    out = subprocess.check_output(['mdfind', f'kMDItemFSName == \\"{name}\\"'], text=True, timeout=15)\n    cands.update(Path(x) for x in out.splitlines() if x.strip())\nexcept Exception:\n    pass\nfor p in sorted(cands, key=lambda x: str(x)):\n    try:\n        if not p.is_file():\n            continue\n        h=hashlib.sha256(p.read_bytes()).hexdigest()\n        if h == expected:\n            print(p)\n            raise SystemExit(0)\n    except OSError:\n        pass\nraise SystemExit('exact uploaded SVG not found on host by filename/hash')\nPY\n)\necho SOURCE_FOUND=\"$SRC\"\ngit fetch origin plot-inbox\ngit reset --hard origin/plot-inbox\nDEST=projects/kobra2-neo/inbox/current.svg\nmkdir -p \"$(dirname \"$DEST\")\"\ncp \"$SRC\" \"$DEST\"\nACTUAL=$(shasum -a 256 \"$DEST\" | awk '{print $1}')\ntest \"$ACTUAL\" = \"$EXPECTED\"\ngit add \"$DEST\"\nif git diff --cached --quiet; then\n  echo RESULT:ARTWORK_ALREADY_PINNED source_sha256=$ACTUAL commit=$(git rev-parse HEAD)\nelse\n  git commit -m 'Stage exact 150mm portrait SVG for plotting'\n  git push origin HEAD:plot-inbox\n  echo RESULT:ARTWORK_PINNED source_sha256=$ACTUAL commit=$(git rev-parse HEAD)\nfi"
+  ]
+}
