@@ -1,14 +1,43 @@
 {
-  "event": "task_started",
+  "event": "stage_progress",
+  "stage_progress": {
+    "stage_name": "kobra-live",
+    "message": "PREFLIGHT_OK",
+    "current": 0,
+    "total": 1784,
+    "metrics": {
+      "max_x": 178.58,
+      "max_y": 225.0,
+      "min_x": 47.42,
+      "min_y": 41.0,
+      "sha256": "41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887"
+    }
+  },
+  "phase": "commands",
+  "index": 1,
+  "total": 1,
+  "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-130\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nPY\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
+  "pid": 37320,
+  "stage_name": "kobra-live",
+  "stage_index": 1,
+  "stage_total": 1,
+  "stage_phase": "commands",
+  "message": "PREFLIGHT_OK",
+  "progress_current": 0,
+  "progress_total": 1784,
+  "metrics": {
+    "max_x": 178.58,
+    "max_y": 225.0,
+    "min_x": 47.42,
+    "min_y": 41.0,
+    "sha256": "41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887"
+  },
+  "last_progress_at": "2026-09-29T17:04:31.505378+00:00",
+  "last_progress_message": "PREFLIGHT_OK",
   "task_id": "kobra2-neo-stephansdom-print-port130-20260929-55",
-  "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
-  "idle_timeout": 600,
-  "task_timeout": 2400,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T17:04:29.625629+00:00",
   "attempt_id": "bb587503cfe62df2d41bfbb4",
+  "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
   "daemon_version": "4.19.8",
   "daemon_pid": 37066,
-  "updated_at": "2026-09-29T17:04:29.625721+00:00",
-  "pid": 37066
+  "updated_at": "2026-09-29T17:04:31.505457+00:00"
 }
