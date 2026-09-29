@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-maintenance-closeout-retry-20260929-42",
+  "task_digest": "c65d47dfe3ddb12d7f2f509678ab34c9b9d0f44279ff15f5b4ef69fff66a6b17",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T14:49:50.635397+00:00",
+  "attempt_id": "0cb78b151a564431f7687d4b",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 47155,
+  "updated_at": "2026-09-29T14:49:50.635477+00:00",
+  "pid": 47155
+}
