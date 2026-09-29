@@ -2,9 +2,12 @@
   "event": "stage_progress",
   "stage_progress": {
     "stage_name": "kobra-live",
-    "message": "DRAWING 1100/1784",
-    "current": 1100,
-    "total": 1784
+    "message": "THERMAL_MONITOR_OK 1500/1784",
+    "current": 1500,
+    "total": 1784,
+    "metrics": {
+      "hotend_c": 0.0
+    }
   },
   "phase": "commands",
   "index": 1,
@@ -15,16 +18,18 @@
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "DRAWING 1100/1784",
-  "progress_current": 1100,
+  "message": "THERMAL_MONITOR_OK 1500/1784",
+  "progress_current": 1500,
   "progress_total": 1784,
-  "metrics": null,
-  "last_progress_at": "2026-09-29T17:08:07.791099+00:00",
-  "last_progress_message": "DRAWING 1100/1784",
+  "metrics": {
+    "hotend_c": 0.0
+  },
+  "last_progress_at": "2026-09-29T17:09:27.542253+00:00",
+  "last_progress_message": "THERMAL_MONITOR_OK 1500/1784",
   "task_id": "kobra2-neo-stephansdom-print-port130-20260929-55",
   "attempt_id": "bb587503cfe62df2d41bfbb4",
   "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
   "daemon_version": "4.19.8",
   "daemon_pid": 37066,
-  "updated_at": "2026-09-29T17:08:07.791281+00:00"
+  "updated_at": "2026-09-29T17:09:27.542523+00:00"
 }
