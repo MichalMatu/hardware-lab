@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-stephansdom-prepare-20260929-50",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 900,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail\ngit fetch origin main plot-inbox\ngit reset --hard origin/main\ntest -z \"$(git status --porcelain)\"\ncd projects/kobra2-neo\nuv sync --frozen >/dev/null\nBASE=/tmp/kobra-stephansdom-ready-20260929-50\nrm -rf \"$BASE\"\nmkdir -p \"$BASE\"\ngit show 09cecee34ea3107a25a4deca1aba087c743e3d67:projects/kobra2-neo/inbox/current.svg > \"$BASE/source.svg\"\nSOURCE_SHA=$(shasum -a 256 \"$BASE/source.svg\" | awk '{print $1}')\ntest \"$SOURCE_SHA\" = \"b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e\"\nuv run kobra-plot prepare \"$BASE/source.svg\" -o \"$BASE/job\"\nGCODE_SHA=$(python3 - \"$BASE/job/report.json\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97\nassert p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nb=r['geometry']['output_bounds']\nassert 8.0 <= b['min_x'] <= b['max_x'] <= 218.0\nassert 41.0 <= b['min_y'] <= b['max_y'] <= 225.0\nprint(r['artifacts']['gcode_sha256'])\nPY\n)\nuv run kobra-live \"$BASE/job/output.gcode\" --report \"$BASE/job/report.json\" --profile config/kobra2_neo_pen.toml --expect-sha256 \"$GCODE_SHA\" --validate-only\necho PREFLIGHT_OK\necho RESULT:READY_TO_PRINT job=$BASE/job source_sha256=$SOURCE_SHA gcode_sha256=$GCODE_SHA"
+  ]
+}
