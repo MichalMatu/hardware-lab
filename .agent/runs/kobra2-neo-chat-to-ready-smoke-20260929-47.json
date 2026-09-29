@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-chat-to-ready-smoke-20260929-47",
+  "task_digest": "e8b6581c53e8a38693e8119431279864f3807049a415965549a93a682dcceaaa",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T16:09:54.999756+00:00",
+  "attempt_id": "a860bad7147eb80ffcd12864",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 63253,
+  "updated_at": "2026-09-29T16:09:54.999899+00:00",
+  "pid": 63253
+}
