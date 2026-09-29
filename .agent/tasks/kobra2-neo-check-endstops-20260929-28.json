@@ -1,0 +1,13 @@
+{
+  "id": "kobra2-neo-check-endstops-20260929-28",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; python3 - <<'PY'\nimport time,serial\nport='/dev/cu.usbserial-130'\nwith serial.Serial(port,115200,timeout=0.25,write_timeout=2) as ser:\n    time.sleep(2.0)\n    ser.reset_input_buffer()\n    for cmd in ('M119','M114'):\n        ser.write((cmd+'\\n').encode()); ser.flush(); print('TX',cmd,flush=True)\n        deadline=time.monotonic()+5\n        while time.monotonic()<deadline:\n            raw=ser.readline()\n            if not raw: continue\n            text=raw.decode('utf-8',errors='replace').strip()\n            if text: print('RX',text,flush=True)\n            low=text.lower()\n            if low=='ok' or low.startswith('ok '): break\nprint('RESULT:ENDSTOP_CHECK_DONE')\nPY"
+  ]
+}
