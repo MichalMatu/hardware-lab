@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-chat-artwork-roundtrip-20260929-46",
+  "task_digest": "3678a3aaeee04d6eb93f42c73009bcb472a9e0a3b2c420932e33c5108debd567",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T16:01:27.979582+00:00",
+  "attempt_id": "0f2b9f0e2a0b13a024c1623f",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 48632,
+  "updated_at": "2026-09-29T16:01:27.979651+00:00",
+  "pid": 48632
+}
