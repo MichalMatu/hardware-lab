@@ -328,6 +328,7 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, therma
     z_feed = job["profile"]["z_feed"]
     started = time.monotonic()
     homed_z = False
+    drawing_started = False
     with PosixSerial(port) as serial:
         # Give an already-open CH340/Marlin session a short deterministic settle.
         time.sleep(0.5)
@@ -353,7 +354,8 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, therma
                 if index % thermal_check_every == 0 and index < len(commands):
                     hotend_c = _check_thermal_monitor(serial)
                     _progress("thermal", f"THERMAL_MONITOR_OK {index}/{len(commands)}", current=index, total=len(commands), metrics={"hotend_c": hotend_c})
-                if index == 5:
+                if not drawing_started and command.startswith("G1 "):
+                    drawing_started = True
                     _progress("stream", "DRAWING_STARTED", current=index, total=len(commands))
                 elif index % progress_every == 0 or index == len(commands):
                     _progress("stream", f"DRAWING {index}/{len(commands)}", current=index, total=len(commands))
