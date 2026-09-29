@@ -1,0 +1,61 @@
+{
+  "id": "kobra2-neo-portrait-artwork-retry-20260929-57",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "plot-inbox",
+  "allow_write": true,
+  "started_at": "2026-09-29T20:29:30.669581+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\nEXPECTED=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nNAME='portrait_plotter_150x150mm(1).svg'\nSRC=$(python3 - \"$EXPECTED\" \"$NAME\" <<'PY'\nfrom pathlib import Path\nimport hashlib, subprocess, sys\nexpected, name = sys.argv[1], sys.argv[2]\nhome = Path.home()\ncands = {home/'Downloads'/name, home/'Desktop'/name, home/'Documents'/name}\ntry:\n    out = subprocess.check_output(['mdfind', name], text=True, timeout=15)\n    cands.update(Path(x) for x in out.splitlines() if x.strip())\nexcept Exception:\n    pass\nfor p in sorted(cands, key=lambda x: str(x)):\n    try:\n        if not p.is_file():\n            continue\n        h = hashlib.sha256(p.read_bytes()).hexdigest()\n        if h == expected:\n            print(p)\n            raise SystemExit(0)\n    except OSError:\n        pass\nraise SystemExit('exact uploaded SVG not found on host by filename/hash')\nPY\n)\necho SOURCE_FOUND=\"$SRC\"\ngit fetch origin plot-inbox\ngit reset --hard origin/plot-inbox\nDEST=projects/kobra2-neo/inbox/current.svg\nmkdir -p \"$(dirname \"$DEST\")\"\ncp \"$SRC\" \"$DEST\"\nACTUAL=$(shasum -a 256 \"$DEST\" | awk '{print $1}')\ntest \"$ACTUAL\" = \"$EXPECTED\"\ngit add \"$DEST\"\nif git diff --cached --quiet; then\n  echo RESULT:ARTWORK_ALREADY_PINNED source_sha256=$ACTUAL commit=$(git rev-parse HEAD)\nelse\n  git commit -m 'Stage exact 150mm portrait SVG for plotting'\n  git push origin HEAD:plot-inbox\n  echo RESULT:ARTWORK_PINNED source_sha256=$ACTUAL commit=$(git rev-parse HEAD)\nfi",
+      "exit_code": 1,
+      "output": "2026-09-29 22:29:32.321 mdfind[93828:39175949] [UserQueryParser] Loading keywords and predicates for locale \"en_GB\"\nexact uploaded SVG not found on host by filename/hash\n",
+      "elapsed_seconds": 1.006,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.34,
+      "output_policy": "stream",
+      "captured_output_chars": 170,
+      "output_truncated": false,
+      "current_rss_mb": 3.34,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 1.006
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.183
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T20:29:33.521526+00:00",
+  "task_digest": "4736a0425ff03ca0023502987b35de6b91981f29354b0d92c36ffb643f24caf1",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "attempt_id": "054e33e67b726047a6059f72",
+  "daemon_version": "4.19.8"
+}
