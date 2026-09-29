@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.19.8",
   "state": "idle",
-  "pid": 37066,
-  "updated_at": "2026-09-29T17:10:46.760364+00:00",
+  "pid": 56184,
+  "updated_at": "2026-09-29T17:16:04.289192+00:00",
   "self_revision": "c951b6e54223ce1e1d4ed47a281597903f869f74",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 37066,
+  "worker_pid": 56184,
   "supervisor_pid": 17429,
-  "last_task_id": "kobra2-neo-stephansdom-print-port130-20260929-55",
   "execution_variant": "parallel"
 }
