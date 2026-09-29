@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-stephansdom-print-after-poweron-20260929-54",
+  "task_digest": "d5da1590f69bbb151c28f76c07ae063c361c6c0a0cf2db4435d03ef51b67d1ff",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T17:02:28.294820+00:00",
+  "attempt_id": "02c23f741cdc35c477d83227",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 33128,
+  "updated_at": "2026-09-29T17:02:28.294968+00:00",
+  "pid": 33128
+}
