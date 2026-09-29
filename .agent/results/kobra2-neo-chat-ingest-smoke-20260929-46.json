@@ -1,0 +1,61 @@
+{
+  "id": "kobra2-neo-chat-ingest-smoke-20260929-46",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T15:21:10.422635+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\ngit fetch origin main plot-inbox\ngit reset --hard origin/main\ntest -z \"$(git status --porcelain)\"\ncd projects/kobra2-neo\nuv sync --frozen >/dev/null\nTMP=$(mktemp -d /tmp/kobra-chat-ingest.XXXXXX)\nSTART=$(python3 -c 'import time; print(time.monotonic())')\ngit show 4059d5cd75e82c84a9ccf952688f58c2464eb4fd:projects/kobra2-neo/inbox/current.svg > \"$TMP/source.svg\"\nSOURCE_SHA=$(shasum -a 256 \"$TMP/source.svg\" | awk '{print $1}')\ntest \"$SOURCE_SHA\" = \"92484c94947aec1dfbfd4a0f36a50521542d00b36fbafea25e0e5a603cd67206\"\nuv run kobra-plot prepare \"$TMP/source.svg\" -o \"$TMP/job\"\nGCODE_SHA=$(python3 - \"$TMP/job/report.json\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == '92484c94947aec1dfbfd4a0f36a50521542d00b36fbafea25e0e5a603cd67206'\nassert r['safety']['valid'] is True\nassert r['profile']['pen_up_z'] == 4.97\nassert r['profile']['pen_down_z'] == 2.97\nassert r['profile']['motion']['travel_feed'] == 6000.0\nassert r['profile']['motion']['draw_feed'] == 2400.0\nassert r['profile']['motion']['z_feed'] == 360.0\nprint(r['artifacts']['gcode_sha256'])\nPY\n)\nuv run kobra-live \"$TMP/job/output.gcode\" --report \"$TMP/job/report.json\" --profile config/kobra2_neo_pen.toml --expect-sha256 \"$GCODE_SHA\" --validate-only\nEND=$(python3 -c 'import time; print(time.monotonic())')\nELAPSED=$(python3 - \"$START\" \"$END\" <<'PY'\nimport sys\nprint(f'{float(sys.argv[2])-float(sys.argv[1]):.3f}')\nPY\n)\necho RESULT:CHAT_ATTACHMENT_READY_TO_PRINT elapsed_seconds=$ELAPSED source_sha256=$SOURCE_SHA gcode_sha256=$GCODE_SHA",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/hardware-lab\n * branch            main       -> FETCH_HEAD\n * branch            plot-inbox -> FETCH_HEAD\n * [new branch]      plot-inbox -> origin/plot-inbox\nHEAD is now at 20cb144 Refresh Kobra agent rules after maintenance closeout\nChecked 20 packages in 6ms\n",
+      "elapsed_seconds": 1.44,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 7.09,
+      "output_policy": "stream",
+      "captured_output_chars": 296,
+      "output_truncated": false,
+      "current_rss_mb": 7.09,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 1.44
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.119
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T15:21:13.786299+00:00",
+  "task_digest": "c73e06a82fe3177c5ca28f91b7794301c738fd446296b68220170b042b84ac20",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "4abde9fbf7d3a92b1eb9698d",
+  "daemon_version": "4.19.8"
+}
