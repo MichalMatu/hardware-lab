@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-maintenance-closeout-retry-20260929-42",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1200,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail\ngit fetch origin main\ngit reset --hard origin/main\ntest -z \"$(git status --porcelain)\"\ngit cat-file -e 9d4b995^{commit}\ngit cherry-pick 9d4b995\ncd projects/kobra2-neo\nuv sync --frozen >/dev/null\nuv run pytest -q\nuv run python -m compileall -q src tests\nuv run kobra-plot doctor >/dev/null\ngit diff --check\ncd ../..\ngit push origin HEAD:main\necho RESULT:KOBRA_MAINTENANCE_CLOSED"
+  ]
+}
