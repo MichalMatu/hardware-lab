@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-continuous-path-push-retry-20260929-44",
+  "task_digest": "8fe5091a7837fb7a1e266f7785123a66c1f37b51a0a96cd72d919a6c39d4e84b",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T14:54:41.454256+00:00",
+  "attempt_id": "4ac104802537d0820089f07e",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 55501,
+  "updated_at": "2026-09-29T14:54:41.455595+00:00",
+  "pid": 55501
+}
