@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-29T20:27:42.510438+00:00",
+  "task_id": "kobra2-neo-portrait-artwork-20260929-56",
+  "daemon_version": "4.19.8",
+  "pid": 90106
+}
