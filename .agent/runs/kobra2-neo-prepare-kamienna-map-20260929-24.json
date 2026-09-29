@@ -1,9 +1,0 @@
-{
-  "event": "invalid_task_rejected",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "updated_at": "2026-09-29T10:38:33.760756+00:00",
-  "task_id": "kobra2-neo-prepare-kamienna-map-20260929-24",
-  "daemon_version": "4.19.6",
-  "pid": 73715
-}
