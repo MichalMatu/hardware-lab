@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-29T20:38:06.628519+00:00",
+  "task_id": "kobra2-neo-portrait-exact-prepare-20260929-60",
+  "daemon_version": "4.19.8",
+  "pid": 9007
+}
