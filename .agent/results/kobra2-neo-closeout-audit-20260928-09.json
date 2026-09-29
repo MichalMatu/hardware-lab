@@ -1,9 +1,0 @@
-{
-  "id": "kobra2-neo-closeout-audit-20260928-09",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-28T16:18:30.855375+00:00",
-  "daemon_version": "4.19.2",
-  "error": "ValueError: commands items must be non-empty strings"
-}
