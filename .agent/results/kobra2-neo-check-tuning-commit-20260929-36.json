@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-check-tuning-commit-20260929-36",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T13:37:57.176986+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git cat-file -e 9d4b995^{commit}; git show --stat --oneline --no-renames 9d4b995",
+      "exit_code": 0,
+      "output": "9d4b995 Tune Kobra pen plotting motion\n projects/kobra2-neo/src/kobra_live.py        | 18 +++++++++++-------\n projects/kobra2-neo/src/kobra_plot.py        | 18 ++++++++++++++++++\n projects/kobra2-neo/tests/test_kobra_live.py | 13 +++++++++++--\n projects/kobra2-neo/tests/test_kobra_plot.py | 16 ++++++++++++++++\n 4 files changed, 56 insertions(+), 9 deletions(-)\n",
+      "elapsed_seconds": 0.392,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.59,
+      "output_policy": "stream",
+      "captured_output_chars": 363,
+      "output_truncated": false,
+      "current_rss_mb": 4.59,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.392
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.104
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "finished_at": "2026-09-29T13:37:59.273442+00:00",
+  "task_digest": "6eac4ae2b711975ebf56818bce08c39683c7f700ba9a963d04c6ed66cd85cbf5",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "attempt_id": "941da42e4ae13bb5caf1702c",
+  "daemon_version": "4.19.8"
+}
