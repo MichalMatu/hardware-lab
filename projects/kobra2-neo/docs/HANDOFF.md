@@ -2,187 +2,136 @@
 
 ## Start here
 
-The Kobra 2 Neo is a dedicated pen plotter. The canonical architecture is now proven through `READY_TO_PRINT` for an artwork originating in this ChatGPT conversation.
+For normal printing, read `CHAT_TO_PRINT.md` first. It is the canonical fast path for the user experience:
 
-Do not resume the failed base64/chunk workflow. Use one normal immutable source file and the staged flow in `WORKFLOW.md`.
+```text
+attach image in ChatGPT
+"drukuj"
+-> ARTWORK
+-> PREPARE
+-> PRINT
+-> DRAWING_STARTED
+```
 
-## Current physical contract
+Do not redesign this flow in a new chat unless repository evidence proves it is broken.
 
-- Anycubic Kobra 2 Neo, stock Marlin `bugfix-2.1.x`.
-- Original printhead/hotend removed.
-- No hotend heater cartridge, hotend thermistor or printhead fans.
-- Pen/marker is the active tool.
-- Cylindrical magnetic/proximity sensor is verified as `z_min` and used for Z homing.
-- Rear physical button maps to `z_max`.
-- Idle hotend `T:0.00` is expected and is not itself a plotting blocker.
-- Firmware-emitted `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or equivalent during an active transaction is terminal.
-- Before XY homing, clear the full Y-bed path, especially the printer power cable.
+## Current hardware/profile
 
-## Current profile — executable source of truth
+Dedicated Anycubic Kobra 2 Neo pen plotter, stock Marlin baseline. Original hotend/heater/thermistor/fans are removed. Pen/marker is the active tool. Cylindrical proximity sensor is verified as `z_min` for Z homing.
 
-Read `config/kobra2_neo_pen.toml` before changing code or documentation.
+Executable profile source of truth: `config/kobra2_neo_pen.toml`.
 
 ```text
 hard envelope: X=3..223, Y=36..230 mm
 normal drawing envelope: X=8..218, Y=41..225 mm
 pen down: Z=2.97
-pen up: Z=4.97   # exactly 2.00 mm lift
-travel feed: 6000 mm/min
-draw feed: 2400 mm/min
+pen up: Z=4.97
+travel: 6000 mm/min
+draw: 2400 mm/min
 Z feed: 360 mm/min
-orientation: flip Y; no XY swap; no X flip
+orientation: flip Y only
 end: M400
 ```
 
-Changing pen, holder, paper thickness/position or Z-reference geometry invalidates dependent calibration until rechecked.
+Idle `M105` hotend value `T:0.00` is expected because the thermistor is intentionally absent. Actual Marlin halt conditions remain terminal. Heater commands are forbidden.
 
-## Maintenance status
+## Implementation status
 
-The previous profile/runner drift was closed on `main` by commit `7a3d510` (`Tune Kobra pen plotting motion`). Verification passed `33/33` tests, compileall, `kobra-plot doctor` and `git diff --check`.
+- Profile/live-runner drift closed by `7a3d510`; maintenance suite passed `33/33` plus compileall/doctor/diff-check.
+- `DRAWING_STARTED` now corresponds to the first acknowledged `G1`; fixed by `ef7eea4`, tests passed.
+- Optional end-to-end path reversal optimization `b358070` passed `35/35` locally but is not required by the canonical flow and was not pushed after two GitHub internal errors.
+- `main` contains the proven chat-artwork workflow documentation.
 
-That baseline provides:
+## Proven chat -> ready path
 
-- headless `T:0.00` acceptance while actual Marlin halt messages remain terminal;
-- profile-driven pen-up Z feed (`360`);
-- current profile values in tests;
-- conservative adjacent touching-path merge before preview/G-code generation.
-
-A non-safety path-ordering enhancement (`b358070`) passed `35/35` locally but two Git pushes were rejected with GitHub `Internal Server Error`; it is not required for the canonical flow.
-
-A small follow-up task to make `DRAWING_STARTED` correspond exactly to the first acknowledged `G1` has been queued on `agent-control` as `kobra2-neo-drawing-start-marker-20260929-48`. At this handoff it had not yet been picked up by the daemon. Do not duplicate it. Resolve/check that one task before using `DRAWING_STARTED` for latency benchmarking.
-
-## Proven ChatGPT artwork ingestion — 2026-09-29
-
-The exact accepted botanical artwork from this conversation was used to prove the missing asset path.
-
-Chat-side vector artifact:
+The accepted botanical artwork from ChatGPT was transported as one normal SVG on `plot-inbox`.
 
 ```text
-local source: botanical-chat-ingest.svg
+source commit: de057fd3a4250dd795e421cdff1d9d087f954b5d
+source path: projects/kobra2-neo/inbox/botanical-chat-ingest.svg
 source SHA-256: 8d3f26b2354b30a9cd0671e93c6c2137973ab23330cc0cecbd6cdb30ea28a945
-Git blob SHA-1: 772d7189578ed68a79b135179900b64470a1f6e1
+Git blob: 772d7189578ed68a79b135179900b64470a1f6e1
 ```
 
-It was transferred as **one normal UTF-8 SVG**, not chunks:
+Local Agent independently reconstructed that exact commit/path and verified the SHA before preparation.
 
 ```text
-branch: plot-inbox
-commit: de057fd3a4250dd795e421cdff1d9d087f954b5d
-path: projects/kobra2-neo/inbox/botanical-chat-ingest.svg
-```
-
-GitHub returned the same Git blob SHA as the local file, proving exact byte identity after transport.
-
-Local Agent task `kobra2-neo-chat-to-ready-smoke-20260929-47` then fetched that exact immutable commit, reconstructed the source with `git show`, verified the SHA-256, and ran the normal offline pipeline.
-
-Result:
-
-```text
-source SHA-256: 8d3f26b2354b30a9cd0671e93c6c2137973ab23330cc0cecbd6cdb30ea28a945
-geometry: 176 polylines, 2018 points
-draw distance: 9508.629 mm
-travel distance: 1676.709 mm
-bounds: X=22.57..203.43, Y=41.00..225.00 mm
-G-code commands: 2373
+176 polylines
+2018 points
+2373 G-code commands
+bounds X=22.57..203.43, Y=41.00..225.00 mm
+safety PASS
 G-code SHA-256: 18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4
-safety: PASS
-kobra-live preflight: PASS
-terminal result: READY_TO_PRINT
-PREPARE + live validate-only: 2.780 s
-whole Local Agent command: 3.960 s
+PREPARE + kobra-live --validate-only: 2.780 s
+RESULT: READY_TO_PRINT
 ```
 
-No serial port was opened and no printer motion occurred during this smoke test.
+## Proven physical path
 
-This proves the full boundary:
+Physical task:
 
 ```text
-image available in ChatGPT
-  -> one pen-compatible SVG
-  -> one GitHub file on plot-inbox
-  -> immutable commit + source SHA
-  -> Local Agent fetches exact commit
-  -> source hash verification
-  -> kobra-plot PREPARE
-  -> preview/report/G-code
-  -> kobra-live --validate-only
-  -> READY_TO_PRINT
+kobra2-neo-botanical-print-live-20260929-49
 ```
 
-## Canonical user-facing target
+It consumed the already prepared immutable job, identified the printer dynamically, homed, and reached real streamed drawing progress (`DRAWING 800/2373` observed during this handoff). This proves the physical PRINT leg is operational; completion still requires terminal `COMPLETE_PEN_UP` evidence.
 
-The desired interaction is:
+## Repository/branch hygiene
+
+The repository intentionally has only:
 
 ```text
-upload image in ChatGPT
-"drukuj"
-  -> create one SVG
-  -> transfer one immutable file
-  -> PREPARE + hashes + preflight
-  -> PRINT
-  -> DRAWING_STARTED target: about 30 seconds from request under normal host/printer conditions
+main          code/docs/profile
+agent-control Local Agent control plane
+plot-inbox    transient single-file artwork ingress
 ```
 
-The offline portion is now comfortably inside that budget. The next benchmark is the physical PRINT portion from an already validated job to the first acknowledged drawing move.
+`plot-inbox` is intentional, not a disposable work branch. Do not create per-job development branches for normal printing. Prefer one reusable file path such as `projects/kobra2-neo/inbox/current.svg`; pin the commit SHA and source SHA-256 so the source remains immutable even when that path is replaced for a later job.
 
-For line-art images, use the proven single-SVG path. Raster/photo rendering remains a separate renderer-quality problem and must not be hidden inside PRINT.
+Never use base64/gzip chunk transport, split artwork files or task-JSON asset blobs.
 
-## Canonical stages
+## Fail-fast
 
-### 1. ARTWORK
+One task = one responsibility. A stage failure stops that stage. One deterministic corrective retry is allowed after exact diagnosis. If that retry fails, stop; do not create speculative retry chains.
 
-- Produce/select artwork.
-- Convert it to one final pen-compatible SVG.
-- Store it as one normal file on `plot-inbox` or another explicit one-file transport.
-- Record SHA-256 and immutable commit/path identity.
-- Never use manual gzip/base64 chunking or task-payload asset transport.
+## New-chat starter prompt
 
-### 2. PREPARE — offline only
+Use the following as the first message in a fresh ChatGPT conversation and attach the image to that same message:
 
-One task: source -> prepared job.
+```text
+Kontynuuj projekt Anycubic Kobra 2 Neo pen plotter z repo MichalMatu/hardware-lab.
 
-- no code edits;
-- no repository mutation;
-- no serial access;
-- verify source hash before conversion;
-- normalize/vectorize, fit and optimize;
-- generate G-code, preview and report;
-- validate command whitelist, Z values, feeds and XY bounds;
-- pin the G-code hash;
-- terminal state: `READY_TO_PRINT` or failure.
+Najpierw przeczytaj z aktualnego main:
+- projects/kobra2-neo/docs/CHAT_TO_PRINT.md
+- projects/kobra2-neo/docs/HANDOFF.md
+- projects/kobra2-neo/docs/WORKFLOW.md
+- projects/kobra2-neo/config/kobra2_neo_pen.toml
+- projects/kobra2-neo/AGENTS.md
 
-### 3. REVIEW / APPROVAL
+Załączony obraz jest dokładnie tym, co chcę narysować. DRUKUJ.
 
-Review the actual prepared artifacts and confirm paper/tool state. An explicit `drukuj` request for the selected image can serve as approval for that single immutable transaction once the system has prepared and revalidated exactly that image/job.
+Użyj kanonicznego flow bez jego przeprojektowywania:
+ARTWORK -> PREPARE -> PRINT.
 
-### 4. PRINT
+Wymagania:
+- użyj dokładnie załączonego obrazu, nie generuj zamiennika;
+- jeden normalny SVG na plot-inbox, bez base64/chunków;
+- przypnij commit i SHA-256 źródła;
+- osobny offline PREPARE do READY_TO_PRINT;
+- moje słowo "DRUKUJ" jest zgodą na pojedynczy fizyczny PRINT tego dokładnego przygotowanego joba;
+- PRINT ma tylko zweryfikować job, znaleźć Kobrę przez M115, zrobić G28 X Y, G28 Z, pen-up i streamować przypięty G-code;
+- żadnych zmian kodu, dokumentacji, pull/rebase/push ani tuningu podczas PRINT;
+- nie pytaj ponownie o zgodę, jeśli automatyczne safety checks przejdą i obraz jest jednoznaczny;
+- zgłoś DRAWING_STARTED dopiero po odpowiednim dowodzie z runnera;
+- jeśli etap padnie: jedna deterministyczna poprawka i jeden retry; drugi fail = stop i konkretny blocker.
 
-PRINT consumes the prepared immutable job and must not edit code, regenerate artwork, commit, pull/rebase or push.
+Cel: od tej wiadomości do fizycznego DRAWING_STARTED około 30 sekund w normalnych warunkach.
+```
 
-- verify hashes and safety state;
-- ensure no competing serial session;
-- identify printer with `M115`;
-- home XY then Z;
-- raise to current pen-up using current Z feed;
-- stream acknowledged immutable artwork;
-- treat firmware halt/resend/transport timeout as terminal;
-- finish pen-up + `M400` and require terminal evidence.
+## Read order for maintenance/debugging only
 
-Say `drawing started` only after `DRAWING_STARTED`. Say `completed` only after `COMPLETE_PEN_UP` or equivalent final acknowledgement.
-
-## Fail-fast rule
-
-There is no multi-hour recovery loop.
-
-A stage failure stops that stage. One corrective retry is allowed only after exact diagnosis and a deterministic fix. If the retry fails, stop and record the blocker instead of creating more task variants.
-
-## Next session / next physical test
-
-Read in this order:
-
-1. `docs/HANDOFF.md`
-2. `docs/WORKFLOW.md`
-3. `config/kobra2_neo_pen.toml`
-4. `docs/GOLDEN_LIVE_FLOW.md`
-
-Before measuring `drukuj -> DRAWING_STARTED`, first check the existing marker-fix task rather than enqueueing a duplicate. Then use the proven single-file artwork path above and keep PRINT as its own bounded physical task.
+1. `CHAT_TO_PRINT.md`
+2. `HANDOFF.md`
+3. `WORKFLOW.md`
+4. `config/kobra2_neo_pen.toml`
+5. `GOLDEN_LIVE_FLOW.md`
