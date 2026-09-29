@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-drawing-start-marker-20260929-48",
+  "task_digest": "da2bc39499a6ff394596157239a07b83acc9ddafdffec119b735ac8b63762b4a",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T16:14:29.046899+00:00",
+  "attempt_id": "664495bcc9bfbed167ebc9b5",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 69006,
+  "updated_at": "2026-09-29T16:14:29.046955+00:00",
+  "pid": 69006
+}
