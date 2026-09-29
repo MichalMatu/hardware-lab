@@ -2,16 +2,9 @@
   "event": "stage_progress",
   "stage_progress": {
     "stage_name": "kobra-live",
-    "message": "PREFLIGHT_OK",
-    "current": 0,
-    "total": 1784,
-    "metrics": {
-      "max_x": 178.58,
-      "max_y": 225.0,
-      "min_x": 47.42,
-      "min_y": 41.0,
-      "sha256": "41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887"
-    }
+    "message": "DRAWING 300/1784",
+    "current": 300,
+    "total": 1784
   },
   "phase": "commands",
   "index": 1,
@@ -22,22 +15,16 @@
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "PREFLIGHT_OK",
-  "progress_current": 0,
+  "message": "DRAWING 300/1784",
+  "progress_current": 300,
   "progress_total": 1784,
-  "metrics": {
-    "max_x": 178.58,
-    "max_y": 225.0,
-    "min_x": 47.42,
-    "min_y": 41.0,
-    "sha256": "41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887"
-  },
-  "last_progress_at": "2026-09-29T17:04:31.505378+00:00",
-  "last_progress_message": "PREFLIGHT_OK",
+  "metrics": null,
+  "last_progress_at": "2026-09-29T17:05:35.588469+00:00",
+  "last_progress_message": "DRAWING 300/1784",
   "task_id": "kobra2-neo-stephansdom-print-port130-20260929-55",
   "attempt_id": "bb587503cfe62df2d41bfbb4",
   "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
   "daemon_version": "4.19.8",
   "daemon_pid": 37066,
-  "updated_at": "2026-09-29T17:04:31.505457+00:00"
+  "updated_at": "2026-09-29T17:05:35.588572+00:00"
 }
