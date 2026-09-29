@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.19.8",
   "state": "idle",
-  "pid": 56660,
-  "updated_at": "2026-09-29T13:57:09.763422+00:00",
+  "pid": 65919,
+  "updated_at": "2026-09-29T14:02:18.510660+00:00",
   "self_revision": "49f522e12238f30b4b5f69cb847bed727c79c115",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 56660,
+  "worker_pid": 65919,
   "supervisor_pid": 33752,
-  "last_task_id": "kobra2-neo-botanical-prepare-final-20260929-39",
   "execution_variant": "parallel"
 }
