@@ -1,0 +1,61 @@
+{
+  "id": "kobra2-neo-portrait-artwork-path-20260929-58",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "plot-inbox",
+  "allow_write": true,
+  "started_at": "2026-09-29T20:32:14.083054+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\nEXPECTED=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nSRC='/Users/michal/Downloads/portrait_plotter_150x150mm.svg'\ntest -f \"$SRC\"\nACTUAL=$(shasum -a 256 \"$SRC\" | awk '{print $1}')\ntest \"$ACTUAL\" = \"$EXPECTED\"\ngit fetch origin plot-inbox\ngit reset --hard origin/plot-inbox\nDEST=projects/kobra2-neo/inbox/current.svg\nmkdir -p \"$(dirname \"$DEST\")\"\ncp \"$SRC\" \"$DEST\"\nVERIFY=$(shasum -a 256 \"$DEST\" | awk '{print $1}')\ntest \"$VERIFY\" = \"$EXPECTED\"\ngit add \"$DEST\"\nif git diff --cached --quiet; then\n  echo RESULT:ARTWORK_ALREADY_PINNED source_sha256=$VERIFY commit=$(git rev-parse HEAD)\nelse\n  git commit -m 'Stage exact 150mm portrait SVG for plotting'\n  git push origin HEAD:plot-inbox\n  echo RESULT:ARTWORK_PINNED source_sha256=$VERIFY commit=$(git rev-parse HEAD)\nfi\n",
+      "exit_code": 1,
+      "output": "shasum: /Users/michal/Downloads/portrait_plotter_150x150mm.svg: Operation not permitted\n",
+      "elapsed_seconds": 0.458,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.55,
+      "output_policy": "stream",
+      "captured_output_chars": 88,
+      "output_truncated": false,
+      "current_rss_mb": 4.55,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.458
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.172
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T20:32:16.247460+00:00",
+  "task_digest": "48ed02e41de7811cf6cbdd0a38319b9e46245e120a14deaf2bf42a33b96ccdcd",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "attempt_id": "f58d0a69de6b8de9c984e084",
+  "daemon_version": "4.19.8"
+}
