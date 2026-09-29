@@ -55,6 +55,16 @@ The cylindrical sensor was manually triggered with metal and `M119` changed `z_m
 - `G28 Z` completed successfully with the cylindrical sensor acting as the Z reference; the 2026-09-28 session reported X=36.00, Y=206.65, Z=2.97.
 - The pen was then raised to Z=6.12 and planner completion was confirmed with `M400`.
 - A full approved 10 cm artwork completed all 7615 acknowledgement-driven commands without firmware error and ended pen-up.
+- On 2026-09-29 the following manual start sequence was re-verified successfully with the current pen setup:
+
+```gcode
+G28 X Y
+G28 Z
+G0 Z6.12 F180
+G0 X90.69 Y134.14 F3000
+```
+
+- During the first 2026-09-29 retry, the Y bed travel was mechanically blocked by the printer power cable, causing the bed to reach the obstruction before `y_min`. After clearing the cable from the Y travel path, the same homing/start sequence completed normally. Treat a clear rear Y travel path, especially the power cable, as a mandatory physical preflight check before `G28 X Y`.
 
 Homing remains an explicit operator decision even though the current Z-reference path has been physically verified.
 
