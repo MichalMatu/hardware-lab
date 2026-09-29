@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-check-tuning-commit-20260929-36",
+  "task_digest": "6eac4ae2b711975ebf56818bce08c39683c7f700ba9a963d04c6ed66cd85cbf5",
+  "idle_timeout": 300,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T13:37:57.176945+00:00",
+  "attempt_id": "941da42e4ae13bb5caf1702c",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 20510,
+  "updated_at": "2026-09-29T13:37:57.177050+00:00",
+  "pid": 20510
+}
