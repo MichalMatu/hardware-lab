@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 2,
-  "command": "set -euo pipefail; git fetch origin main; git reset --hard origin/main; git cherry-pick 9d4b995; cd projects/kobra2-neo; uv sync --frozen >/dev/null; uv run pytest -q; git diff --check; echo RESULT:LOCAL_TUNING_READY",
-  "pid": 56929,
+  "command": "set -euo pipefail\ncd projects/kobra2-neo\nuv run python - <<'PY'\nfrom pathlib import Path\nimport base64, gzip, hashlib, json, tempfile, xml.etree.ElementTree as ET\nimport kobra_plot as kp\n\nroot = Path(\"samples/source\")\npayload = \"\".join((root / f\"botanical-engraving-150.svg.gz.b64.part{i:02d}\").read_text(encoding=\"utf-8\") for i in range(3))\nraw = gzip.decompress(base64.b64decode(payload))\nexpected = \"107bfd3e20533d739669aaa848afdb8f07db455707a97da18197f3af61df9c8f\"\nactual = hashlib.sha256(raw).hexdigest()\nif actual != expected:\n    raise SystemExit(f\"source SHA mismatch: {actual}\")\n\ndesktop = Path.home() / \"Desktop\"\nsrc = desktop / \"botanical-engraving-150.svg\"\ngp = desktop / \"botanical-engraving-150-kobra.gcode\"\npp = desktop / \"botanical-engraving-150-kobra-preview.svg\"\nrp = desktop / \"botanical-engraving-150-kobra-report.json\"\nsrc.write_bytes(raw)\n\nprofile = kp.load_profile()\npage = 150.0\nox, oy = 38.0, 58.0\n\nwith tempfile.TemporaryDirectory(prefix=\"botanical-\") as td:\n    norm = Path(td) / \"normalized.svg\"\n    kp.normalize_svg(src, norm)\n    lines = kp.load_normalized_svg(norm)\n    root_el = ET.parse(norm).getroot()\n    vx, vy, vw, vh = [float(x) for x in root_el.attrib[\"viewBox\"].replace(\",\", \" \").split()]\n    mapped = []\n    for line in lines:\n        out = []\n        for x, y in line:\n            px = (x - vx) / vw * page\n            py = (y - vy) / vh * page\n            if profile.orientation.swap_xy:\n                px, py = py, px\n            if profile.orientation.flip_x:\n                px = page - px\n            if profile.orientation.flip_y:\n                py = page - py\n            out.append((ox + px, oy + py))\n        mapped.append(out)\n    before = len(mapped)\n    mapped = kp.merge_touching_polylines(mapped, 0.02)\n    b = kp.bounds(mapped)\n    ws = profile.workspace\n    if not (ws.draw_min_x <= b.min_x <= b.max_x <= ws.draw_max_x and ws.draw_min_y <= b.min_y <= b.max_y <= ws.draw_max_y):\n        raise SystemExit(f\"unsafe bounds: {b}\")\n    gcode = kp.generate_gcode(mapped, profile)\n    safety = kp.validate_gcode(gcode, profile)\n    stats = kp.geometry_stats(mapped, profile)\n    stats[\"output_bounds\"] = b.as_dict()\n    stats[\"polylines_before_touch_merge\"] = before\n    stats[\"polylines_after_touch_merge\"] = len(mapped)\n    gp.write_text(gcode, encoding=\"utf-8\")\n    pp.write_text(kp.render_preview(mapped, profile), encoding=\"utf-8\")\n    report = {\n        \"schema_version\": 1,\n        \"title\": \"Botanical engraving 150x150\",\n        \"bounds_mm\": {\"min_x\": round(b.min_x,2), \"max_x\": round(b.max_x,2), \"min_y\": round(b.min_y,2), \"max_y\": round(b.max_y,2)},\n        \"source\": {\"filename\": src.name, \"sha256\": actual, \"page_mm\": [page,page], \"machine_page_origin_mm\": [ox,oy]},\n        \"geometry\": stats,\n        \"profile\": {\"pen_up_z\": profile.tool.pen_up_z, \"pen_down_z\": profile.tool.pen_down_z, \"travel_feed\": profile.motion.travel_feed, \"draw_feed\": profile.motion.draw_feed, \"z_feed\": profile.motion.z_feed},\n        \"safety\": safety\n    }\n    report[\"gcode_sha256\"] = hashlib.sha256(gcode.encode(\"utf-8\")).hexdigest()\n    rp.write_text(json.dumps(report, indent=2, sort_keys=True) + \"\\n\", encoding=\"utf-8\")\n    print(\"RESULT:BOTANICAL_PREPARED\")\n    print(json.dumps(stats, sort_keys=True))\n    print(report[\"gcode_sha256\"])\nPY",
+  "pid": 57179,
   "timeout": 1800,
   "idle_timeout": 1200,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T13:56:46.561433+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-29T13:56:54.567032+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 2,
   "stage_phase": "commands",
   "task_id": "kobra2-neo-botanical-prepare-final-20260929-39",
@@ -18,5 +18,5 @@
   "task_digest": "3ab9908fede80521d83102fdce69f3fd2f9d043e95406840cd861c6338931627",
   "daemon_version": "4.19.8",
   "daemon_pid": 56660,
-  "updated_at": "2026-09-29T13:56:46.574516+00:00"
+  "updated_at": "2026-09-29T13:56:54.641494+00:00"
 }
