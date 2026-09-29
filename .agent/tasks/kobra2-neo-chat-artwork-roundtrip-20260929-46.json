@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-chat-artwork-roundtrip-20260929-46",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail; git fetch origin plot-inbox; ACTUAL=$(git show de057fd3a4250dd795e421cdff1d9d087f954b5d:projects/kobra2-neo/inbox/botanical-chat-ingest.svg | shasum -a 256 | awk '{print $1}'); test \"$ACTUAL\" = \"8d3f26b2354b30a9cd0671e93c6c2137973ab23330cc0cecbd6cdb30ea28a945\"; echo RESULT:ARTWORK_INGEST_OK sha256=$ACTUAL commit=de057fd3a4250dd795e421cdff1d9d087f954b5d"
+  ]
+}
