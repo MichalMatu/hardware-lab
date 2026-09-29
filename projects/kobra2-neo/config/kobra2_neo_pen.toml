@@ -9,9 +9,9 @@ max_y = 230.0
 margin = 5.0
 
 [motion]
-travel_feed = 3000.0
-draw_feed = 1200.0
-z_feed = 180.0
+travel_feed = 6000.0
+draw_feed = 2400.0
+z_feed = 360.0
 
 [orientation]
 swap_xy = false
@@ -19,7 +19,7 @@ flip_x = false
 flip_y = true
 
 [tool]
-pen_up_z = 6.12
+pen_up_z = 4.97
 pen_down_z = 2.97
 
 [sequence]
