@@ -1,10 +1,12 @@
 # Incident review — slow live plot start — 2026-09-28
 
+> **Correction added 2026-09-29:** the current machine is a dedicated headless pen plotter. The original printhead is intentionally removed: no hotend heater, no hotend thermistor and no printhead fans. The active tool is a pen, and the cylindrical magnetic/proximity sensor is the verified `z_min`. Therefore idle `M105` hotend `T:0.00` is expected and must not block plotting. The historical `MINTEMP` event below proves only that an actual firmware kill during execution is terminal; it does not require reinstalling the thermistor. Current behavior is defined by `HARDWARE.md`, `SAFETY.md` and `GOLDEN_LIVE_FLOW.md`.
+
 ## Impact
 
 An operator-approved Kobra 2 Neo drawing took more than three hours of conversation/workflow churn before the physical plot was finally started. The printer/calibration were not the main cause of the startup delay. The delay was orchestration and artifact-flow debt.
 
-The eventual live run also exposed a separate real hardware/firmware safety dependency: stock Marlin halted during the plot with `MINTEMP` on hotend sensor E0. That failure is independent of the earlier three-hour startup delay, but it must be part of the permanent live-flow contract.
+The eventual live run also exposed a separate firmware event: stock Marlin halted during the plot with `MINTEMP` on hotend sensor E0. The correct current interpretation is that a firmware kill during motion is terminal. It is not evidence that the intentionally absent hotend sensor must be restored for pen plotting.
 
 ## What happened
 
@@ -15,7 +17,7 @@ The eventual live run also exposed a separate real hardware/firmware safety depe
 5. The correct worker boundary was then used: `host-ops` performed a generic serial/identity probe on its own binding, while the hardware-lab worker used the already-proven direct Marlin serial path.
 6. Task `kobra2-neo-live-shaft50-showcase-20260928-21` then passed full G-code preflight, identified the physical printer with `M115`, completed XY homing, completed Z homing, raised the pen and started drawing.
 7. The task streamed successfully through progress `3300/4345`. Marlin then returned `Error:MINTEMP triggered, system stopped! Heater_ID: E0` after command `G1 X151.15 Y83.71 F1200`.
-8. The task terminated failed after `801.199 s`. Because Marlin had entered a halted safety state, there is no acknowledged final pen-up. The final physical pen state from that run is therefore **unknown**, not inferred.
+8. The task terminated failed after `801.199 s`. Because Marlin had entered a halted state, there is no acknowledged final pen-up. The final physical pen state from that run is therefore **unknown**, not inferred.
 9. Progress messages in the ad-hoc task were plain stdout. Local Agent already supports structured `[AGENT_PROGRESS]` markers, but they were not used. Remote heartbeat evidence therefore showed liveness/recent output but not the exact physical checkpoint.
 10. An assistant status message consequently overstated evidence by saying homing had passed before the corresponding captured output was available. Later terminal result evidence did prove that homing had in fact succeeded, but the earlier claim was still unsupported at the time it was made.
 
@@ -35,27 +37,35 @@ The eventual live run also exposed a separate real hardware/firmware safety depe
 - Evidence language was not strict enough: process liveness was treated as proof of a physical stage.
 - A new chat/session was allowed to trigger redundant capability rediscovery instead of reusing known state and proving only the facts that could actually have changed.
 
-## Separate runtime safety finding: E0 thermal monitor
+## Separate runtime finding: E0 firmware halt
 
-The `MINTEMP` failure was not caused by heater commands in the artwork: the prepared job contained no heater or extrusion commands and passed the command whitelist/bounds checks. Stock Marlin nevertheless continues to enforce the hotend thermistor safety circuit during pen-only motion.
+The prepared job contained no heater or extrusion commands and passed the command whitelist/bounds checks. During the live run, stock Marlin nevertheless emitted a `MINTEMP` kill for E0.
 
-The repository does not yet prove whether the observed E0 `MINTEMP` came from an intermittent thermistor connector, sensor/wiring fault or another physical thermal-input issue. Do not guess and do not disable thermal protection to work around it.
+At the time of the incident, documentation incorrectly inferred that the next pen plot required a healthy connected hotend thermistor and stable room-temperature `M105` evidence. That inference is now superseded by the confirmed physical configuration:
 
-Before the next physical plot, inspect the E0 thermistor wiring/connector and obtain stable room-temperature `M105` evidence. The durable live runner now makes that a pre-motion and periodic runtime gate.
+- the original printhead/hotend is intentionally absent;
+- there is no heater cartridge;
+- there is no hotend thermistor;
+- there are no printhead fans;
+- the pen is the intended tool;
+- idle `T:0.00` is expected.
+
+The durable rule is narrower: if Marlin itself enters `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or another kill state **during an active command transaction**, stop and report final pen state unknown. Do not convert the expected absent thermistor into a pre-motion block.
+
+The operator later reported that interacting with the printer-screen nozzle-temperature control preceded the thermal failure. Do not use nozzle-temperature controls or send heater commands in the pen-plotter configuration.
 
 ## Corrective actions completed
 
 - Added committed project-local `kobra-live` runner in `hardware-lab`.
 - Runner revalidates G-code/report before opening serial, can pin SHA-256, checks calibrated envelope/Z values and identifies the printer with `M115`.
-- Runner queries `M105` before motion and periodically during long streams; implausible temperature or Marlin thermal kill-state evidence terminates the job explicitly.
 - Runner handles the approved homing/start/stream/end sequence and waits for Marlin acknowledgement after each command.
 - A firmware kill state is reported as `FIRMWARE_HALTED_FINAL_PEN_STATE_UNKNOWN`; it is not disguised as a successful recovery pen-up.
 - Runner emits `[AGENT_PROGRESS]` checkpoints consumable by Local Agent heartbeat/status evidence.
 - Added unit/preflight tests and CI compilation/validate-only coverage.
-- Added `GOLDEN_LIVE_FLOW.md` with repository boundaries, fast path, evidence gates, thermal-health gate, fail-fast communication and recovery rules.
+- Added `GOLDEN_LIVE_FLOW.md` with repository boundaries, fast path, evidence gates, fail-fast communication and recovery rules.
 - Clarified in `host-ops` that `serial transact` is a bounded raw transaction/discovery primitive, not the Kobra long-running protocol executor.
 - Added Local Agent physical-task progress guidance so physical stages are asserted only from structured evidence.
-- Updated Kobra hardware and safety documentation with the exact `MINTEMP` evidence and the unknown final pen state.
+- Updated Kobra hardware and safety documentation with the confirmed headless pen-plotter configuration and corrected interpretation of `T:0.00`.
 
 ## Rules preventing recurrence
 
@@ -66,12 +76,12 @@ Before the next physical plot, inspect the E0 thermistor wiring/connector and ob
 5. Emit structured progress for long physical operations.
 6. Never state `homing passed`, `drawing started` or `complete` from generic heartbeat/liveness alone.
 7. Diagnose one failed boundary before retrying. No speculative retry chains.
-8. Do not repeat host/device discovery solely because the chat changed. Re-prove only state that may actually have changed; `kobra-live` always performs its own physical `M115` identity check before motion.
-9. A stable `M105` thermal-health check is mandatory before the next Kobra physical plot and is repeated during long plots.
-10. Never disable Marlin thermal protection merely to keep a pen plot moving.
+8. Do not repeat host/device discovery solely because the chat changed. Re-prove only state that may actually have changed; `kobra-live` performs its own physical `M115` identity check before motion.
+9. Do not block the current headless pen plotter on idle `M105 T:0.00`; the hotend thermistor is intentionally absent.
+10. Do not send heater commands or use nozzle-temperature controls with the headless pen setup.
+11. Treat an actual Marlin kill/halt during execution as terminal and do not issue speculative recovery motion after the firmware has halted.
+12. Before XY homing, verify the whole bed path is clear, especially the rear Y path and printer power cable.
 
 ## Golden baseline
 
-The post-incident baseline is the first `hardware-lab/main` revision after these corrective changes pass CI and the cross-repository documentation/branch audit is complete. That revision is the canonical Kobra workflow checkpoint for future sessions.
-
-A golden software/workflow checkpoint does **not** mean the printer is currently cleared for another physical plot. After the 2026-09-28 `MINTEMP`, the next physical transaction remains blocked until the E0 thermal-monitor path is inspected and stable `M105` room-temperature evidence is obtained.
+The current canonical hardware and live-flow contracts are `HARDWARE.md`, `SAFETY.md`, `WORKFLOW.md` and `GOLDEN_LIVE_FLOW.md`. This incident file remains historical evidence and must not override those current documents.
