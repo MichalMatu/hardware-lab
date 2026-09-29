@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.19.8",
-  "state": "running",
+  "state": "idle",
   "pid": 2014,
-  "updated_at": "2026-09-29T20:33:55.877875+00:00",
+  "updated_at": "2026-09-29T20:34:22.263386+00:00",
   "self_revision": "c951b6e54223ce1e1d4ed47a281597903f869f74",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "kobra2-neo-portrait-artwork-finder-retry-20260929-59",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -25,6 +25,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 2014,
   "supervisor_pid": 17429,
-  "active_resources": [],
+  "last_task_id": "kobra2-neo-portrait-artwork-finder-retry-20260929-59",
   "execution_variant": "parallel"
 }
