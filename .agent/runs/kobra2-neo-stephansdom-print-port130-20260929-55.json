@@ -1,35 +1,43 @@
 {
-  "event": "stage_progress",
-  "stage_progress": {
-    "stage_name": "kobra-live",
-    "message": "THERMAL_MONITOR_OK 1500/1784",
-    "current": 1500,
-    "total": 1784,
-    "metrics": {
-      "hotend_c": 0.0
-    }
-  },
+  "event": "command_heartbeat",
   "phase": "commands",
   "index": 1,
   "total": 1,
   "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-130\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nPY\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
   "pid": 37320,
-  "stage_name": "kobra-live",
+  "elapsed_seconds": 361.354,
+  "seconds_since_output": 8.142,
+  "updated_at": "2026-09-29T17:10:32.703724+00:00",
+  "stage_name": "command-1",
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "THERMAL_MONITOR_OK 1500/1784",
-  "progress_current": 1500,
-  "progress_total": 1784,
-  "metrics": {
-    "hotend_c": 0.0
+  "task_budget_remaining_seconds": 2036.926,
+  "stage_progress": {
+    "stage_name": "kobra-live",
+    "message": "THERMAL_MONITOR_OK 1750/1784",
+    "current": 1750,
+    "total": 1784,
+    "metrics": {
+      "hotend_c": 0.0
+    }
   },
-  "last_progress_at": "2026-09-29T17:09:27.542253+00:00",
-  "last_progress_message": "THERMAL_MONITOR_OK 1500/1784",
+  "last_progress_at": "2026-09-29T17:10:24.561919+00:00",
+  "last_progress_message": "THERMAL_MONITOR_OK 1750/1784",
+  "current_rss_mb": 9.14,
+  "peak_rss_mb": 21.22,
+  "host_load_1m": 2.47,
+  "host_memory_available_mb": 2399.81,
+  "host_memory_used_percent": 70.71,
+  "host_swap_used_mb": 1988.94,
+  "host_swap_total_mb": 3072.0,
+  "host_cpu_percent": 24.56,
+  "command_cpu_percent": 0.0,
+  "command_rss_mb": 9.14,
+  "command_children": 0,
   "task_id": "kobra2-neo-stephansdom-print-port130-20260929-55",
   "attempt_id": "bb587503cfe62df2d41bfbb4",
   "task_digest": "399748c54bce0bace865438d26f6791770d5d27de24218ec1d5dd3aeff80cd43",
   "daemon_version": "4.19.8",
-  "daemon_pid": 37066,
-  "updated_at": "2026-09-29T17:09:27.542523+00:00"
+  "daemon_pid": 37066
 }
