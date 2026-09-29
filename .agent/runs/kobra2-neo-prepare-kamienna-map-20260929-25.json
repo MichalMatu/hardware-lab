@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-prepare-kamienna-map-20260929-25",
+  "task_digest": "485e5c3a0f3c74e87bcd7b23c4ac783753c01aca11208bbc6ee62f25ee23d7e3",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T10:39:09.186586+00:00",
+  "attempt_id": "01f12869bb98112d2d5ccf79",
+  "daemon_version": "4.19.6",
+  "daemon_pid": 74354,
+  "updated_at": "2026-09-29T10:39:09.186653+00:00",
+  "pid": 74354
+}
