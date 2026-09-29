@@ -2,9 +2,12 @@
   "event": "stage_progress",
   "stage_progress": {
     "stage_name": "kobra-live",
-    "message": "DRAWING 14000/100240",
-    "current": 14000,
-    "total": 100240
+    "message": "THERMAL_MONITOR_OK 15000/100240",
+    "current": 15000,
+    "total": 100240,
+    "metrics": {
+      "hotend_c": 0.0
+    }
   },
   "phase": "commands",
   "index": 1,
@@ -15,16 +18,18 @@
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "DRAWING 14000/100240",
-  "progress_current": 14000,
+  "message": "THERMAL_MONITOR_OK 15000/100240",
+  "progress_current": 15000,
   "progress_total": 100240,
-  "metrics": null,
-  "last_progress_at": "2026-09-29T20:57:37.424219+00:00",
-  "last_progress_message": "DRAWING 14000/100240",
+  "metrics": {
+    "hotend_c": 0.0
+  },
+  "last_progress_at": "2026-09-29T20:58:42.094532+00:00",
+  "last_progress_message": "THERMAL_MONITOR_OK 15000/100240",
   "task_id": "kobra2-neo-portrait-exact-print-port130-20260929-62",
   "attempt_id": "ceeb3f01f13bd712262bf15c",
   "task_digest": "663af8c48c098b5633a8cd73922caab19f6a041205c11da99e1189c7f6d749c7",
   "daemon_version": "4.19.8",
   "daemon_pid": 14080,
-  "updated_at": "2026-09-29T20:57:37.424297+00:00"
+  "updated_at": "2026-09-29T20:58:42.094654+00:00"
 }
