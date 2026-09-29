@@ -1,0 +1,61 @@
+{
+  "id": "kobra2-neo-stephansdom-print-after-poweron-20260929-54",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T17:02:28.294852+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-120\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" \"$PORT\" <<'PY'\nimport json, sys\nfrom kobra_live import PosixSerial, _identify\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nwith PosixSerial(sys.argv[2]) as serial:\n    _identify(serial)\nprint('PRINTER_IDENTIFIED_PRECHECK', sys.argv[2], flush=True)\nPY\necho RESULT:PORT_IDENTIFIED port=$PORT\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
+      "exit_code": 1,
+      "output": "Traceback (most recent call last):\n  File \"<stdin>\", line 13, in <module>\n  File \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/src/kobra_live.py\", line 306, in _identify\n    response = serial.transact(\"M115\", timeout=12.0)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/michal/agent-workspace/repos/hardware-lab/work/projects/kobra2-neo/src/kobra_live.py\", line 290, in transact\n    raise LivePlotError(f\"timeout waiting for Marlin acknowledgement after {command!r}\")\nkobra_live.LivePlotError: timeout waiting for Marlin acknowledgement after 'M115'\n",
+      "elapsed_seconds": 12.453,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 17.83,
+      "output_policy": "stream",
+      "captured_output_chars": 600,
+      "output_truncated": false,
+      "current_rss_mb": 8.28,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 12.453
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.124
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.103
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T17:02:42.456311+00:00",
+  "task_digest": "d5da1590f69bbb151c28f76c07ae063c361c6c0a0cf2db4435d03ef51b67d1ff",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "02c23f741cdc35c477d83227",
+  "daemon_version": "4.19.8"
+}
