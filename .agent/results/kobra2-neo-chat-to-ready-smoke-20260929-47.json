@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-chat-to-ready-smoke-20260929-47",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T16:09:54.999829+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin main plot-inbox; git reset --hard origin/main; test -z \"$(git status --porcelain)\"; TMP=$(mktemp -d /tmp/kobra-chat-ready.XXXXXX); git show de057fd3a4250dd795e421cdff1d9d087f954b5d:projects/kobra2-neo/inbox/botanical-chat-ingest.svg > \"$TMP/source.svg\"; ACTUAL=$(shasum -a 256 \"$TMP/source.svg\" | awk '{print $1}'); test \"$ACTUAL\" = \"8d3f26b2354b30a9cd0671e93c6c2137973ab23330cc0cecbd6cdb30ea28a945\"; cd projects/kobra2-neo; uv sync --frozen >/dev/null; START=$(python3 -c 'import time; print(time.monotonic())'); uv run kobra-plot prepare \"$TMP/source.svg\" -o \"$TMP/job\"; SHA=$(python3 - \"$TMP/job/report.json\" <<'PY'\nimport json,sys\nr=json.load(open(sys.argv[1]))\nassert r['safety']['valid'] is True\nassert r['execution']['allowed'] is False\nassert r['profile']['pen_up_z'] == 4.97\nassert r['profile']['pen_down_z'] == 2.97\nassert r['profile']['motion']['travel_feed'] == 6000.0\nassert r['profile']['motion']['draw_feed'] == 2400.0\nassert r['profile']['motion']['z_feed'] == 360.0\nprint(r['artifacts']['gcode_sha256'])\nPY\n); uv run kobra-live \"$TMP/job/output.gcode\" --report \"$TMP/job/report.json\" --profile config/kobra2_neo_pen.toml --expect-sha256 \"$SHA\" --validate-only; END=$(python3 -c 'import time; print(time.monotonic())'); ELAPSED=$(python3 - \"$START\" \"$END\" <<'PY'\nimport sys\nprint(f'{float(sys.argv[2])-float(sys.argv[1]):.3f}')\nPY\n); echo RESULT:READY_TO_PRINT elapsed_seconds=$ELAPSED source_sha256=$ACTUAL gcode_sha256=$SHA job_dir=$TMP/job",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/hardware-lab\n * branch            main       -> FETCH_HEAD\n * branch            plot-inbox -> FETCH_HEAD\nHEAD is now at 20cb144 Refresh Kobra agent rules after maintenance closeout\nChecked 20 packages in 12ms\njob: /tmp/kobra-chat-ready.L2ygbI/job\ngeometry: 176 polylines, 2018 points, draw 9508.629 mm, travel 1676.709 mm\nnominal time: 371.82 s\nsafety: PASS\nexecution: disabled (prepare-only V1)\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PREFLIGHT_OK\",\"metrics\":{\"max_x\":203.43,\"max_y\":225.0,\"min_x\":22.57,\"min_y\":41.0,\"sha256\":\"18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4\"},\"stage_name\":\"kobra-live\",\"stage_phase\":\"preflight\",\"total\":2373}\nRESULT:KOBRA_LIVE_PREFLIGHT_OK sha256=18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4 commands=2373\nRESULT:READY_TO_PRINT elapsed_seconds=2.780 source_sha256=8d3f26b2354b30a9cd0671e93c6c2137973ab23330cc0cecbd6cdb30ea28a945 gcode_sha256=18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4 job_dir=/tmp/kobra-chat-ready.L2ygbI/job\n",
+      "elapsed_seconds": 3.96,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 106.17,
+      "output_policy": "stream",
+      "captured_output_chars": 1055,
+      "output_truncated": false,
+      "current_rss_mb": 106.17,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.96
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.093
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.064
+  },
+  "finished_at": "2026-09-29T16:10:00.636709+00:00",
+  "task_digest": "e8b6581c53e8a38693e8119431279864f3807049a415965549a93a682dcceaaa",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "attempt_id": "a860bad7147eb80ffcd12864",
+  "daemon_version": "4.19.8"
+}
