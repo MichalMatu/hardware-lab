@@ -1,0 +1,16 @@
+{
+  "id": "kobra2-neo-prepare-kamienna-map-20260929-24",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "commands": [
+    {
+      "command": "set -euo pipefail; SRC=\"$HOME/Desktop/kamienna110-map-150x150.svg\"; JOB=\"$HOME/Desktop/kamienna110-map-150x150-kobra-job-20260929\"; OUT=\"$HOME/Desktop/kamienna110-map-150x150-kobra.gcode\"; PREVIEW=\"$HOME/Desktop/kamienna110-map-150x150-kobra-preview.svg\"; REPORT=\"$HOME/Desktop/kamienna110-map-150x150-kobra-report.json\"; test -s \"$SRC\"; test ! -e \"$JOB\"; cd projects/kobra2-neo; uv sync --frozen; uv run kobra-plot doctor; uv run kobra-plot prepare \"$SRC\" -o \"$JOB\"; test -s \"$JOB/output.gcode\"; test -s \"$JOB/preview.svg\"; test -s \"$JOB/report.json\"; cp \"$JOB/output.gcode\" \"$OUT\"; cp \"$JOB/preview.svg\" \"$PREVIEW\"; cp \"$JOB/report.json\" \"$REPORT\"; echo '=== FILES ==='; ls -lh \"$OUT\" \"$PREVIEW\" \"$REPORT\"; echo '=== REPORT SUMMARY ==='; python3 - <<'PY'\nimport json, pathlib\np=pathlib.Path.home()/\"Desktop/kamienna110-map-150x150-kobra-report.json\"\nr=json.loads(p.read_text())\nfor k in (\"source\",\"geometry\",\"gcode\",\"safety\",\"execution\"):\n    if k in r: print(k, json.dumps(r[k], ensure_ascii=False, sort_keys=True))\nPY\necho '=== GCODE SANITY ==='; head -8 \"$OUT\"; echo '...'; tail -8 \"$OUT\"; if grep -En '(^|[[:space:]])(G28|G91|M10[49]|M140|M190|M82|M83)([[:space:]]|$)|(^|[[:space:]])E[-+0-9.]' \"$OUT\"; then echo 'DISALLOWED_COMMAND_FOUND'; exit 22; else echo 'NO_DISALLOWED_COMMANDS'; fi; echo -n 'SHA256='; shasum -a 256 \"$OUT\" | awk '{print $1}'; echo PREPARE_MAP_DONE"
+    }
+  ]
+}
