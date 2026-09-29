@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-continuous-path-closeout-20260929-43",
+  "task_digest": "d2d17c2f4104c4ab132e03fb48143ad36ff4c3a1a959bbc9d99e5a81f2f4e0db",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T14:53:06.313035+00:00",
+  "attempt_id": "4f3d2444e8574c2fe69892a6",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 52718,
+  "updated_at": "2026-09-29T14:53:06.313276+00:00",
+  "pid": 52718
+}
