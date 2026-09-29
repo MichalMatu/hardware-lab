@@ -1,0 +1,15 @@
+{
+  "id": "kobra2-neo-botanical-print-live-20260929-49",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 2400,
+  "idle_timeout": 600,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail; git fetch origin main; git reset --hard origin/main; test -z \"$(git status --porcelain)\"; cd projects/kobra2-neo; JOB=/tmp/kobra-chat-ready.L2ygbI/job; G=\"$JOB/output.gcode\"; R=\"$JOB/report.json\"; test -f \"$G\"; test -f \"$R\"; SHA=$(shasum -a 256 \"$G\" | awk '{print $1}'); test \"$SHA\" = \"18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4\"; uv sync --frozen >/dev/null; PORT=$(uv run python - <<'PY'\nfrom glob import glob\nfrom kobra_live import PosixSerial, _identify\nmatches=[]\nfor port in sorted(glob('/dev/cu.usbserial-*')):\n    try:\n        with PosixSerial(port) as serial:\n            _identify(serial)\n        matches.append(port)\n    except Exception:\n        pass\nif len(matches) != 1:\n    raise SystemExit(f'expected exactly one Anycubic Kobra, found {matches}')\nprint(matches[0])\nPY\n); echo RESULT:PORT_IDENTIFIED port=$PORT; uv run kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250"
+  ]
+}
