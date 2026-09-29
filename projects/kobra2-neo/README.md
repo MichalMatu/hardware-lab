@@ -1,19 +1,27 @@
 # Kobra 2 Neo pen plotter / motion platform
 
-Anycubic Kobra 2 Neo used as a reusable XY/Z motion platform. The current validated tool is a pen/marker holder; later tools may reuse the same project-level hardware and safety model.
+Anycubic Kobra 2 Neo converted into a reusable XY/Z pen-plotter motion platform. The current validated tool is a pen/marker holder; later tools may reuse the same project-level hardware and safety model.
 
-## Current validated state — 2026-09-28
+## Current validated state — 2026-09-29
 
 - Stock Marlin `bugfix-2.1.x` remains the firmware baseline.
 - USB serial is CH340 at 115200 baud; identify the printer with `M115`, not by port name alone.
+- The original printhead / hotend assembly is intentionally removed.
+- The current plotter has **no hotend heater cartridge, no hotend thermistor and no printhead fans**.
+- `M105` hotend `T:0.00` is therefore an **expected normal reading** for this machine and must not block pen plotting.
+- Heater and extrusion commands remain forbidden in plot jobs. Do not use nozzle-temperature controls on the printer screen during pen plotting.
 - A pen holder is installed and usable for bounded plotting motion.
-- The cylindrical Z sensor is present and verified as `z_min`; the rear physical button maps to `z_max`.
+- The cylindrical magnetic/proximity Z sensor is present and verified as `z_min`; it is the active Z homing reference for the pen setup. The rear physical button maps to `z_max`.
 - Current pen-tip work envelope: `X=3..223`, `Y=36..230` mm.
 - Normal plotting keeps an additional 5 mm internal margin.
 - Current pen calibration: pen-up `Z=6.12`, pen-down `Z=2.97`.
 - These coordinates are specific to the current pen, holder and paper placement and must be revalidated after mechanical changes.
-- First approved full artwork plot completed successfully on 2026-09-28: a 10 cm `MongooseLemur.svg` outline job, bounded to X=63.79..163.00 and Y=84.21..181.79, completed all 7615 streamed commands in about 14 min 44 s and finished pen-up.
-- Durable live execution is now provided by the project-local `kobra-live` runner. Do not rebuild an ad-hoc serial streamer in Local Agent task payloads.
+- Verified start sequence: `G28 X Y` -> `G28 Z` -> `G0 Z6.12 F180`; the 2026-09-29 session also verified travel to `X90.69 Y134.14` after homing.
+- Before XY homing, physically clear the complete Y-bed path. A printer power cable blocking rear travel caused a failed homing attempt on 2026-09-29; after moving the cable, the same homing sequence worked normally.
+- First approved full artwork plot completed successfully on 2026-09-28: a 10 cm `MongooseLemur.svg` outline job completed all 7615 streamed commands in about 14 min 44 s and finished pen-up.
+- Durable live execution is provided by the project-local `kobra-live` runner. Do not rebuild an ad-hoc serial streamer in Local Agent task payloads.
+
+A firmware-reported `MINTEMP`, `MAXTEMP`, `Printer halted`, `kill() called` or equivalent kill state **during an active transaction** remains a terminal failure. That is separate from the expected idle `T:0.00` caused by the intentionally absent hotend thermistor.
 
 See `docs/CALIBRATION.md`, `docs/HARDWARE.md`, `docs/SAFETY.md`, `docs/WORKFLOW.md`, `docs/PREPARE_CLI.md`, `docs/GOLDEN_LIVE_FLOW.md` and `docs/THIRD_PARTY_PLOTTER_SOFTWARE.md` before extending the workflow or trying external plotter software.
 
@@ -56,7 +64,7 @@ uv run kobra-live \
   --expect-sha256 EXPECTED_SHA256
 ```
 
-`kobra-live` performs full offline revalidation before opening the port, proves printer identity with `M115`, executes the explicit XY-home -> Z-home -> pen-up preamble, streams with acknowledgement after every command, emits Local Agent `[AGENT_PROGRESS]` checkpoints, waits for completion and finishes pen-up. See `docs/GOLDEN_LIVE_FLOW.md` for the authoritative fast path and evidence rules.
+`kobra-live` performs full offline revalidation before opening the port, proves printer identity with `M115`, applies the current headless pen-plotter hardware profile, executes the explicit XY-home -> Z-home -> pen-up preamble, streams with acknowledgement after every command, emits Local Agent `[AGENT_PROGRESS]` checkpoints, waits for completion and finishes pen-up. See `docs/GOLDEN_LIVE_FLOW.md` for the authoritative fast path and evidence rules.
 
 ## Project layout
 
