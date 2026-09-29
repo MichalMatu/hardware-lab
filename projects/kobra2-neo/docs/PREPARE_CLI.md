@@ -1,12 +1,35 @@
 # `kobra-plot` offline preparation CLI
 
-`kobra-plot` prepares inspectable pen-plotter jobs for the current Kobra 2 Neo setup. V1 is deliberately offline-only: it has no serial dependency and no `execute` command.
+`kobra-plot` converts one source file into one inspectable prepared pen-plotter job. PREPARE is deliberately offline-only and must stay independent from live serial execution.
 
-## Safety boundary
+## Boundary
 
-`prepare` may read source files and create local artifacts. It must not discover/open a serial port, home the printer, send G-code, heat/extrude, or decide that a prepared job is approved for execution.
+PREPARE may:
 
-Every V1 report contains `execution.allowed = false`.
+- read one normal source file;
+- normalize/vectorize supported input;
+- simplify/order geometry;
+- apply current Kobra orientation and fit;
+- generate preview, report and G-code;
+- validate command vocabulary, feeds, Z values and XY bounds;
+- compute artifact hashes/statistics.
+
+PREPARE must not:
+
+- open/discover a serial port;
+- home or move the printer;
+- heat/extrude;
+- edit project code;
+- commit/push as part of normal job preparation;
+- decide that the job is physically approved.
+
+## Input transport rule
+
+The input is one normal file. For generated artwork, finish conversion/vectorization first and transfer/store the result as one `.svg` (or another supported single file).
+
+Do **not** use manually split gzip/base64 chunks, a large task JSON string or a sequence of partial GitHub files as an artwork-transfer mechanism. That approach caused repeated failed preparation attempts on 2026-09-29 and is explicitly retired.
+
+If the source cannot be transferred as one file through the available connector/workspace path, stop before PREPARE and choose a proper file-transfer mechanism.
 
 ## Setup
 
@@ -17,28 +40,15 @@ uv sync
 uv run kobra-plot doctor
 ```
 
-The project pins `vpype==1.15.0`; no global vpype installation is required. External vpype calls have a 300-second timeout.
+The project pins its source-conversion dependencies. Do not rely on a different worker having a global `vpype` binary.
 
 ## SVG
 
 ```bash
-uv run kobra-plot prepare samples/svg/curve-demo.svg
-uv run kobra-plot prepare drawing.svg -o /tmp/drawing-job
+uv run kobra-plot prepare path/to/drawing.svg -o /tmp/drawing-job
 ```
 
-vpype linearizes SVG curves, simplifies geometry and orders strokes before the Kobra-specific fit/safety stage. The included `curve-demo.svg` deliberately contains Bézier `C` and `S` commands so end-to-end tests prove that curves are flattened before the strict normalized-geometry parser sees them.
-
-V1 accepts source SVG elements that map directly to plot geometry: `svg`, `g`, `path`, `line`, `polyline`, `polygon`, `rect`, `circle`, and `ellipse`. Unsupported elements such as embedded text/images, `<use>`, clipping/filter constructs and other silently-discardable content fail closed. External references are forbidden.
-
-Limits:
-
-- source size: 20 MiB;
-- XML elements: 10,000;
-- nesting depth: 128;
-- normalized polylines: 10,000;
-- normalized points: 100,000.
-
-After normalization, unexpected element types and transform attributes fail closed.
+The SVG path is linearized/normalized before the strict Kobra geometry stage. Unsupported or externally referenced SVG content must fail closed rather than disappear silently.
 
 ## Text
 
@@ -46,18 +56,25 @@ After normalization, unexpected element types and transform attributes fail clos
 uv run kobra-plot text "MILEGO DNIA" -o /tmp/milego-dnia-job
 ```
 
-A UTF-8 `.txt` file is also accepted by `prepare`. Text uses vpype's bundled Hershey vector fonts.
+UTF-8 text uses vector stroke fonts before machine fitting.
 
-## Raster and PDF inputs
+## Raster / generated images
 
-V1 recognizes common raster extensions and PDF but rejects them intentionally. A later phase must implement and test explicit pen-compatible renderers such as outline, hatch/crosshatch or stipple.
+The current core prepare CLI does not treat arbitrary raster art as magically printable. Raster/photo input requires an explicit conversion strategy (for example contour, hatch/crosshatch or stipple) that outputs normal vector/plot geometry first.
+
+For ChatGPT-generated artwork the preferred pipeline is:
+
+```text
+generated image -> deliberate vectorization/simplification -> one final SVG -> PREPARE
+```
+
+Do not combine vectorizer development with the same task that is expected to prepare or print a physical job.
 
 ## Job artifacts
 
-A successful job directory contains:
+A successful prepared job contains the equivalent of:
 
 ```text
-.kobra-plot-job
 source.<ext>
 normalized.svg
 preview.svg
@@ -65,28 +82,40 @@ output.gcode
 report.json
 ```
 
-The marker makes `--force` safe: only a directory previously created by `kobra-plot` may be recursively replaced. An arbitrary existing directory is never removed by `--force`.
-
-`normalized.svg` is the source-independent line geometry. `preview.svg` shows drawing paths in black and pen-up travel as dashed gray lines. `report.json` records source/profile/backend identity, source and artifact hashes, geometry statistics, bounds, nominal feed-time estimate and safety state.
-
-The time estimate is geometric feed-time only; it does not model firmware acceleration, planner overhead or the initial XY move to the first stroke.
+`report.json` records enough identity/safety information to bind the reviewed source/profile/G-code. Hashes must be preserved through REVIEW and PRINT.
 
 ## G-code contract
 
-The validator accepts only this generated command vocabulary:
+Generated artwork is bounded motion only. The current profile is `config/kobra2_neo_pen.toml`.
 
-- one leading `G90`;
-- `G0 X... Y... F...` only while the pen is known up, using the configured travel feed;
-- `G0 Z... F...` only for the exact configured pen-up/pen-down Z values and Z feed;
-- `G1 X... Y... F...` only while the pen is known down, using the configured draw feed;
-- one trailing `M400`.
+At the 2026-09-29 handoff it defines:
 
-Every XY move must include both X and Y and remain inside the normal drawing envelope (`X=8..218`, `Y=41..225` for the current profile). The validator rejects every other command, `E`, malformed/duplicate parameters, unexpected feeds, unsafe pen-state transitions, unexpected Z values and motion outside that envelope. `G28`, `G91`, heater commands and extrusion therefore fail closed.
+```text
+travel feed = 6000 mm/min
+draw feed   = 2400 mm/min
+Z feed      = 360 mm/min
+pen up      = Z4.97
+pen down    = Z2.97
+normal XY   = X8..218, Y41..225 mm
+end         = M400
+```
 
-The profile lives at `config/kobra2_neo_pen.toml`. Unknown/missing keys and invalid types fail closed; prepare V1 also requires the end sequence to be exactly `M400`.
+Prepared artwork must not contain homing, heaters, extrusion or unexpected relative-mode behavior. Homing is a live PRINT preamble concern.
 
-## Review before future live execution
+## Path optimization rule
 
-A prepared job is not permission to run it. Before any future execution layer accepts a job, review at least `preview.svg`, report bounds/stroke counts/distances, the complete G-code, and whether the current physical calibration still matches the pen/holder/paper.
+Stroke ordering may reduce pen-up travel. Consecutive paths may be merged without lifting only when their endpoints actually touch within a tested conservative tolerance. Never draw an unintended connector across a real gap merely to reduce Z cycles.
 
-The prepare CLI remains offline-only. A separate temporary Local Agent serial streamer has successfully completed one full approved plot, but live transport is not part of this CLI. A permanent execution layer should reuse only genuinely generic machine/serial capabilities from `host-ops` while keeping Kobra-specific policy here.
+The 2026-09-29 handoff records that this optimization was tested in a local-only commit but was not yet merged to `main`; resolve that code-maintenance gate before relying on it.
+
+## Success / failure
+
+PREPARE ends in either:
+
+```text
+READY_TO_PRINT
+```
+
+or a concrete failure. A failed PREPARE does not trigger PRINT and must not automatically spawn a chain of variant preparation tasks.
+
+Review `preview.svg`, report and G-code before physical approval. See `WORKFLOW.md` for the full stage contract.
