@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "kobra2-neo-maintenance-closeout-20260929-41",
   "task_digest": "ac6c450efc43eb5795be0145eca002fc9aea26054f90dc0b02922f00625c53dd",
-  "idle_timeout": 300,
-  "task_timeout": 1800,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-29T14:47:30.034097+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T14:47:33.216337+00:00",
   "attempt_id": "d1970ec7de2020767846ec9a",
   "daemon_version": "4.19.8",
   "daemon_pid": 43285,
-  "updated_at": "2026-09-29T14:47:30.034203+00:00",
+  "updated_at": "2026-09-29T14:47:33.483775+00:00",
   "pid": 43285
 }
