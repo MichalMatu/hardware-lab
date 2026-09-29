@@ -1,35 +1,43 @@
 {
-  "event": "stage_progress",
-  "stage_progress": {
-    "stage_name": "kobra-live",
-    "message": "THERMAL_MONITOR_OK 500/2373",
-    "current": 500,
-    "total": 2373,
-    "metrics": {
-      "hotend_c": 0.0
-    }
-  },
+  "event": "command_heartbeat",
   "phase": "commands",
   "index": 1,
   "total": 1,
   "command": "set -euo pipefail; git fetch origin main; git reset --hard origin/main; test -z \"$(git status --porcelain)\"; cd projects/kobra2-neo; JOB=/tmp/kobra-chat-ready.L2ygbI/job; G=\"$JOB/output.gcode\"; R=\"$JOB/report.json\"; test -f \"$G\"; test -f \"$R\"; SHA=$(shasum -a 256 \"$G\" | awk '{print $1}'); test \"$SHA\" = \"18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4\"; uv sync --frozen >/dev/null; PORT=$(uv run python - <<'PY'\nfrom glob import glob\nfrom kobra_live import PosixSerial, _identify\nmatches=[]\nfor port in sorted(glob('/dev/cu.usbserial-*')):\n    try:\n        with PosixSerial(port) as serial:\n            _identify(serial)\n        matches.append(port)\n    except Exception:\n        pass\nif len(matches) != 1:\n    raise SystemExit(f'expected exactly one Anycubic Kobra, found {matches}')\nprint(matches[0])\nPY\n); echo RESULT:PORT_IDENTIFIED port=$PORT; uv run kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
   "pid": 80055,
-  "stage_name": "kobra-live",
+  "elapsed_seconds": 210.847,
+  "seconds_since_output": 10.676,
+  "updated_at": "2026-09-29T16:24:08.625963+00:00",
+  "stage_name": "command-1",
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "THERMAL_MONITOR_OK 500/2373",
-  "progress_current": 500,
-  "progress_total": 2373,
-  "metrics": {
-    "hotend_c": 0.0
+  "task_budget_remaining_seconds": 2187.352,
+  "stage_progress": {
+    "stage_name": "kobra-live",
+    "message": "THERMAL_MONITOR_OK 750/2373",
+    "current": 750,
+    "total": 2373,
+    "metrics": {
+      "hotend_c": 0.0
+    }
   },
-  "last_progress_at": "2026-09-29T16:23:07.046624+00:00",
-  "last_progress_message": "THERMAL_MONITOR_OK 500/2373",
+  "last_progress_at": "2026-09-29T16:23:57.949907+00:00",
+  "last_progress_message": "THERMAL_MONITOR_OK 750/2373",
+  "current_rss_mb": 31.52,
+  "peak_rss_mb": 51.84,
+  "host_load_1m": 2.64,
+  "host_memory_available_mb": 1809.48,
+  "host_memory_used_percent": 77.91,
+  "host_swap_used_mb": 4561.62,
+  "host_swap_total_mb": 6144.0,
+  "host_cpu_percent": 41.47,
+  "command_cpu_percent": 0.0,
+  "command_rss_mb": 31.28,
+  "command_children": 2,
   "task_id": "kobra2-neo-botanical-print-live-20260929-49",
   "attempt_id": "fe2a5fe7934a4984fd03bd7f",
   "task_digest": "65493432f4b61851c7a8e664006277d79510a782e8d1d4910a4cb28c8b6fbe5f",
   "daemon_version": "4.19.8",
-  "daemon_pid": 79948,
-  "updated_at": "2026-09-29T16:23:07.047040+00:00"
+  "daemon_pid": 79948
 }
