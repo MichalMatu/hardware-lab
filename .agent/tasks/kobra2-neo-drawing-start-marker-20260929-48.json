@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-drawing-start-marker-20260929-48",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 600,
+  "task_timeout": 900,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail; git fetch origin main; git reset --hard origin/main; test -z \"$(git status --porcelain)\"; cd projects/kobra2-neo; python3 - <<'PY'\nfrom pathlib import Path\np=Path('src/kobra_live.py')\ns=p.read_text()\nold='''    started = time.monotonic()\n    homed_z = False\n    with PosixSerial(port) as serial:\n'''\nnew='''    started = time.monotonic()\n    homed_z = False\n    drawing_started = False\n    with PosixSerial(port) as serial:\n'''\nif old not in s:\n    raise SystemExit('execute state block not found')\ns=s.replace(old,new,1)\nold='''                if index == 5:\n                    _progress(\"stream\", \"DRAWING_STARTED\", current=index, total=len(commands))\n                elif index % progress_every == 0 or index == len(commands):\n'''\nnew='''                if not drawing_started and command.startswith(\"G1 \"):\n                    drawing_started = True\n                    _progress(\"stream\", \"DRAWING_STARTED\", current=index, total=len(commands))\n                elif index % progress_every == 0 or index == len(commands):\n'''\nif old not in s:\n    raise SystemExit('DRAWING_STARTED block not found')\ns=s.replace(old,new,1)\np.write_text(s)\nPY\nuv sync --frozen >/dev/null; uv run pytest -q; uv run python -m compileall -q src tests; git diff --check; git add src/kobra_live.py; git commit -m 'Emit drawing start on first draw move'; cd ../..; git push origin HEAD:main; echo RESULT:DRAWING_START_MARKER_FIXED"
+  ]
+}
