@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-maintenance-closeout-retry-20260929-42",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-29T14:49:50.635438+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\ngit fetch origin main\ngit reset --hard origin/main\ntest -z \"$(git status --porcelain)\"\ngit cat-file -e 9d4b995^{commit}\ngit cherry-pick 9d4b995\ncd projects/kobra2-neo\nuv sync --frozen >/dev/null\nuv run pytest -q\nuv run python -m compileall -q src tests\nuv run kobra-plot doctor >/dev/null\ngit diff --check\ncd ../..\ngit push origin HEAD:main\necho RESULT:KOBRA_MAINTENANCE_CLOSED",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/hardware-lab\n * branch            main       -> FETCH_HEAD\nHEAD is now at 17256b9 Refresh third-party plotter evaluation note\n[agent-work 7a3d510] Tune Kobra pen plotting motion\n Date: Tue Sep 29 15:22:43 2026 +0200\n 4 files changed, 56 insertions(+), 9 deletions(-)\nChecked 20 packages in 9ms\n.................................                                        [100%]\nTo https://github.com/MichalMatu/hardware-lab.git\n   17256b9..7a3d510  HEAD -> main\nRESULT:KOBRA_MAINTENANCE_CLOSED\n",
+      "elapsed_seconds": 20.41,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 120.86,
+      "output_policy": "stream",
+      "captured_output_chars": 525,
+      "output_truncated": false,
+      "current_rss_mb": 19.88,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 20.41
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.183
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.089
+  },
+  "finished_at": "2026-09-29T14:50:13.301137+00:00",
+  "task_digest": "c65d47dfe3ddb12d7f2f509678ab34c9b9d0f44279ff15f5b4ef69fff66a6b17",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "0cb78b151a564431f7687d4b",
+  "daemon_version": "4.19.8"
+}
