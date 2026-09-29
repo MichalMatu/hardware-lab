@@ -2,12 +2,9 @@
   "event": "stage_progress",
   "stage_progress": {
     "stage_name": "kobra-live",
-    "message": "THERMAL_MONITOR_OK 1750/2373",
-    "current": 1750,
-    "total": 2373,
-    "metrics": {
-      "hotend_c": 0.0
-    }
+    "message": "DRAWING 2100/2373",
+    "current": 2100,
+    "total": 2373
   },
   "phase": "commands",
   "index": 1,
@@ -18,18 +15,16 @@
   "stage_index": 1,
   "stage_total": 1,
   "stage_phase": "commands",
-  "message": "THERMAL_MONITOR_OK 1750/2373",
-  "progress_current": 1750,
+  "message": "DRAWING 2100/2373",
+  "progress_current": 2100,
   "progress_total": 2373,
-  "metrics": {
-    "hotend_c": 0.0
-  },
-  "last_progress_at": "2026-09-29T16:27:33.917888+00:00",
-  "last_progress_message": "THERMAL_MONITOR_OK 1750/2373",
+  "metrics": null,
+  "last_progress_at": "2026-09-29T16:28:36.616233+00:00",
+  "last_progress_message": "DRAWING 2100/2373",
   "task_id": "kobra2-neo-botanical-print-live-20260929-49",
   "attempt_id": "fe2a5fe7934a4984fd03bd7f",
   "task_digest": "65493432f4b61851c7a8e664006277d79510a782e8d1d4910a4cb28c8b6fbe5f",
   "daemon_version": "4.19.8",
   "daemon_pid": 79948,
-  "updated_at": "2026-09-29T16:27:33.918118+00:00"
+  "updated_at": "2026-09-29T16:28:36.616433+00:00"
 }
