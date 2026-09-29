@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-portrait-artwork-finder-retry-20260929-59",
+  "task_digest": "f4bcefa3ed249719193d2065b8109fc27981df70580c53f6c474be0c83b67a74",
+  "idle_timeout": 300,
+  "task_timeout": 240,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-29T20:33:59.534373+00:00",
+  "attempt_id": "ab6f861bc1a406df2836f21b",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 2014,
+  "updated_at": "2026-09-29T20:33:59.534475+00:00",
+  "pid": 2014
+}
