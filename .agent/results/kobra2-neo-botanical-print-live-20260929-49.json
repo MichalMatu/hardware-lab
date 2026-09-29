@@ -1,0 +1,60 @@
+{
+  "id": "kobra2-neo-botanical-print-live-20260929-49",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T16:20:35.976066+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin main; git reset --hard origin/main; test -z \"$(git status --porcelain)\"; cd projects/kobra2-neo; JOB=/tmp/kobra-chat-ready.L2ygbI/job; G=\"$JOB/output.gcode\"; R=\"$JOB/report.json\"; test -f \"$G\"; test -f \"$R\"; SHA=$(shasum -a 256 \"$G\" | awk '{print $1}'); test \"$SHA\" = \"18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4\"; uv sync --frozen >/dev/null; PORT=$(uv run python - <<'PY'\nfrom glob import glob\nfrom kobra_live import PosixSerial, _identify\nmatches=[]\nfor port in sorted(glob('/dev/cu.usbserial-*')):\n    try:\n        with PosixSerial(port) as serial:\n            _identify(serial)\n        matches.append(port)\n    except Exception:\n        pass\nif len(matches) != 1:\n    raise SystemExit(f'expected exactly one Anycubic Kobra, found {matches}')\nprint(matches[0])\nPY\n); echo RESULT:PORT_IDENTIFIED port=$PORT; uv run kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/hardware-lab\n * branch            main       -> FETCH_HEAD\nHEAD is now at 8f0af0a Make proven chat artwork flow canonical\nChecked 20 packages in 6ms\nRESULT:PORT_IDENTIFIED port=/dev/cu.usbserial-130\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PREFLIGHT_OK\",\"metrics\":{\"max_x\":203.43,\"max_y\":225.0,\"min_x\":22.57,\"min_y\":41.0,\"sha256\":\"18989085c5031f3e55e60b9103450d18435a0f872451e48b737cdc453bb2a8f4\"},\"stage_name\":\"kobra-live\",\"stage_phase\":\"preflight\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PRINTER_IDENTIFIED\",\"metrics\":{\"port\":\"/dev/cu.usbserial-130\"},\"stage_name\":\"kobra-live\",\"stage_phase\":\"identity\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"THERMAL_MONITOR_OK\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"HOMING_XY_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"homing\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"HOMING_Z_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"homing\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":0,\"message\":\"PEN_UP_OK\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"start\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":5,\"message\":\"DRAWING_STARTED\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":100,\"message\":\"DRAWING 100/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":200,\"message\":\"DRAWING 200/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":250,\"message\":\"THERMAL_MONITOR_OK 250/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":300,\"message\":\"DRAWING 300/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":400,\"message\":\"DRAWING 400/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":500,\"message\":\"THERMAL_MONITOR_OK 500/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":500,\"message\":\"DRAWING 500/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":600,\"message\":\"DRAWING 600/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":700,\"message\":\"DRAWING 700/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":750,\"message\":\"THERMAL_MONITOR_OK 750/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":800,\"message\":\"DRAWING 800/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":900,\"message\":\"DRAWING 900/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1000,\"message\":\"THERMAL_MONITOR_OK 1000/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1000,\"message\":\"DRAWING 1000/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1100,\"message\":\"DRAWING 1100/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1200,\"message\":\"DRAWING 1200/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1250,\"message\":\"THERMAL_MONITOR_OK 1250/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1300,\"message\":\"DRAWING 1300/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1400,\"message\":\"DRAWING 1400/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1500,\"message\":\"THERMAL_MONITOR_OK 1500/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1500,\"message\":\"DRAWING 1500/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1600,\"message\":\"DRAWING 1600/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1700,\"message\":\"DRAWING 1700/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1750,\"message\":\"THERMAL_MONITOR_OK 1750/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1800,\"message\":\"DRAWING 1800/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":1900,\"message\":\"DRAWING 1900/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2000,\"message\":\"THERMAL_MONITOR_OK 2000/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2000,\"message\":\"DRAWING 2000/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2100,\"message\":\"DRAWING 2100/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2200,\"message\":\"DRAWING 2200/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2250,\"message\":\"THERMAL_MONITOR_OK 2250/2373\",\"metrics\":{\"hotend_c\":0.0},\"stage_name\":\"kobra-live\",\"stage_phase\":\"thermal\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2300,\"message\":\"DRAWING 2300/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2373,\"message\":\"DRAWING 2373/2373\",\"stage_name\":\"kobra-live\",\"stage_phase\":\"stream\",\"total\":2373}\n[AGENT_PROGRESS] {\"current\":2373,\"message\":\"COMPLETE_PEN_UP\",\"metrics\":{\"elapsed_seconds\":511.746},\"stage_name\":\"kobra-live\",\"stage_phase\":\"complete\",\"total\":2373}\nRESULT:KOBRA_LIVE_COMPLETE_PEN_UP elapsed_seconds=511.746\n",
+      "elapsed_seconds": 525.197,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 51.84,
+      "output_policy": "stream",
+      "captured_output_chars": 5997,
+      "output_truncated": false,
+      "current_rss_mb": 15.19,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 525.197
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.125
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-29T16:29:23.172008+00:00",
+  "task_digest": "65493432f4b61851c7a8e664006277d79510a782e8d1d4910a4cb28c8b6fbe5f",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "fe2a5fe7934a4984fd03bd7f",
+  "daemon_version": "4.19.8"
+}
