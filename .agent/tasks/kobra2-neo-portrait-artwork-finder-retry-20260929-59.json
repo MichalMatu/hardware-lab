@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-portrait-artwork-finder-retry-20260929-59",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "plot-inbox",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 240,
+  "memory_limit_mb": 1024,
+  "commands": [
+    "set -euo pipefail\nEXPECTED=f8d654a8809802805c4fce869fee4ea3b554adb327f9e710b7d1dcbc47ea7f1a\nORIG='/Users/michal/Downloads/portrait_plotter_150x150mm.svg'\nTMP='/tmp/portrait_plotter_150x150mm.svg'\nrm -f \"$TMP\"\n/usr/bin/osascript <<'APPLESCRIPT'\ntell application \"Finder\"\n  set srcFile to POSIX file \"/Users/michal/Downloads/portrait_plotter_150x150mm.svg\" as alias\n  set destFolder to POSIX file \"/tmp\" as alias\n  duplicate srcFile to destFolder with replacing\nend tell\nAPPLESCRIPT\ntest -f \"$TMP\"\nACTUAL=$(shasum -a 256 \"$TMP\" | awk '{print $1}')\ntest \"$ACTUAL\" = \"$EXPECTED\"\ngit fetch origin plot-inbox\ngit reset --hard origin/plot-inbox\nDEST=projects/kobra2-neo/inbox/current.svg\ncp \"$TMP\" \"$DEST\"\nVERIFY=$(shasum -a 256 \"$DEST\" | awk '{print $1}')\ntest \"$VERIFY\" = \"$EXPECTED\"\ngit add \"$DEST\"\ngit commit -m 'Stage exact 150mm portrait SVG for plotting'\ngit push origin HEAD:plot-inbox\necho RESULT:ARTWORK_PINNED source_sha256=$VERIFY commit=$(git rev-parse HEAD)\n"
+  ]
+}
