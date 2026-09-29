@@ -40,6 +40,22 @@ def test_fit_inside_drawing_envelope() -> None:
     assert ws.draw_min_y <= result.min_y <= result.max_y <= ws.draw_max_y
 
 
+def test_current_profile_uses_two_mm_lift_and_double_speed() -> None:
+    profile = kp.load_profile()
+    assert profile.tool.pen_down_z == pytest.approx(2.97)
+    assert profile.tool.pen_up_z == pytest.approx(4.97)
+    assert profile.motion.travel_feed == pytest.approx(6000.0)
+    assert profile.motion.draw_feed == pytest.approx(2400.0)
+    assert profile.motion.z_feed == pytest.approx(360.0)
+
+
+def test_merge_touching_polylines_only_merges_touching_ends() -> None:
+    lines = [[(10.0, 50.0), (20.0, 60.0)], [(20.01, 60.0), (30.0, 70.0)], [(30.10, 70.0), (40.0, 80.0)]]
+    merged = kp.merge_touching_polylines(lines, tolerance_mm=0.02)
+    assert len(merged) == 2
+    assert merged[0][-1] == (30.0, 70.0)
+
+
 def test_generated_gcode_is_safe() -> None:
     profile = kp.load_profile()
     gcode = kp.generate_gcode([[(10.0, 50.0), (20.0, 60.0)]], profile)

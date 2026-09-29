@@ -74,6 +74,7 @@ def _load_profile(path: Path) -> dict[str, Any]:
         raise LivePlotError(f"cannot read valid profile {path}: {exc}") from exc
     try:
         workspace = value["workspace"]
+        motion = value["motion"]
         tool = value["tool"]
         return {
             "min_x": float(workspace["min_x"]) + float(workspace["margin"]),
@@ -82,6 +83,7 @@ def _load_profile(path: Path) -> dict[str, Any]:
             "max_y": float(workspace["max_y"]) - float(workspace["margin"]),
             "pen_up_z": float(tool["pen_up_z"]),
             "pen_down_z": float(tool["pen_down_z"]),
+            "z_feed": float(motion["z_feed"]),
         }
     except (KeyError, TypeError, ValueError) as exc:
         raise LivePlotError(f"profile is missing required plotting keys: {exc}") from exc
@@ -311,17 +313,19 @@ def _identify(serial: PosixSerial) -> list[str]:
 def _check_thermal_monitor(serial: PosixSerial) -> float:
     response = serial.transact("M105", timeout=10.0)
     hotend_c = extract_hotend_temperature(response)
-    # Plotting never heats the hotend, but stock Marlin still enforces its
-    # thermistor safety state. A cold-room value below 5 C is treated as an
-    # implausible/open-sensor condition and must fail before further motion.
+    # Dedicated pen plotter: hotend/heater/thermistor/fans are intentionally absent.
+    # T:0.00 is therefore normal. Firmware-reported MINTEMP/MAXTEMP/kill remains terminal.
+    if math.isclose(hotend_c, 0.0, abs_tol=0.01):
+        return hotend_c
     if not 5.0 <= hotend_c <= 80.0:
-        raise LivePlotError(f"hotend thermal monitor implausible for heater-off plotting: {hotend_c:.2f} C")
+        raise LivePlotError(f"hotend thermal monitor implausible for pen plotting: {hotend_c:.2f} C")
     return hotend_c
 
 
 def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, thermal_check_every: int = 250) -> float:
     commands: list[str] = job["commands"]
     pen_up_z = job["profile"]["pen_up_z"]
+    z_feed = job["profile"]["z_feed"]
     started = time.monotonic()
     homed_z = False
     with PosixSerial(port) as serial:
@@ -339,7 +343,7 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, therma
         _progress("homing", "HOMING_Z_OK", current=0, total=len(commands))
 
         serial.transact("G90", timeout=10.0)
-        serial.transact(f"G0 Z{pen_up_z:.2f} F180", timeout=30.0)
+        serial.transact(f"G0 Z{pen_up_z:.2f} F{z_feed:.0f}", timeout=30.0)
         _progress("start", "PEN_UP_OK", current=0, total=len(commands))
 
         try:
@@ -354,7 +358,7 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, therma
                 elif index % progress_every == 0 or index == len(commands):
                     _progress("stream", f"DRAWING {index}/{len(commands)}", current=index, total=len(commands))
 
-            serial.transact(f"G0 Z{pen_up_z:.2f} F180", timeout=30.0)
+            serial.transact(f"G0 Z{pen_up_z:.2f} F{z_feed:.0f}", timeout=30.0)
             serial.transact("M400", timeout=180.0)
         except FirmwareHaltError:
             # A Marlin kill state rejects motion. Do not claim or repeatedly
@@ -365,7 +369,7 @@ def execute(job: dict[str, Any], port: str, *, progress_every: int = 100, therma
             if homed_z:
                 try:
                     serial.transact("G90", timeout=5.0)
-                    serial.transact(f"G0 Z{pen_up_z:.2f} F180", timeout=15.0)
+                    serial.transact(f"G0 Z{pen_up_z:.2f} F{z_feed:.0f}", timeout=15.0)
                     _progress("error", "ABORT_PEN_UP_OK", current=0, total=len(commands))
                 except Exception as recovery_exc:  # pragma: no cover - hardware-only recovery
                     _progress("error", "ABORT_PEN_UP_UNCONFIRMED", current=0, total=len(commands))

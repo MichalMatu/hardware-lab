@@ -597,6 +597,23 @@ def _distance(a: Point, b: Point) -> float:
     return math.hypot(b[0] - a[0], b[1] - a[1])
 
 
+def merge_touching_polylines(polylines: list[Polyline], tolerance_mm: float = 0.02) -> list[Polyline]:
+    if tolerance_mm < 0:
+        raise GeometryError("merge tolerance must be non-negative")
+    merged: list[Polyline] = []
+    for line in polylines:
+        if len(line) < 2:
+            continue
+        current = list(line)
+        if merged and _distance(merged[-1][-1], current[0]) <= tolerance_mm:
+            if _distance(merged[-1][-1], current[0]) > 1e-9:
+                merged[-1].append(current[0])
+            merged[-1].extend(current[1:])
+        else:
+            merged.append(current)
+    return merged
+
+
 def geometry_stats(polylines: list[Polyline], profile: Profile) -> dict[str, object]:
     draw = 0.0
     travel = 0.0
@@ -907,6 +924,7 @@ def prepare_file(
     normalized_geometry = load_normalized_svg(normalized)
     input_bounds = bounds(normalized_geometry)
     fitted = fit_to_profile(normalized_geometry, profile)
+    fitted = merge_touching_polylines(fitted)
     output_bounds = bounds(fitted)
 
     gcode = generate_gcode(fitted, profile)

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from kobra_live import (
+    _check_thermal_monitor,
     LivePlotError,
     PROGRESS_PREFIX,
     extract_hotend_temperature,
@@ -39,7 +40,7 @@ def _job(tmp_path: Path, gcode: str) -> tuple[Path, Path]:
 def test_validate_known_safe_job(tmp_path: Path) -> None:
     gcode, report = _job(
         tmp_path,
-        "G90\nG0 Z6.12 F180\nG0 X10 Y50 F3000\nG0 Z2.97 F180\nG1 X20 Y60 F1200\nG0 Z6.12 F180\nM400\n",
+        "G90\nG0 Z4.97 F360\nG0 X10 Y50 F3000\nG0 Z2.97 F360\nG1 X20 Y60 F1200\nG0 Z4.97 F360\nM400\n",
     )
     result = validate_job(gcode, report, PROFILE)
     assert len(result["commands"]) == 7
@@ -83,6 +84,14 @@ def test_validate_sha_pin(tmp_path: Path) -> None:
         validate_job(gcode, report, PROFILE, expected_sha256="0" * 64)
 
 
+def test_headless_plotter_accepts_absent_hotend_thermistor() -> None:
+    class FakeSerial:
+        def transact(self, command: str, *, timeout: float) -> list[str]:
+            assert command == "M105"
+            return ["ok T:0.00 /0.00 B:23.50 /0.00"]
+    assert _check_thermal_monitor(FakeSerial()) == pytest.approx(0.0)
+
+
 def test_extract_hotend_temperature_from_m105() -> None:
     assert extract_hotend_temperature(["ok T:23.41 /0.00 B:24.00 /0.00"]) == pytest.approx(23.41)
 
@@ -95,7 +104,7 @@ def test_extract_hotend_temperature_requires_t_field() -> None:
 def test_cli_validate_only_emits_agent_progress(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     gcode, report = _job(
         tmp_path,
-        "G90\nG0 Z6.12 F180\nG0 X10 Y50 F3000\nG0 Z2.97 F180\nG1 X20 Y60 F1200\nG0 Z6.12 F180\nM400\n",
+        "G90\nG0 Z4.97 F360\nG0 X10 Y50 F3000\nG0 Z2.97 F360\nG1 X20 Y60 F1200\nG0 Z4.97 F360\nM400\n",
     )
     assert main([str(gcode), "--report", str(report), "--validate-only"]) == 0
     stdout = capsys.readouterr().out
