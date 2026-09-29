@@ -1,0 +1,14 @@
+{
+  "id": "kobra2-neo-check-tuning-commit-20260929-36",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail; git cat-file -e 9d4b995^{commit}; git show --stat --oneline --no-renames 9d4b995"
+  ]
+}
