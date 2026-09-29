@@ -1,0 +1,61 @@
+{
+  "id": "kobra2-neo-stephansdom-print-20260929-51",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-29T16:57:56.922990+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" <<'PY'\nimport json, sys\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nPY\nPORT=$(.venv/bin/python - <<'PY'\nfrom glob import glob\nfrom kobra_live import PosixSerial, _identify\nmatches=[]\nfor port in sorted(glob('/dev/cu.usbserial-*')):\n    try:\n        with PosixSerial(port) as serial:\n            _identify(serial)\n        matches.append(port)\n    except Exception:\n        pass\nif len(matches) != 1:\n    raise SystemExit(f'expected exactly one Anycubic Kobra, found {matches}')\nprint(matches[0])\nPY\n)\necho RESULT:PORT_IDENTIFIED port=$PORT\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250",
+      "exit_code": 1,
+      "output": "expected exactly one Anycubic Kobra, found []\n",
+      "elapsed_seconds": 12.424,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 23.69,
+      "output_policy": "stream",
+      "captured_output_chars": 46,
+      "output_truncated": false,
+      "current_rss_mb": 23.69,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 12.424
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.083
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-29T16:58:11.003095+00:00",
+  "task_digest": "9dce092e4277dc2c6c09bbb31573019acadaac14d15dca64353d8cf8760cc84c",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "768125767786e39edc4f5331",
+  "daemon_version": "4.19.8"
+}
