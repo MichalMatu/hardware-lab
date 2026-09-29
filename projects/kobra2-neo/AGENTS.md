@@ -103,6 +103,7 @@ M115 identity -> G28 X Y -> G28 Z -> pen up -> immutable artwork stream -> M400 
 Additional rules:
 
 - explicit operator approval is required before the full physical transaction;
+- an explicit `drukuj` request for one specific uploaded image may serve as that approval only after the immutable prepared job and automatic safety checks exist for that exact image;
 - never identify the printer solely by CH340 VID/PID or remembered port path; require `M115` identity;
 - never open a second serial session while a live task owns the printer;
 - wait for Marlin acknowledgement according to the live runner contract;
@@ -118,9 +119,17 @@ Additional rules:
 - Say `complete` only after `COMPLETE_PEN_UP` or equivalent final acknowledgement.
 - Report missing artifacts, repository mismatch, worker mismatch, serial identity failure, firmware errors and timeouts immediately.
 
-## Known handoff gate
+## Current implementation status
 
-`docs/HANDOFF.md` records that the committed profile is ahead of parts of the visible `main` implementation: the runner/generator drift must be resolved and tests passed before the next unattended live plot. Do not bypass that maintenance gate just because `kobra-live` exists.
+- `main` commit `7a3d510` aligns headless `T:0.00` handling and profile-driven Z feed with the current profile and passed the full maintenance suite (`33/33`, compileall, doctor, diff-check).
+- A read-only `SVG -> PREPARE -> kobra-live --validate-only -> READY_TO_PRINT` smoke test completed in 6.971 s.
+- Optional end-touch path reversal was implemented/tested locally as `b358070` (`35/35`) but two GitHub pushes returned `Internal Server Error`; per fail-fast rules that push was not retried again. Do not silently recreate a retry loop around it.
+
+## Fast-path product target
+
+The intended interaction is: user uploads an image in ChatGPT and says `drukuj`; normal conditions should reach `DRAWING_STARTED` in about 30 seconds.
+
+Achieve this by making ARTWORK transfer deterministic and fast, not by weakening PREPARE or PRINT safety. The one-command UX may orchestrate several internal stages, but the responsibility boundaries remain separate and observable.
 
 ## Mechanical design
 
