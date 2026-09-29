@@ -1,0 +1,15 @@
+{
+  "id": "kobra2-neo-stephansdom-print-after-poweron-20260929-54",
+  "agent_binding": "fa3dc1d7-5ee2-4b59-841c-e41918610df1",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 2400,
+  "idle_timeout": 600,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail\ncd projects/kobra2-neo\nJOB=/tmp/kobra-stephansdom-ready-20260929-50/job\nG=\"$JOB/output.gcode\"\nR=\"$JOB/report.json\"\nPORT=/dev/cu.usbserial-120\ntest -f \"$G\"\ntest -f \"$R\"\nSHA=$(shasum -a 256 \"$G\" | awk '{print $1}')\ntest \"$SHA\" = \"41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887\"\n.venv/bin/python - \"$R\" \"$PORT\" <<'PY'\nimport json, sys\nfrom kobra_live import PosixSerial, _identify\nr=json.load(open(sys.argv[1]))\nassert r['source']['sha256'] == 'b8f500646869f0ce2e6e32b0448b55e13e76198c69ea0a275d8b41d9df48321e'\nassert r['artifacts']['gcode_sha256'] == '41d314b85bfd19490af07709797681711514947748e4d00dbe5c9b440f482887'\nassert r['safety']['valid'] is True\np=r['profile']\nassert p['pen_up_z'] == 4.97 and p['pen_down_z'] == 2.97\nassert p['motion']['travel_feed'] == 6000.0\nassert p['motion']['draw_feed'] == 2400.0\nassert p['motion']['z_feed'] == 360.0\nwith PosixSerial(sys.argv[2]) as serial:\n    _identify(serial)\nprint('PRINTER_IDENTIFIED_PRECHECK', sys.argv[2], flush=True)\nPY\necho RESULT:PORT_IDENTIFIED port=$PORT\n.venv/bin/kobra-live \"$G\" --report \"$R\" --profile config/kobra2_neo_pen.toml --port \"$PORT\" --expect-sha256 \"$SHA\" --progress-every 100 --thermal-check-every 250"
+  ]
+}
