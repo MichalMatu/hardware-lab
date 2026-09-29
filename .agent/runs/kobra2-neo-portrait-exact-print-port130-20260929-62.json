@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "kobra2-neo-portrait-exact-print-port130-20260929-62",
+  "task_digest": "663af8c48c098b5633a8cd73922caab19f6a041205c11da99e1189c7f6d749c7",
+  "idle_timeout": 600,
+  "task_timeout": 9000,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-29T20:41:31.040437+00:00",
+  "attempt_id": "ceeb3f01f13bd712262bf15c",
+  "daemon_version": "4.19.8",
+  "daemon_pid": 14080,
+  "updated_at": "2026-09-29T20:41:31.040505+00:00",
+  "pid": 14080
+}
