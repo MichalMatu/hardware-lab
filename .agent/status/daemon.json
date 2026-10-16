@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.20.6",
-  "state": "running",
+  "state": "idle",
   "pid": 35417,
-  "updated_at": "2026-10-16T16:38:16.318722+00:00",
+  "updated_at": "2026-10-16T16:38:35.367003+00:00",
   "self_revision": "1df07c5160269f45f774c6d0144ed2a3b971f52e",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -16,7 +16,7 @@
   "memory_limit_mb_default": 4096,
   "memory_limit_mb_min": 0,
   "memory_limit_mb_max": 16384,
-  "current_task_id": "la-mac-b1c-lane-smoke-hardware-lab-20261016-v1",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "hardware-lab",
@@ -27,6 +27,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 35417,
   "supervisor_pid": 21126,
-  "active_resources": [],
+  "last_task_id": "la-mac-b1c-lane-smoke-hardware-lab-20261016-v1",
   "execution_variant": "parallel"
 }
