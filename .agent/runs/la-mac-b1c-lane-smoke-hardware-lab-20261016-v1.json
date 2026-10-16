@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "la-mac-b1c-lane-smoke-hardware-lab-20261016-v1",
+  "task_digest": "6c366a665b8ca7ff85cce8fbe76a5467a04e9405f121d50aaaa6844e2293f617",
+  "idle_timeout": 100,
+  "task_timeout": 300,
+  "memory_limit_mb": 460,
+  "started_at": "2026-10-16T16:38:19.877884+00:00",
+  "attempt_id": "d2c58f64d9e05d1fdc3abfe4",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 35417,
+  "updated_at": "2026-10-16T16:38:19.878116+00:00",
+  "pid": 35417
+}
