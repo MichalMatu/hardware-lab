@@ -1,16 +1,20 @@
 # ESP32-S3 Edge AI Lab
 
-Status: **scaffold only**. The scope is intentionally open.
+Status: **early project definition / scaffold**. Architecture, use cases and implementation scope remain open.
 
-A standalone workspace for experimenting with lightweight on-device data analysis and possible AI inference on ESP32-S3 hardware. The aim is to explore what is practical before deciding which capabilities, if any, should be integrated into other firmware projects such as GrowClip.
+An independent, reusable exploration of lightweight on-device intelligence for ESP32-S3 systems. The recommended long-term direction is **a small sensor/time-series intelligence module** that can interpret observations and publish insights (anomalies, short-horizon forecasts, changes in behavior, and diagnostics) without taking ownership of hardware or automation policy.
+
+See [Project direction](docs/PROJECT_DIRECTION.md) for the evolving vision, technical guardrails and BloomML donor policy.
 
 ## Working principles
 
-- Keep experiments independent from application-specific automation engines.
-- Measure internal DRAM, PSRAM, execution time and runtime impact rather than assume resource costs.
-- Separate reusable algorithms from ESP32-S3-specific integration.
-- Prefer simple, testable approaches first; do not require a neural network to call an experiment useful.
-- Do not treat an experiment as production-ready without evidence.
+- Keep experiments independent of GrowClip and other application-specific automation engines.
+- Optimize for real usefulness: compare simple signal-processing/statistical baselines with TinyML rather than assume a neural model is better.
+- Favor small internal-DRAM overhead. Evaluate PSRAM/Flash use, performance, allocation safety and latency on real hardware; zero new DRAM is not guaranteed.
+- Keep data acquisition, time-series processing, inference, results and application adapters separated.
+- Let applications decide what to do with an insight. The module must not directly actuate devices.
+- Train/evaluate on a host where appropriate; device-side inference should work offline.
+- Treat source-qualified tests and measurements as prerequisites for production integration.
 
 ## Layout
 
@@ -23,10 +27,10 @@ A standalone workspace for experimenting with lightweight on-device data analysi
 | `examples/` | Small isolated demonstrations |
 | `benchmarks/` | Resource/performance experiments |
 | `tests/` | Unit and integration tests |
-| `docs/` | Exploratory notes and decisions |
+| `docs/` | Exploratory notes, decisions and source references |
 
-## Not decided yet
+## Scope status
 
-Use cases, input datasets, frameworks, model formats, API surface, hardware targets, validation thresholds and integration strategy are **open questions**. See [docs/README.md](docs/README.md).
+This remains **documentation and directory scaffolding only**: no firmware, model, dependencies or GrowClip changes are introduced. Frameworks, interfaces, model families, target boards and acceptance thresholds have not been selected.
 
-No firmware, model, build system, dependencies or GrowClip integration is introduced by this scaffold.
+BloomML (`MichalMatu/bloomml`) is a **potential upstream donor** and is **still being actively developed**. Do not fork/synchronize it wholesale or assume its current artifacts are reusable without independent review. See the [donor notes](docs/PROJECT_DIRECTION.md#bloomml-as-a-potential-donor).
