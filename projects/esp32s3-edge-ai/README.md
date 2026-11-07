@@ -4,7 +4,7 @@ Status: **early project definition / scaffold**. Architecture, use cases and imp
 
 An independent, reusable exploration of lightweight on-device intelligence for ESP32-S3 systems. The recommended long-term direction is **a small sensor/time-series intelligence module** that can interpret observations and publish insights (anomalies, short-horizon forecasts, changes in behavior, and diagnostics) without taking ownership of hardware or automation policy.
 
-See [Project direction](docs/PROJECT_DIRECTION.md) for the evolving vision and BloomML donor policy, and [reuse research](docs/REUSE_RESEARCH.md) for practical ready-made code/library candidates.
+See [Project direction](docs/PROJECT_DIRECTION.md) for the evolving vision and BloomML donor policy, [reuse research](docs/REUSE_RESEARCH.md) for candidate code, and the [documentation audit](docs/DOCS_AUDIT_2026-11-07.md) for known gaps and unresolved readiness gates.
 
 ## Working principles
 

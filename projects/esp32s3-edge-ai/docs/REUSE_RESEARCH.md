@@ -7,11 +7,11 @@ External code has **not** been imported or benchmarked on this device.
 
 ## Executive selection
 
-**Start with BloomML + emlearn + ESP-DSP, not a large new framework.**
+**Evaluate a no-ML statistical baseline first, then reusable BloomML ideas and emlearn.** Use ESP-DSP only when measured signal-processing needs warrant it; defer larger neural stacks.
 
 - **BloomML** provides working reference ideas for trend estimation, trace/replay, schema checks, portable C++ logic, and Python/C++ parity. It is an **active, moving donor**; borrow only small validated pieces after re-checking main.
 - **emlearn** provides low-overhead portable C inference for trained models, including Gaussian mixture / Mahalanobis-style anomaly scoring. Its existing model tooling is a fast path to real, explainable experiments; no ESP32-S3 SIMD benefit is guaranteed.
-- **ESP-DSP** provides Espressif's optimized filters, FFT, vector and matrix routines. Reuse only relevant functions (initially filters/vector maths); signal processing is useful without a neural model.
+- **ESP-DSP** provides Espressif's optimized filters, FFT, vector and matrix routines. It is a conditional math accelerator, not a requirement for anomaly detection; compare a simple portable implementation first.
 - **ESP-NN** deserves a later controlled test of ESP32-S3 vector acceleration with quantized models via TFLite Micro. A faster convolution benchmark alone does not justify a heavier production stack.
 
 A viable early result is a **read-only score/forecast service** that consumes existing sensor snapshots, reports freshness/validity and never owns physical outputs. Keep framework switching and model selection behind an adapter.
@@ -31,7 +31,7 @@ Effort is an architectural estimate for a *small isolated lab integration*, not 
 | P2 | [espressif/esp-tflite-micro](https://github.com/espressif/esp-tflite-micro) | Espressif reference application integrating TFLM + ESP-NN | Apache-2.0 for component/examples; third-party notices vary | High | Example benchmark uses **internal RAM**; cannot assume equal speed with PSRAM arena |
 | Host only | [online-ml/river](https://github.com/online-ml/river) | Streaming statistics, drift/anomaly algorithms as evaluation references | BSD-3-Clause | Low for Python evaluation, high to port | Python framework is NOT MCU firmware |
 | Host only | [numenta/NAB](https://github.com/numenta/NAB) | Anomaly benchmark runner, labeled series and detection scoring | MIT repository; check individual dataset provenance | Low for offline reference | Public datasets differ from growbox signals; they do not replace domain validation |
-| Reference | [edgeimpulse/inferencing-sdk-cpp](https://github.com/edgeimpulse/inferencing-sdk-cpp) | Signal-processing/inferencing design ideas | BSD-3-Clause-Clear and mixed component licenses | Medium–high | Broader SDK and license/provenance surface than first prototype needs |
+| **License hold — reference only** | [edgeimpulse/inferencing-sdk-cpp](https://github.com/edgeimpulse/inferencing-sdk-cpp) | Architecture/design ideas; **no source copy** until resolved | Repository default BSD-3-Clause-Clear, **but** at least one file asserts paid subscription terms | High / blocked | See [dsp/config.hpp](https://github.com/edgeimpulse/inferencing-sdk-cpp/blob/master/dsp/config.hpp); conflicting per-file terms require legal/provenance review |
 | Deprioritize | [eloquentarduino/micromlgen](https://github.com/eloquentarduino/micromlgen) | Simple generated C/C++ classifiers | MIT | Low | Archived 2024; emlearn is a more maintainable first candidate |
 
 ## Concrete donor touchpoints
@@ -40,28 +40,36 @@ Effort is an architectural estimate for a *small isolated lab integration*, not 
 
 Reference observed at `main@d5044b712b9f7b56278c31f5770d853836089071`; refresh before copying.
 
-- [lib/environment_control/src/climate/ClimateTrendEstimator.cpp](https://github.com/MichalMatu/bloomml/blob/main/lib/environment_control/src/climate/ClimateTrendEstimator.cpp) — bounded samples and slope. Candidate for math-only extraction.
-- [lib/environment_control/src/climate/ClimateFeatureEncoder.cpp](https://github.com/MichalMatu/bloomml/blob/main/lib/environment_control/src/climate/ClimateFeatureEncoder.cpp) — freshness, validity, range checking and normalization **patterns**, not the fixed 44-feature climate contract.
-- [components/emlearn_runtime](https://github.com/MichalMatu/bloomml/tree/main/components/emlearn_runtime) — a small header-only emlearn subset; note this component carries its own upstream MIT notice.
-- [lib/environment_control/src/ModelRuntime.h](https://github.com/MichalMatu/bloomml/blob/main/lib/environment_control/src/ModelRuntime.h) — current generated model has **fixed global scratch buffers and requires serialized invocation**. Do not blindly copy this memory model.
-- [tools/ml/export_model.py](https://github.com/MichalMatu/bloomml/blob/main/tools/ml/export_model.py) — deterministic model/manifest/golden export.
-- [tools/ml/climate_replay.py](https://github.com/MichalMatu/bloomml/blob/main/tools/ml/climate_replay.py) and [tools/ml/generate_climate_runtime_parity.py](https://github.com/MichalMatu/bloomml/blob/main/tools/ml/generate_climate_runtime_parity.py) — reproducible replay and Python/C++ consistency.
-- [docs/ML_DECISION_REPORT.md](https://github.com/MichalMatu/bloomml/blob/main/docs/ML_DECISION_REPORT.md) — evidence that the evaluated climate ML policies did not qualify for active control; preserve rule/safety ownership.
+- [lib/environment_control/src/climate/ClimateTrendEstimator.cpp](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/lib/environment_control/src/climate/ClimateTrendEstimator.cpp) — bounded samples and slope. Candidate for math-only extraction.
+- [lib/environment_control/src/climate/ClimateFeatureEncoder.cpp](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/lib/environment_control/src/climate/ClimateFeatureEncoder.cpp) — freshness, validity, range checking and normalization **patterns**, not the fixed 44-feature climate contract.
+- [components/emlearn_runtime](https://github.com/MichalMatu/bloomml/tree/d5044b712b9f7b56278c31f5770d853836089071/components/emlearn_runtime) — a small header-only emlearn subset; note this component carries its own upstream MIT notice and may duplicate upstream emlearn if both are imported.
+- [lib/environment_control/src/ModelRuntime.h](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/lib/environment_control/src/ModelRuntime.h) — current generated model has **fixed global scratch buffers and requires serialized invocation**. Do not blindly copy this memory model.
+- [tools/ml/export_model.py](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/tools/ml/export_model.py) — deterministic model/manifest/golden export.
+- [tools/ml/climate_replay.py](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/tools/ml/climate_replay.py) and [tools/ml/generate_climate_runtime_parity.py](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/tools/ml/generate_climate_runtime_parity.py) — reproducible replay and Python/C++ consistency.
+- [docs/ML_DECISION_REPORT.md](https://github.com/MichalMatu/bloomml/blob/d5044b712b9f7b56278c31f5770d853836089071/docs/ML_DECISION_REPORT.md) — evidence that the evaluated climate ML policies did not qualify for active control; preserve rule/safety ownership.
 
 **Donor rule:** track exact source path, commit, license and upstream notice for a chosen module. Copy only reviewed portions, make interfaces project-neutral, test them independently. Do not synchronize all of BloomML or import its saved model/weights as an anomaly detector.
 
 ### emlearn
 
 - [Repository and API](https://github.com/emlearn/emlearn).
-- [Anomaly-detection documentation](https://emlearn.readthedocs.io/en/latest/anomaly_detection.html) lists **Gaussian Mixture Models** and **Mahalanobis distance / EllipticEnvelope**; output is an anomaly **score** whose threshold must be validated.
+- [Anomaly-detection documentation](https://emlearn.readthedocs.io/en/stable/anomaly_detection.html) lists **Gaussian Mixture Models** and **Mahalanobis distance / EllipticEnvelope**. These are **trained offline**, not built-in on-device adaptive learning; output is an anomaly score whose threshold must be validated.
 - Fit/calibrate on representative **normal** sensor data offline. Define false-alarm and missed-detection trade-offs with held-out labeled cases. Do not claim the library automatically learns from streaming measurements on the device.
 
 ### ESP-DSP and S3 acceleration
 
 - [ESP-DSP official examples](https://github.com/espressif/esp-dsp/tree/master/examples): basic math, IIR, FIR, FFT and Kalman.
 - [ESP-NN performance and supported chips](https://github.com/espressif/esp-nn): optimized s8 kernels for ESP32-S3 vector instructions.
-- [ESP-TFLite-Micro](https://github.com/espressif/esp-tflite-micro) has integrated ESP-NN examples. Its published S3 person-detection speedup uses internal RAM, not a PSRAM-constrained GrowClip profile.
-- [ESP-DL](https://github.com/espressif/esp-dl) supports quantized model deployment and its own `.espdl` tooling. Treat its broad model demos as **capability references**, not evidence that an anomaly model will fit our resource budget.
+- [ESP-TFLite-Micro](https://github.com/espressif/esp-tflite-micro) has integrated ESP-NN examples. Its **published performance table** explicitly states internal memory; [the person-detection example](https://github.com/espressif/esp-tflite-micro/blob/master/examples/person_detection/main/main_functions.cc) currently prefers PSRAM for its arena with internal-memory fallback. These are different conditions, not a verified PSRAM inference benchmark. Re-measure on the intended configuration.
+- [ESP-DL](https://github.com/espressif/esp-dl) supports quantized model deployment and its own `.espdl` tooling. Treat its broad model demos as **capability references**, not evidence that an anomaly model will fit our resource budget. The main repository license is MIT; bundled models/components still need separate review.
+
+## Verification notes for the candidate inventory
+
+- Licenses in the table describe upstream repositories at review time, **not unconditional permission for every vendored/generated file or trained weight**. The Edge Impulse license conflict above is a specific **stop-copy blocker**, not merely a caution.
+- The lightweight BloomML emlearn subset and full emlearn are **alternatives**, not two dependencies to import together by default. Keep a single runtime owner and validate thread-safe scratch allocation.
+- ESP-NN kernels accelerate supported quantized operations; they do not accelerate arbitrary statistical anomaly scoring. TinyMaix, TFLM and ESP-DL differ in model formats, supported operators and runtime memory needs.
+- The current Hardware Lab has no build system, installed dependency or device memory measurements. Candidate labels (`P0/P1/P2`) rank **investigation value**, not implementation readiness.
+- Each link to an upstream moving branch is informational; adoption requires a new commit pin, per-file license check, reproducible tests and explicit memory evidence.
 
 ## What *not* to copy
 
@@ -73,11 +81,11 @@ Reference observed at `main@d5044b712b9f7b56278c31f5770d853836089071`; refresh b
 
 ## Suggested first evaluation (not an approved sprint)
 
-1. Use a small, **portable time-series sample contract**: numeric value, monotonic timestamp, validity/freshness and source identifier; no hardware polling inside the detector.
+1. Start with a **portable sample contract proposal**: source ID, unit, numeric value, capture uptime/boot generation and validity/freshness. Handle missing, stale, repeated and out-of-order observations. This is not a frozen API; no hardware polling inside the detector.
 2. Extract or reimplement a very small **BloomML-inspired bounded trend** baseline (slope + EWMA or robust deviation) and test missing/stale/constant/spike/drift patterns.
 3. Evaluate `emlearn` anomaly scoring against the same labeled replay traces; compare with simple baselines, not just an ML-only score.
 4. If numerics dominate, try an isolated **ESP-DSP** implementation. If a neural model actually wins, compare **TinyMaix** and later **ESP-NN/TFLM**.
-5. Verify on ESP32-S3 with PSRAM: internal DRAM delta, largest contiguous internal block, PSRAM peak, Flash footprint, inference time, scheduling impact, boot/stop and cache-disabled safety. Also test a constrained 2 MB PSRAM profile if it is a target.
+5. Verify on ESP32-S3 with PSRAM: matched DRAM delta/minimum, largest internal free block, task stacks/TCBs, PSRAM use/peak, Flash footprint, inference latency and jitter during concurrent firmware workloads, boot/stop and cache-disabled safety. Test a 2 MB PSRAM board if it is a target; do not assume the 16 MB board result generalizes.
 6. Provide outputs to a hypothetical application adapter as **read-only state**. No direct actuation and no changes to GrowClip until a candidate is qualified.
 
 ## Decision rules

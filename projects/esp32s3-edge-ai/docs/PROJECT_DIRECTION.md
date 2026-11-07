@@ -45,9 +45,23 @@ application / hardware sensors / logs
 - The core should be portable and testable on a host without ESP32 hardware.
 - ESP32-S3-specific storage, memory and acceleration are platform concerns.
 - Data sources are supplied by the application; never require a new direct hardware polling path or microSD access for every inference.
+- For GrowClip, prefer coherent cached sensor snapshots; Data Logger's microSD archive is optional and is not an implicit dependency. Raw samples, retained-on-change samples and rollups may have different statistical meanings. Never treat aggregate rollups as equivalent to raw observations.
+- Independent host tools may load exported/consented historical datasets; MCU inference must not depend on host tools or a network connection.
 - Keep results read-only/observational. A future application may use them as Nodeflow inputs, but the AI module does not dispatch actions.
 - ML training and heavyweight experimentation can happen offline; the deployed device must not depend on cloud services.
 - Dataset format, exact output fields, sampling cadence, thresholds and algorithm interface are **undecided**.
+
+## Data and result semantics (design invariants, not a frozen schema)
+
+A future *sample* boundary should distinguish source identity and unit, a numeric observation, monotonic capture time, data quality/freshness and, where known, operating context (e.g. configured actuator command and **separately** observed physical response). Do not infer a successful measurement from a scheduling tick, archive write or HTTP refresh. Sampling cadence, unit conversion and source-specific freshness thresholds remain open.
+
+- Missing, invalid, repeated, out-of-order or delayed samples and reboot/time-base discontinuities must have explicit behavior. A new boot generally starts a new observation epoch; never silently join uptime-based windows across resets.
+- Sample history may be collected in a fixed-capacity in-memory ring and/or supplied through an offline replay adapter. Reusing already captured measurements avoids competing sensor I/O. Choose retention/window sizes only after measuring realistic rates and resource costs.
+- A result must distinguish **warming up**, **valid**, **stale/unavailable**, and **error** rather than exposing an unqualified score or anomaly boolean. A valid result should carry its source/window identity, generation/timestamp and freshness limit. Score threshold and model identity/version are needed when ML is involved; confidence is not automatically calibrated.
+- Treat sensor health checks (e.g. stale/NaN), statistical change detection, forecast error, and learned anomaly scores as distinct methods even when surfaced through one future integration API.
+- Do not allow downstream applications to treat an unavailable, warming-up or expired result as a valid positive trigger. GrowClip Nodeflow input conversion, scheduling and fail-closed behavior need their own contract review before integration.
+
+For training/evaluation, distinguish **normal-only fitting data**, calibration data and held-out test traces. Split by time/trajectory and operating regime, prevent look-ahead leakage, and record ground truth/source when available. Synthetic faults test robustness but do not alone validate real-world detection quality. Define an acceptable false-alarm burden and usefulness against a simple non-ML baseline before model selection. Retention, export security and data privacy remain to be decided.
 
 ## Resource and hardware priorities
 
@@ -56,7 +70,9 @@ Internal DRAM is scarce. Design for **minimal *measured* additional internal DRA
 - Investigate PSRAM for bounded observation windows and suitable temporary buffers, Flash for model assets/weights, and minimal internal state where required.
 - Review memory capabilities for task control blocks, task stacks, DMA and code paths with disabled Flash cache; do not assume that every buffer can safely move to PSRAM.
 - Evaluate alternatives to an extra permanent worker if scheduling and isolation can be achieved safely with less overhead. Never run long inference or blocking I/O inside time-critical control/heartbeat paths.
-- Measure internal free heap, largest free block, peak allocation, PSRAM, Flash and inference duration on the actual target configuration.
+- Measure internal free heap, largest free block, boot/runtime minima and peak allocation, PSRAM allocation/free and largest block, Flash footprint, inference duration and control-loop jitter on the actual target configuration. Compare like-for-like idle and concurrent load (network/TLS, storage, display as applicable) before and after enabling the module.
+- Distinguish resident model weights, tensor/scratch buffers, FreeRTOS stack/TCB, allocators and temporary buffers. A PSRAM stack or arena is not automatically safe on paths that can run with Flash cache disabled or require specific DMA/internal-memory capabilities.
+- GrowClip's current build uses Arduino/PlatformIO over ESP-IDF; an ESP-IDF component example is a compatibility candidate, not drop-in proof. Keep the portable core independent of both build systems.
 - ESP32-S3 offers useful vector instructions, **not a dedicated general-purpose NPU**. SIMD/ESP-NN and framework choices must be benchmarked rather than assumed faster.
 - In the absence of reliable/fresh observations or an accepted model, return an unavailable result; do not fabricate a confident score or command.
 
@@ -101,8 +117,21 @@ No donor material has been copied or integrated by this documentation change.
 - Qualify PSRAM/DRAM/Flash/latency on an ESP32-S3, including concurrency and lifecycle behavior.
 - Consider a thin GrowClip adapter **only after** a reusable module shows value and safe bounded behavior.
 
+## Readiness gates for a future implementation
+
+These are **evidence categories**, not pre-approved thresholds or a committed sprint:
+
+1. A fixed deterministic baseline that handles missing/duplicate/out-of-order/gapped data and changes across reboots.
+2. Replay on representative real or controlled data, with false positives, missed events, detection delay and utility versus a simple threshold/slope baseline; protect hold-out traces from training and tuning.
+3. Target-specific DRAM/PSRAM/Flash/CPU/time accounting, including first startup and any worker stack/TCB, and a no-silent-DRAM-fallback allocation policy.
+4. Safe lifecycle, concurrent network/storage stress, watchdog/heartbeat impact and model/runtime failure paths; cold boot, shutdown, disabled mode and no sensor/SD available.
+5. License and precise commit/component provenance for any donor code, with independent host and hardware verification before downstream reuse.
+6. A separate application-adapter contract review (e.g. GrowClip's numeric providers, sample freshness and action gating), with AI-only shadow observation first.
+
+No gate is marked passed yet; no hardware tests or firmware changes were made as part of this documentation.
+
 ## Still open
 
-The initial use case, selection of hardware/profile, data collection and retention policy, sample contracts, model format, training method, license review, memory ceilings, runtime scheduling and integration order all remain undecided.
+The initial use case, selection of hardware/profile, data source and sampling cadence, data collection/retention/privacy policy, sample and result schemas, model format, label/threshold policy, training method, component-license review, DRAM/PSRAM/Flash ceilings, runtime scheduling and integration order all remain undecided.
 
 Avoid turning these notes into a detailed spec until those choices have been discussed and measured.
