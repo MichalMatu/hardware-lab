@@ -9,6 +9,7 @@ This repository consolidates several previously standalone repositories while re
 - `projects/esp_rs` — ESP Rust experiments and starter firmware
 - `projects/rp_pi2_zero` — Raspberry Pi Zero 2 W setup and experiments
 - `projects/modules` — ESP32-family module experiments
+- `projects/esp32s3-edge-ai` — modular ESP32-S3 edge AI experiments (scaffold only)
 - `projects/nrf52840` — nRF52840 SuperMini / nice!nano experiments
 - `projects/LilyGo_4.7` — LilyGo T5 4.7-inch e-paper firmware
 - `projects/milkV256mb` — Milk-V Duo 256 setup and experiments
